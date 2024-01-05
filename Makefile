@@ -1,6 +1,6 @@
-SRCS = main.cpp Parsing.cpp
+SRCS = main.cpp Parsing.cpp Server.cpp
 
-INCS = Parsing.hpp
+INCS = Parsing.hpp Server.hpp
 
 OBJS = $(SRCS:.cpp=.o)
 
