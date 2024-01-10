@@ -1,5 +1,7 @@
 
-#include "Parsing.hpp"
+#include "code/includes/ServerConfig.hpp"
+#include "code/includes/Config.hpp"
+#include "code/includes/LocationConfig.hpp"
 
 int main(int argc, char **argv)
 {
@@ -17,7 +19,7 @@ int main(int argc, char **argv)
         path = "configuration_file.txt";
       else
         path = argv[1];
-      Parsing parsing(path);
+      Config config(path);
 
     }
     catch(const std::exception& e)

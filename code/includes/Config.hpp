@@ -1,32 +1,43 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
-#include <map>
-#include <vector>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <string>
+#include <vector>
 
-class Server {
+class ServerConfig;
+
+class Config
+{
   public:
-      Server();
-      Server(Server const &src);
-      Server &operator=(Server const &rhs);
-      ~Server();
+      Config();
+      Config(std::string path);
+      Config(Config const &src);
+      Config &operator=(Config const &rhs);
+      ~Config();
+      void trimComments(std::string &content);
+      void trimSpaces(std::string &content);
+      class ConfigException : public std::exception {
+        public:
+          ConfigException(std::string message) throw()
+          {
+            _msg = "Parsing problem: " + message;
+          };
+          virtual const char* what() const throw()
+          {
+            return(_msg.c_str());
+          }
+        private:
+          std::string _msg;
+      };
   private:
-    std::string _ip;
-    unsigned int _clientMaxBodySize;
-    unsigned int _port;
-    unsigned int _host;
-    std::string _server_names;
-	  std::map<int, std::string> _errorPages;
-	  std::string _key;
-	  std::vector<std::string> _methods;
-	  std::string _redirection;
-	  std::string _root;
-	  std::string _uploads;
-	  bool _autoindex;
-	  std::string _index;
-
+    bool _foundServer;
+    void _parse(std::ifstream &configurationFile);
+    std::string _extractElements(std::string &line, std::ifstream &configurationFile);
+    std::string _extractPath(std::string &line);
+    std::vector<ServerConfig> _servers;
 };
 #endif
