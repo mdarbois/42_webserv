@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 12:05:45 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/10 15:06:36 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,27 +23,26 @@ typedef enum eSocketType
 {
 	CLIENT,
 	SERVER
-};
+}t_socketType;
 
 class Socket
 {
 
 	public:
 		~Socket();
+		Socket();
+		Socket( Socket const & src );
+		Socket &		operator=( Socket const & rhs );
 
 		virtual void	setUpSocket() = 0;
-		eSocketType		getType() const;
+		t_socketType	getType() const;
 		int				getFD() const;
 
 		bool			operator==(const Socket& other);
 
 	protected:
-		eSocketType	_type;
-		int			_fd;
-		Socket();
-		Socket();
-		Socket( Socket const & src );
-		Socket &		operator=( Socket const & rhs );
+		t_socketType	_type;
+		int				_fd;
 };
 
 //std::ostream &			operator<<( std::ostream & o, Socket const & i );

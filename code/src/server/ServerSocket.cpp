@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 12:20:07 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/10 16:31:20 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ ServerSocket::ServerSocket( const ServerSocket & src )
 {
 }
 
+ServerSocket::ServerSocket()
+{
+}
+
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -44,10 +48,13 @@ ServerSocket::~ServerSocket()
 
 ServerSocket &				ServerSocket::operator=( ServerSocket const & rhs )
 {
-	//if ( this != &rhs )
-	//{
-		//this->_value = rhs.getValue();
-	//}
+	if ( this != &rhs )
+	{
+		this->_fd = rhs._fd;
+		this->_ip = rhs._ip;
+		this->_port = rhs._port;
+		this->_type = rhs._type;
+	}
 	return *this;
 }
 
@@ -61,11 +68,6 @@ std::ostream &			operator<<( std::ostream & o, ServerSocket const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
-
-
-/*
-** --------------------------------- ACCESSOR ---------------------------------
-*/
 void	ServerSocket::setUpSocket()
 {
 	// Create socket
@@ -76,14 +78,13 @@ void	ServerSocket::setUpSocket()
 	}
 
 	// Set up server address structure
-	struct sockaddr_in	server_addr;
-	memset( &server_addr, 0, sizeof(server_addr) );
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(_port);
+	memset( &_serverSockAddr, 0, sizeof(_serverSockAddr) );
+	_serverSockAddr.sin_family = AF_INET;
+	_serverSockAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverSockAddr.sin_port = htons(_port);
 
 	// Bind the socket
-	if (bind(_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+	if (bind(_fd, (struct sockaddr*)&_serverSockAddr, sizeof(_serverSockAddr)) == -1) {
 		std::cerr << "Error binding socket\n";
 		close(_fd);
 		exit(EXIT_FAILURE);
@@ -95,6 +96,21 @@ void	ServerSocket::setUpSocket()
 		close(_fd);
 		exit(EXIT_FAILURE);
 	}
+	std::cout << "Created Server Socket" << std::endl;
 }
+
+/*
+** --------------------------------- ACCESSOR ---------------------------------
+*/
+int	ServerSocket::getPort() const
+{
+	return (_port);
+}
+
+struct sockaddr_in ServerSocket::getAddress() const
+{
+	return (_serverSockAddr);
+}
+
 
 /* ************************************************************************** */

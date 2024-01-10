@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 12:25:33 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/10 18:37:51 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,17 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ClientSocket::ClientSocket(int serverFD)
+ClientSocket::ClientSocket(int connectingServerFD)
 {
-	_connectingServerFD = serverFD;
+	_connectingServerFD = connectingServerFD;
 	setUpSocket();
 }
 
 ClientSocket::ClientSocket( const ClientSocket & src )
+{
+}
+
+ClientSocket::ClientSocket()
 {
 }
 
@@ -63,6 +67,7 @@ void	ClientSocket::setUpSocket()
 {
 	// Accept
 	_fd = accept(_connectingServerFD, NULL, NULL);
+	//client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
 	if (_fd == -1) {
 		std::cerr << "Error accepting connection\n";
 		exit(EXIT_FAILURE);

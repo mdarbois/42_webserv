@@ -6,12 +6,12 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 12:29:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 12:29:20 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/10 15:53:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "Parsing.hpp"
-#include "./includes/Server.hpp"
+#include "../../includes/Server.hpp"
 
 int main(int argc, char **argv)
 {
@@ -20,6 +20,9 @@ int main(int argc, char **argv)
 		std::cout << "Invalid number of arguments" << std::endl;
 		return (1);
 	}
+	
+	Server	server;
+	server.run();
 	/* else
 	{
 		try
@@ -38,9 +41,6 @@ int main(int argc, char **argv)
 			return (1);
 		}
 	} */
-
-
-
-
+	
 	return (0);
 }

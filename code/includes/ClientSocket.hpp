@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 12:25:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/10 15:47:55 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,24 @@
 # include <iostream>
 # include <string>
 #include "Socket.hpp"
+#include "ServerSocket.hpp"
+
+class ServerSocket;
 
 class ClientSocket: public Socket
 {
 
 	public:
-		ClientSocket(int serverFD);
+		ClientSocket(int connectingServerFD);
+		~ClientSocket();
+		ClientSocket();
+		ClientSocket( ClientSocket const & src );
+		ClientSocket &		operator=( ClientSocket const & rhs );
+		
 		void	setUpSocket();
 
 	private:
 		int	_connectingServerFD;
-		~ClientSocket();
-		ClientSocket( ClientSocket const & src );
-		ClientSocket &		operator=( ClientSocket const & rhs );
 
 };
 
