@@ -1,58 +1,49 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 11:37:36 by aehrlich         ###   ########.fr       */
+/*   Created: 2024/01/10 11:17:13 by aehrlich          #+#    #+#             */
+/*   Updated: 2024/01/10 11:59:16 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "../../includes/Socket.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Server::Server()
-{
-}
-
-Server::Server( const Server & src )
-{
-}
+//Socket::Socket() {}
+//Socket::Socket( const Socket & src ) {}
+//Socket::Socket() {}
 
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Server::~Server()
-{
-}
+Socket::~Socket() {}
 
 
 /*
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-Server &				Server::operator=( Server const & rhs )
-{
-	//if ( this != &rhs )
-	//{
-		//this->_value = rhs.getValue();
-	//}
-	return *this;
-}
+Socket &				Socket::operator=( Socket const & rhs ) {}
 
-std::ostream &			operator<<( std::ostream & o, Server const & i )
+std::ostream &			operator<<( std::ostream & o, Socket const & i )
 {
 	//o << "Value = " << i.getValue();
 	return o;
 }
 
+bool	Socket::operator==(const Socket& other)
+{
+	return this->_fd == other.getFD();
+}
 
 /*
 ** --------------------------------- METHODS ----------------------------------
@@ -62,6 +53,14 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
+eSocketType	Socket::getType() const
+{
+	return (_type);
+}
 
+int	Socket::getFD() const
+{
+	return (_fd);
+}
 
 /* ************************************************************************** */
