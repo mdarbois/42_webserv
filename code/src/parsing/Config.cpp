@@ -64,14 +64,6 @@ void Config::_parse(std::ifstream &configurationFile)
 			serverStream.str("");
 			serverStream.clear();
 		}
-
-	/* 	if (foundServer && line.find("listen") != std::string::npos)
-		if (foundServer && line.find("server_names") != std::string::npos)
-		if (foundServer && line.find("host") != std::string::npos)
-		if (foundServer && line.find("root") != std::string::npos)
-		if (foundServer && line.find("index") != std::string::npos)
-		if (foundServer && line.find("error_pages") != std::string::npos)
-		if (foundServer && line.find("client_max_body_size") != std::string::npos) */
 		else if (foundServer && line.find("location") != std::string::npos)
 		{
 			std::string path = _extractPath(line, line.find("location"), strlen("location"));

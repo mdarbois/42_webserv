@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     {
       std::string path;
       if (argc == 1)
-        path = "configuration_file.txt";
+        path = "./resources/configuration_file.txt";
       else
         path = argv[1];
       Config config(path);

@@ -33,12 +33,7 @@ class ServerConfig {
 
 
 
-	 /*  std::string _key;
-	  std::vector<std::string> _methods;
-	  std::string _redirection;
-	  std::string _root;
-	  std::string _uploads;
-	  bool _autoindex; */
+
 	 
 
 };

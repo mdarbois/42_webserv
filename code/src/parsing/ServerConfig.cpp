@@ -90,24 +90,5 @@ std::vector<int> ServerConfig::_extractPorts(std::string &line, size_t pos, size
 	return values;
 }
 
-std::string ServerConfig::_extractString(std::string &line, size_t pos, size_t length)
-{
-  if (pos != std::string::npos)
-		line.erase(pos, length);
-  line.erase(line.find(";"), 1);
- return (line);
-}
-
-unsigned int ServerConfig::_extractInt(std::string &line, size_t pos, size_t length)
-{
-   if (pos != std::string::npos)
-		line.erase(pos, length);
-	trimSpaces(line);
-  line.erase(line.find(";"), 1);
-  std::istringstream  lineStream(line);
-  int intNumber;
-  lineStream >> intNumber;
-  return intNumber;
-}
 
 void ServerConfig::_parseErrorPages()
