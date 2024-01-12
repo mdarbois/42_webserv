@@ -4,18 +4,40 @@
 # include <iostream>
 # include <string>
 #include <vector>
+#include <cstring>
+#include "utils.hpp"
+# include <sstream>
+#include <stdexcept>
 
 class LocationConfig
 {
 
 	public:
-
 		LocationConfig();
 		LocationConfig(std::stringstream &elements);
 		LocationConfig( LocationConfig const & src );
 		~LocationConfig();
 
 		LocationConfig &		operator=( LocationConfig const & rhs );
+		std::vector<std::string> _extractMethods(std::string &line, size_t pos, size_t length);
+		void _setDefaultLocations();
+		
+		std::vector<std::string> getMethods(void) const;
+		std::string getRedirection(void) const;
+		std::string getRoot(void) const;
+		std::string getIndex(void) const;
+		bool    getAutoindex(void) const;
+		std::string getUploads(void) const;
+
+		/* class LocationConfigException : public std::exception {
+        public:
+          virtual const char* what(std::string) const throw()
+          {
+            return(_msg.c_str());
+          }
+        private:
+          std::string _msg;
+      }; */
 
 	private:
 	  std::vector<std::string> _methods;

@@ -1,6 +1,8 @@
+#include "../../includes/utils.hpp"
+
 void trimComments(std::string &content)
 {
-  size_t pos_start;
+  	size_t pos_start;
 
 	pos_start = content.find('#');
 	while (pos_start != std::string::npos)
@@ -25,16 +27,15 @@ void trimSpaces(std::string &content)
 	content = content.substr(0, i + 1);
 }
 
-
-std::string _extractString(std::string &line, size_t pos, size_t length)
+std::string extractString(std::string &line, size_t pos, size_t length)
 {
   if (pos != std::string::npos)
 		line.erase(pos, length);
   line.erase(line.find(";"), 1);
- return (line);
+ 	return (line);
 }
 
-unsigned int _extractInt(std::string &line, size_t pos, size_t length)
+unsigned int extractInt(std::string &line, size_t pos, size_t length)
 {
    if (pos != std::string::npos)
 		line.erase(pos, length);

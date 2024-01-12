@@ -11,13 +11,13 @@ Config::Config(std::string path) {
 	_foundServer = false;
   std::cout << "Config fancy constructor called" << std::endl;
   if (path.empty() || path.length() == 0 || path.find(".txt") == std::string::npos)
-    throw ConfigException("Path not valid");
+    throw std::runtime_error("Config: Path not valid");
   //should we check more? access permissions to be checked (R_OK, W_OK, X_OK) or the existence (F_OK)?
   if (access(path.c_str(), R_OK) == -1)
-    throw ConfigException("File not accessible");
+    throw std::runtime_error("Config: File not accessible");
   std::ifstream configurationFile(path.c_str());
   if(!configurationFile || !configurationFile.is_open())
-    throw ConfigException("Error opening configuration file");
+    throw std::runtime_error("Config: Error opening configuration file");
 
   _parse(configurationFile);
   
@@ -53,36 +53,39 @@ void Config::_parse(std::ifstream &configurationFile)
 	std::map<std::string, LocationConfig> locations;
 	while (std::getline(configurationFile, line))
 	{
+		trimSpaces(line);
 		if (line.empty())
 			continue;
 		else if (line.find("#") != std::string::npos)
 			trimComments(line);
-		trimSpaces(line);
 		else if (line.find("server {") != std::string::npos)
 		{
-			foundServer = true;
+			_foundServer = true;
 			serverStream.str("");
 			serverStream.clear();
 		}
-		else if (foundServer && line.find("location") != std::string::npos)
+		else if (_foundServer)
 		{
-			std::string path = _extractPath(line, line.find("location"), strlen("location"));
-			std::stringstream elements(_extractElements(line, configurationFile));
-			locations.insert(std::make_pair(path, LocationConfig(elements)));
+			if(line.find("location") != std::string::npos)
+			{
+				std::string path = _extractPath(line, line.find("location"), strlen("location"));
+				std::stringstream elements(_extractElements(line, configurationFile));
+				locations.insert(std::make_pair(path, LocationConfig(elements)));
+			}
+			else if (_foundServer && line.find("}") != std::string::npos)
+			{
+				ServerConfig server(serverStream, _servers.size(), locations);
+				_servers.push_back(server);
+				locations.clear();
+			}
+			else if (_foundServer)
+				serverStream << line << std::endl;
+			else
+				throw std::runtime_error("Config: Wrong keyword found");
 		}
-		else if (foundServer && line.find("}") != std::string::npos)
-		{
-			ServerConfig server(serverStream, _servers.size(), locations);
-			_servers.push_back(server);
-			locations.clear();
-		}
-		else if (foundServer)
-			serverStream << line << std::endl;
-		else
-			throw ConfigException("Wrong keyword found");
 	}
-	if (!foundServer)
-    	throw ConfigException("No server found");
+	if (!_foundServer)
+    	throw std::runtime_error("Config: No server found");
 }
 
 std::string Config::_extractElements(std::string &line, std::ifstream &configurationFile)
@@ -94,13 +97,15 @@ std::string Config::_extractElements(std::string &line, std::ifstream &configura
     start = line.find_first_of("{", start) + 1;
     substr = line.substr(start, end - start);
     std::getline(configurationFile, line, '}');
+	printf("line = %s\n", (substr + line).c_str());
     return (substr + line);
 }
 
 std::string Config::_extractPath(std::string &line, size_t pos, size_t length)
 {
-	if (pos != std::string::npos)
-		line.erase(pos, length);
+	//if (pos != std::string::npos)
+	line.erase(pos, length);
+	line.resize(line.size() - 1);
 	trimSpaces(line);
 	return (line);
 }
@@ -172,20 +177,3 @@ std::string Config::_extractPath(std::string &line, size_t pos, size_t length)
 	return (start);
 }
  */
-
-/*createServers
-key == "listen"
-key == "location" ?
-key == "host"
-key == "root"
-key == "errorPages"
-key == "clientMaxBodySize"
-key == "server_names" ?
-key == "index"
-key == "autoindex"
-//key == "ip"
-//key == "ports"
-// key == "methods"
-// key == "redirection"
-// key == "uploads"
-*/

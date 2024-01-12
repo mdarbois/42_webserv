@@ -4,9 +4,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include "utils.hpp"
+#include <stdexcept>
 
 class ServerConfig;
 
@@ -18,13 +21,12 @@ class Config
       Config(Config const &src);
       Config &operator=(Config const &rhs);
       ~Config();
-      void trimComments(std::string &content);
-      void trimSpaces(std::string &content);
+/* 
       class ConfigException : public std::exception {
         public:
           ConfigException(std::string message) throw()
           {
-            _msg = "Parsing problem: " + message;
+            _msg = "Config Parsing problem: " + message;
           };
           virtual const char* what() const throw()
           {
@@ -32,12 +34,12 @@ class Config
           }
         private:
           std::string _msg;
-      };
+      }; */
   private:
     bool _foundServer;
     void _parse(std::ifstream &configurationFile);
     std::string _extractElements(std::string &line, std::ifstream &configurationFile);
-    std::string _extractPath(std::string &line);
+    std::string _extractPath(std::string &line, size_t pos, size_t length);
     std::vector<ServerConfig> _servers;
 };
 #endif

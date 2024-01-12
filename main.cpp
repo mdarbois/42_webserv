@@ -2,6 +2,7 @@
 #include "code/includes/ServerConfig.hpp"
 #include "code/includes/Config.hpp"
 #include "code/includes/LocationConfig.hpp"
+#include "code/includes/utils.hpp"
 
 int main(int argc, char **argv)
 {
