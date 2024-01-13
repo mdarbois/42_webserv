@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 18:45:44 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/13 11:29:40 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,21 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+std::string	_buildResponse(std::string body)
+{
+	std::string	crlf = "\r\n";
+	std::string	response;
+	std::string	lengthStr = std::to_string(body.length());
+
+	response += "HTTP/1.1 200 OK" + crlf;			// Status-Line
+	response += "Content-Type: text/html" + crlf;	// Entity-Header-Field
+	response += "Content-Length: " + lengthStr + crlf;		// Entity-Header-Field
+	response += crlf;
+	response += body + crlf;				// message-body
+	response += crlf;
+	
+	return response;
+}
 	void	Server::run()
 	{
 		std::cout << "Server listening on port " << 18000 << "...\n";
@@ -66,25 +81,15 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 			// Accept connection
 			_testClientSocket = new ClientSocket(_mainSocket.getFD());
 			// Handle request in a separate function
-
-			//read out the request
-			char buf[10];
-			int n;
-			while ((n = read(_testClientSocket->getFD(), buf, sizeof(buf) - 1)) > 0)
+			if (_testClientSocket->getFD() < 0)
 			{
-				buf[n] = '\0';
-				std::cout << buf;
+				std::cerr << "Err creating client socket" << std::endl;
+				exit(EXIT_FAILURE);
 			}
-			if (n < 0)
-			{
-				// Handle the error case (e.g., print an error message)
-				std::cerr << "Error reading from socket\n";
-				return ;
-			}
-			
-			const char* response = "HTTP/1.1 200 OK\r\n\r\nMARIEEEEEsadfasdfadfa";
-			send(_testClientSocket->getFD(), response, strlen(response), 0);
+			std::string	response = _buildResponse("YOOOOOO WASSUP?!");
+			send(_testClientSocket->getFD(), response.c_str(), strlen(response.c_str()), 0);
 			close(_testClientSocket->getFD());
+			std::cerr << "Sent response" << std::endl;
 			delete _testClientSocket;
 		}
 		// Close the server socket
