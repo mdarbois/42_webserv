@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/13 11:29:40 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/13 13:03:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,15 @@
 
 Server::Server()
 {
-	_mainSocket = ServerSocket(18000, 2130706433); //127.0.0.1 = 2130706433
+	for (int i = 0; i < nbrServers; i++)
+	{
+		_sockets.push_back(new ServerSocket(serverPorts[i], serverIPs[i]));
+		struct pollfd newPollFD;
+		_pollFDs.push_back(newPollFD);
+		_pollFDs[i].fd = _sockets[i]->getFD();
+		_pollFDs[i].events = 0;
+		_pollFDs[i].events = _pollFDs[i].events | POLLIN;
+	}
 }
 
 Server::Server( const Server & src )
@@ -75,25 +83,44 @@ std::string	_buildResponse(std::string body)
 }
 	void	Server::run()
 	{
-		std::cout << "Server listening on port " << 18000 << "...\n";
-		while (true)
+		int timeOut = TIMEOUT_POLL;
+		int pollRegistered = 0;
+		ClientSocket	*temp;
+		while (4242)
 		{
-			// Accept connection
-			_testClientSocket = new ClientSocket(_mainSocket.getFD());
-			// Handle request in a separate function
-			if (_testClientSocket->getFD() < 0)
+			while (!pollRegistered)
 			{
-				std::cerr << "Err creating client socket" << std::endl;
-				exit(EXIT_FAILURE);
+				if ( (pollRegistered = poll(&_pollFDs[0], nbrServers, timeOut)) < 0)
+				{
+					std::cerr << "error: poll() failed";
+					std::exit(EXIT_FAILURE);
+				}
 			}
-			std::string	response = _buildResponse("YOOOOOO WASSUP?!");
-			send(_testClientSocket->getFD(), response.c_str(), strlen(response.c_str()), 0);
-			close(_testClientSocket->getFD());
-			std::cerr << "Sent response" << std::endl;
-			delete _testClientSocket;
+			
+			//Check every server if a new connection has been requested
+			for (int i = 0; i < nbrServers; i++)
+			{
+				if ( (_pollFDs[i].revents & POLLIN) == POLLIN )
+				{
+					std::cout << "\r" << "Client connected on server: " << i << " with FD : " << _pollFDs[i].fd << "on PORT: " << _sockets[i]->getFD() << std::endl;
+					temp = new ClientSocket(_sockets[i]->getFD());
+					if ( temp->getFD() < 0)
+					{
+						std::cerr << "Err creating client socket" << std::endl;
+						std::exit(EXIT_FAILURE);
+					}
+					std::string	response = _buildResponse("Hello from Server " + std::to_string(i));
+					send(temp->getFD(), response.c_str(), strlen(response.c_str()), 0);
+					close(temp->getFD());
+					std::cerr << "Sent response" << std::endl;
+					delete temp;
+				}
+			}
+			pollRegistered = 0;
 		}
 		// Close the server socket
-		close(_mainSocket.getFD());
+		for (int i = 0; i < nbrServers; i++)
+			close(_sockets[i]->getFD());
 	}
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

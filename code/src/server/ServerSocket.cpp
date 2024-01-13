@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 16:31:20 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/13 12:39:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,12 @@ void	ServerSocket::setUpSocket()
 	}
 
 	// Listen for incoming connections
-	if (listen(_fd, MAX_CONNECTIONS) == -1) {
+	if (listen(_fd, 100) == -1) {
 		std::cerr << "Error listening for connections\n";
 		close(_fd);
 		exit(EXIT_FAILURE);
 	}
-	std::cout << "Created Server Socket" << std::endl;
+	std::cout << "Created Server Socket listening to port" << _port << std::endl;
 }
 
 /*
