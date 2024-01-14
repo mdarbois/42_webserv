@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 17:53:04 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/14 21:55:55 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <poll.h>
 
 typedef enum eSocketType
 {
@@ -37,12 +38,13 @@ class Socket
 		virtual void	setUpSocket() = 0;
 		t_socketType	getType() const;
 		int				getFD() const;
-
+		void			setPollFD(int fd, short events, short revents);
+		struct pollfd	getPollFD() const;
 		bool			operator==(const Socket& other);
 
 	protected:
 		t_socketType	_type;
-		int				_fd;
+		struct pollfd	_pollFD;
 };
 
 //std::ostream &			operator<<( std::ostream & o, Socket const & i );
