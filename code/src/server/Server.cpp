@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 17:52:15 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/14 22:11:39 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,12 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-void	Server::_setPollFD(struct pollfd *pfd, int fd, short events, short revents)
-{
-	pfd->events = events;
-	pfd->revents = revents;
-	pfd->fd = fd;
-}
-
 Server::Server()
 {
-	//initialize the pollFDs
-	for (int i = 0; i < MAX_CONNECTIONS; i++)
-		_setPollFD(&_pollFDs[i], -1, 0, 0);
-	
 	//This should be set later according to the config file
 	for (int i = 0; i < nbrServers; i++)
-	{
 		_sockets.push_back(new ServerSocket(serverPorts[i], serverIPs[i]));
-		_pollFDs[i].fd = _sockets[i]->getFD();
-		_pollFDs[i].events = 0;
-		_pollFDs[i].events = _pollFDs[i].events | POLLIN;
-	}
+	_updatePollFDArray();
 }
 
 Server::Server( const Server & src )
@@ -76,6 +61,22 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+/*
+	The pollfd of each socket is attatched to the socket. This makes deleting and addign new ones easaier.
+	After each deletion or adding of a socket to the _sockets, the pollFD Arr needs to be updated.
+	The poll method needs the the pollFD Array.
+*/
+void	Server::_updatePollFDArray()
+{
+	for (int i = 0; i < MAX_CONNECTIONS; i++)
+	{
+		memset(&_pollFDs[i], 0, sizeof(struct pollfd));
+		if (i < _sockets.size())
+			_pollFDs[i] = _sockets[i]->getPollFD();
+	}
+}
+
 std::string	_buildResponse(std::string body)
 {
 	std::string	crlf = "\r\n";
@@ -128,7 +129,7 @@ void	Server::run()
 	while (4242) //react to sigint later
 	{
 		//Check all monitored fd with poll if an event occured
-		if ( (pollResult = poll(&_pollFDs[0], nbrServers, TIMEOUT_POLL)) < 0)
+		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
 		{
 			std::cerr << "error: poll() failed";
 			std::exit(EXIT_FAILURE);
