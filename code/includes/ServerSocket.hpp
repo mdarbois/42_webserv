@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:52 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 15:36:46 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/13 13:48:22 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,8 @@
 
 # include <iostream>
 # include <string>
+# include <fcntl.h>
 # include "Socket.hpp"
-
-#define MAX_CONNECTIONS 10
 
 class ServerSocket: public Socket
 {

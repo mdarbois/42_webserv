@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/13 12:39:25 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/14 17:53:33 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,25 @@ void	ServerSocket::setUpSocket()
 		exit(EXIT_FAILURE);
 	}
 
+	// Reusable Port and Socket
+	int on = 1;
+	if ( setsockopt(_fd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
+	{
+		perror("setsockop()");
+		std::exit(EXIT_FAILURE);
+	}
+
+	// Set socket to non-blocking. Otherwise accept on the _fd would block it.
+	if( fcntl(_fd, F_SETFL, O_NONBLOCK) < 0 )
+	{
+		std::cerr << "Error: setup server (fcntl() failed)" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+
 	// Set up server address structure
 	memset( &_serverSockAddr, 0, sizeof(_serverSockAddr) );
 	_serverSockAddr.sin_family = AF_INET;
-	_serverSockAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverSockAddr.sin_addr.s_addr = INADDR_ANY; //should be replaced by the ip adress later
 	_serverSockAddr.sin_port = htons(_port);
 
 	// Bind the socket
@@ -90,7 +105,7 @@ void	ServerSocket::setUpSocket()
 		exit(EXIT_FAILURE);
 	}
 
-	// Listen for incoming connections
+	// Listen for incoming connections. Make it a passive partner of the connection
 	if (listen(_fd, 100) == -1) {
 		std::cerr << "Error listening for connections\n";
 		close(_fd);
