@@ -4,12 +4,12 @@
 
 Config::Config() {
 
-  std::cout << "Config default constructor called" << std::endl;
+  //std::cout << "Config default constructor called" << std::endl;
 }
 
 Config::Config(std::string path) {
 	_foundServer = false;
-  std::cout << "Config fancy constructor called" << std::endl;
+  //std::cout << "Config fancy constructor called" << std::endl;
   if (path.empty() || path.length() == 0 || path.find(".txt") == std::string::npos)
     throw std::runtime_error("Config: Path not valid");
   //should we check more? access permissions to be checked (R_OK, W_OK, X_OK) or the existence (F_OK)?
@@ -20,17 +20,17 @@ Config::Config(std::string path) {
     throw std::runtime_error("Config: Error opening configuration file");
 
   _parse(configurationFile);
-  
   configurationFile.close();
   _print();
 }
+
 
 Config::Config(Config const &src) {
   if(this != &src)
   {
     *this = src;
   }
-    std::cout << "Config copy constructor called" << std::endl;
+   // std::cout << "Config copy constructor called" << std::endl;
 }
 
 Config &Config::operator=(const Config &rhs) {
@@ -38,12 +38,12 @@ Config &Config::operator=(const Config &rhs) {
         _servers = rhs._servers;
     }
 
-  std::cout << "Config copy assignment operator called" << std::endl;
+  //std::cout << "Config copy assignment operator called" << std::endl;
 	return *this;
 }
 
 Config::~Config() {
-    std::cout << "Config destructor called" << std::endl;
+    //std::cout << "Config destructor called" << std::endl;
 }
 
 void Config::_parse(std::ifstream &configurationFile)
@@ -99,7 +99,7 @@ std::string Config::_extractElements(std::string &line, std::ifstream &configura
     start = line.find_first_of("{", start) + 1;
     substr = line.substr(start, end - start);
     std::getline(configurationFile, line, '}');
-	printf("line=%s\n", (substr + line).c_str());
+	//printf("line=%s\n", (substr + line).c_str());
 
     return (substr + line);
 }

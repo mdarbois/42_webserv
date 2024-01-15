@@ -23,35 +23,22 @@ LocationConfig::LocationConfig(std::stringstream &elements)
 		if (line.find("methods") != std::string::npos)
 			_methods = _extractMethods(line, line.find("methods"), strlen("methods"));
 		else if (line.find("redirection") != std::string::npos)
-		{
 			_redirection = extractString(line, line.find("redirection"), strlen("redirection"));
-			printf("redirection=%s\n", _redirection.c_str());
-		}
 		else if (line.find("root") != std::string::npos)
-		{
 			_root = extractString(line, line.find("root"), strlen("root"));
-			printf("root=%s\n", _root.c_str());
-		}
 		else if (line.find("index") != std::string::npos)
-		{
 			_index = extractString(line, line.find("index"), strlen("index"));
-			printf("index=%s\n", _index.c_str());
-		}
 		else if (line.find("autoindex") != std::string::npos)
 		{
 			if (extractString(line, line.find("autoindex"), strlen("autoindex")) == "on")
 				_autoindex = true;
-			printf("autoindex=%d\n", _autoindex);
 		}
 		else if (line.find("uploads") != std::string::npos)
-		{
 			_uploads = extractString(line, line.find("uploads"), strlen("uploads"));
-			printf("uploads=%s\n", _uploads.c_str());
-		}
 		else
             throw (std::runtime_error("Location: Error, unknown keyword in locations"));
 	}
-	_setDefaultLocations();
+	_validate();
 }
 
 LocationConfig::LocationConfig( const LocationConfig & src )
@@ -62,7 +49,7 @@ LocationConfig::LocationConfig( const LocationConfig & src )
 	_index = src._index;
 	_autoindex = src._autoindex;
 	_uploads = src._uploads;
-	 std::cout << "LocationConfig copy constructor called" << std::endl;
+	 //std::cout << "LocationConfig copy constructor called" << std::endl;
 }
 
 
@@ -72,7 +59,7 @@ LocationConfig::LocationConfig( const LocationConfig & src )
 
 LocationConfig::~LocationConfig()
 {
-	std::cout << "LocationConfig destructor called" << std::endl;
+	//std::cout << "LocationConfig destructor called" << std::endl;
 }
 
 std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size_t pos, size_t length) 
@@ -118,19 +105,50 @@ std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size
 	return methods;
 }
 
-void LocationConfig::_setDefaultLocations()
+/* std::pair<int, std::string> LocationConfig::_extractRedirection(std::string &line, size_t pos, size_t length) 
+{
+	if (pos != std::string::npos)
+		line.erase(pos, length);
+	if (line.find(";") != std::string::npos)
+  		line.erase(line.find(";"), 1);
+	std::string sCode = line.erase(0,3);
+	std::istringstream iss(line);
+	std::istringstream codess(sCode);
+    std::string str;
+    std::pair<int, std::string>  newPair;
+	int code;
+	codess >> code;
+    if (iss >> code >> str)
+    {
+        return (std::make_pair(code, str));
+    }
+    else
+    {
+    	throw (std::runtime_error("Error, incomplete key value pair"));
+    }
+} */
+
+void LocationConfig::_validate()
 {
 	if (_methods.empty())
+		throw std::runtime_error("Location should specify the methods");
+	/*if (_root.empty() || _uploads.empty())
+		throw std::runtime_error("Location should specify the root and uploads");
+	 if (!_index.empty() || _autoindex == true || _redirection.empty())
+        throw std::runtime_error("cannot specify index, autoindex or return in CGI");
+	 */
+	if (!_redirection.empty())
 	{
-		_methods.push_back("GET");
-		_methods.push_back("POST");
-		_methods.push_back("DELETE");
+	std::string copy = _redirection;
+	std::string number = copy.substr(0,3);
+	std::istringstream iss(number);
+    int intValue;
+	iss >> intValue;
+	if (intValue != 0 && (intValue < 301 || intValue > 308))
+		throw std::runtime_error("HTTP status code for redirection is out of range");
 	}
-	if (_index.empty())
-    	_index = "index.html";
-	if (_uploads.empty())
-		_uploads = "uploads.html";
 }
+
 /*
 ** --------------------------------- OVERLOAD ---------------------------------
 */

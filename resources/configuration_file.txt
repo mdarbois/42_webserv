@@ -6,20 +6,22 @@ server {
 	server_name coucou;
 	
 	location / {
-		methods GET POST;
+		methods GET;
 		autoindex off;
 		root ./html;
 		index index.html;
+		uploads usr/bin/php;
 	}
 
 	location /restricted {
 		methods GET;
 		index my_awesome_index.html;
+		uploads usr/bin/php;
 	}
 
 	location /red {
 		methods GET;
-		redirection 	303 https://www.ecosia.org/;
+		redirection 	301 https://www.ecosia.org/;
 	}
 
 	#location /autoindex {

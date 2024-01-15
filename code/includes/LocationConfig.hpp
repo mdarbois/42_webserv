@@ -16,7 +16,8 @@ class LocationConfig
 
 		LocationConfig &		operator=( LocationConfig const & rhs );
 		std::vector<std::string> _extractMethods(std::string &line, size_t pos, size_t length);
-		void _setDefaultLocations();
+		//std::pair<int, std::string> _extractRedirection(std::string &line, size_t pos, size_t length);
+		void _validate();
 		
 		std::vector<std::string> getMethods(void) const;
 		std::string getRedirection(void) const;

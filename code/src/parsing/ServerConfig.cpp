@@ -2,16 +2,16 @@
 
 ServerConfig::ServerConfig(){
 
-  std::cout << "ServerConfig default constructor called" << std::endl;
+  //std::cout << "ServerConfig default constructor called" << std::endl;
 }
 
 ServerConfig::ServerConfig(std::stringstream &serverStream, int index, std::map<std::string, LocationConfig> locations) : _port(0), _ports(), _host (""), _root(""), _serverName(""), _clientMaxBodySize(0), _ip(0), _errorPages(), _locations(locations)
 {
-  	std::cout << "ServerConfig fancy constructor called" << std::endl;
+  	//std::cout << "ServerConfig fancy constructor called" << std::endl;
   _parseServer(serverStream);
   _ip = _ipConvert(_host);
   _setDefault(index);
-  // validation
+  _validation();
 }
 
 ServerConfig::ServerConfig(ServerConfig const &src) {
@@ -24,7 +24,7 @@ ServerConfig::ServerConfig(ServerConfig const &src) {
     this->_ip = src._ip;
     this->_errorPages = src._errorPages;
     this->_locations = src._locations;
-  std::cout << "ServerConfig copy constructor called" << std::endl;
+  //std::cout << "ServerConfig copy constructor called" << std::endl;
 }
 
 ServerConfig &ServerConfig::operator=(const ServerConfig &rhs) {
@@ -39,12 +39,12 @@ ServerConfig &ServerConfig::operator=(const ServerConfig &rhs) {
       this->_errorPages = rhs._errorPages;
       this->_locations = rhs._locations;
     }
-  std::cout << "ServerConfig copy assignment operator called" << std::endl;
+  //std::cout << "ServerConfig copy assignment operator called" << std::endl;
 	return *this;
 }
 
 ServerConfig::~ServerConfig() {
-    std::cout << "ServerConfig destructor called" << std::endl;
+    //std::cout << "ServerConfig destructor called" << std::endl;
 }
 
 void ServerConfig::_parseServer(std::stringstream &serverStream)
@@ -123,6 +123,7 @@ unsigned int ServerConfig::_ipConvert(const std::string host)
 void ServerConfig::_setDefault(int index)
 {
   _setDefaultErrorPages();
+  _setDefaultLocations();
   if (_serverName.empty())
   {
     std::stringstream ss;
@@ -133,6 +134,34 @@ void ServerConfig::_setDefault(int index)
     _clientMaxBodySize = 42000000;
 }
 
+void ServerConfig::_setDefaultLocations()
+{
+  std::map<std::string, LocationConfig>::const_iterator   it;
+    
+    it = _locations.find("/");
+    if (it == _locations.end())
+    {
+        LocationConfig          rootLocation;
+        std::vector<std::string> methods;
+
+        methods.push_back("GET");
+        methods.push_back("POST");
+        //rootLocation.setMethods(methods);
+        _locations.insert(std::make_pair("/", rootLocation));
+    }
+    it = _locations.find("/uploads");
+    if (it == _locations.end())
+    {
+        LocationConfig           uploadsLocation;
+        std::vector<std::string>  methods;
+
+        methods.push_back("GET");
+        methods.push_back("POST");
+        methods.push_back("DELETE");
+        //newLocation.setMethods(methods);
+        _locations.insert(std::make_pair("/uploads", uploadsLocation));
+    }
+}
 void ServerConfig::_setDefaultErrorPages()
 {
   _errorPages[200] = "/error_pages/200.html";
@@ -141,6 +170,23 @@ void ServerConfig::_setDefaultErrorPages()
   _errorPages[413] = "/error_pages/413.html";
   _errorPages[501] = "/error_pages/501.html";
 }
+
+void ServerConfig::_validation(void) const
+{
+  if (_ports.size() == 0)
+    throw std::runtime_error("no port specified");
+  if (_host.empty())
+    throw std::runtime_error("no IP (host) specified");
+  if (_root.empty())
+        throw std::runtime_error("no root specified");
+  for (std::vector<unsigned int>::const_iterator it = _ports.begin(); it != _ports.end(); it++)
+    {
+      std::vector<unsigned int>::const_iterator duplicate = std::find(it + 1, _ports.end(), *it);
+      if (duplicate != _ports.end())
+        throw std::runtime_error("duplicate ports");
+    }
+}
+
 
 unsigned int ServerConfig::getPort() const
 {

@@ -26,6 +26,7 @@ class ServerConfig {
     unsigned int _ipConvert(const std::string host);
     void _setDefault(int index);
     void _setDefaultErrorPages();
+    void _setDefaultLocations();
 
     unsigned int getPort() const;
     std::vector<unsigned int> getPorts() const;
@@ -36,6 +37,7 @@ class ServerConfig {
     unsigned int getIp(void) const;
     std::map<unsigned int, std::string> getErrorPages(void) const;
     std::map<std::string,LocationConfig> getLocations(void) const;
+    void _validation(void) const;
     void	setPort(const int &p);
 
  /*    class ServerConfigException : public std::exception {
