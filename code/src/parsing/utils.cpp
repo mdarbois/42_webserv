@@ -49,3 +49,15 @@ unsigned int extractInt(std::string &line, size_t pos, size_t length)
   lineStream >> intNumber;
   return intNumber;
 }
+
+bool checkSemiColon(const std::string& line) {
+	if (!line.empty() && line.find("server {") == std::string::npos && line.find("location") == std::string::npos && line.find("}") == std::string::npos)
+    {
+		if (line[line.length() - 1] != ';')
+			return false;
+		else
+			return true;
+	}
+	else
+		return true;
+}

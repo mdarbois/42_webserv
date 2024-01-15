@@ -54,6 +54,8 @@ void Config::_parse(std::ifstream &configurationFile)
 	while (std::getline(configurationFile, line))
 	{
 		trimSpaces(line);
+		if (!checkSemiColon(line))
+			throw std::runtime_error("Server: missing semicolons at the end of the lines");
 		if (line.empty())
 			continue;
 		else if (line.find("#") != std::string::npos)
@@ -97,6 +99,8 @@ std::string Config::_extractElements(std::string &line, std::ifstream &configura
     start = line.find_first_of("{", start) + 1;
     substr = line.substr(start, end - start);
     std::getline(configurationFile, line, '}');
+	printf("line=%s\n", (substr + line).c_str());
+
     return (substr + line);
 }
 

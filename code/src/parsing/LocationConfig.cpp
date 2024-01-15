@@ -13,10 +13,11 @@ LocationConfig::LocationConfig(std::stringstream &elements)
 {
 	std::cout << "LocationConfig fancy constructor called" << std::endl;
 	std::string line;
-	while (std::getline(elements, line, ';'))
+	while (std::getline(elements, line))
 	{
 		trimSpaces(line);
-		
+		if (!checkSemiColon(line))
+			throw std::runtime_error("Location: missing semicolons at the end of the lines");
 		if (line.empty())
 			continue;
 		if (line.find("methods") != std::string::npos)
