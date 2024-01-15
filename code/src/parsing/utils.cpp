@@ -29,10 +29,13 @@ void trimSpaces(std::string &content)
 
 std::string extractString(std::string &line, size_t pos, size_t length)
 {
-  if (pos != std::string::npos)
+	trimSpaces(line);
+  	if (pos != std::string::npos)
 		line.erase(pos, length);
-  line.erase(line.find(";"), 1);
- 	return (line);
+	if (line.find(";") != std::string::npos)
+  		line.erase(line.find(";"), 1);
+ 	trimSpaces(line);
+	return (line);
 }
 
 unsigned int extractInt(std::string &line, size_t pos, size_t length)

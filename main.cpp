@@ -21,7 +21,6 @@ int main(int argc, char **argv)
       else
         path = argv[1];
       Config config(path);
-
     }
     catch(const std::exception& e)
     {

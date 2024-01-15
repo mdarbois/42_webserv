@@ -5,6 +5,11 @@
 #include <unistd.h>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <stdexcept>
+#include <cstring>
+#include <fstream>
+
 
 void trimComments(std::string &content);
 void trimSpaces(std::string &content);

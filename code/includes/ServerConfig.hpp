@@ -36,6 +36,7 @@ class ServerConfig {
     unsigned int getIp(void) const;
     std::map<unsigned int, std::string> getErrorPages(void) const;
     std::map<std::string,LocationConfig> getLocations(void) const;
+    void	setPort(const int &p);
 
  /*    class ServerConfigException : public std::exception {
         public:

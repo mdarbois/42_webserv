@@ -1,13 +1,9 @@
 #ifndef LOCATIONCONFIG_HPP
 # define LOCATIONCONFIG_HPP
 
-# include <iostream>
-# include <string>
-#include <vector>
-#include <cstring>
+
 #include "utils.hpp"
-# include <sstream>
-#include <stdexcept>
+
 
 class LocationConfig
 {

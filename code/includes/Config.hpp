@@ -1,15 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <vector>
 #include "utils.hpp"
-#include <stdexcept>
+
 
 class ServerConfig;
 
@@ -21,6 +14,8 @@ class Config
       Config(Config const &src);
       Config &operator=(Config const &rhs);
       ~Config();
+      std::vector<ServerConfig> servers(void) const;
+
 /* 
       class ConfigException : public std::exception {
         public:
@@ -36,6 +31,7 @@ class Config
           std::string _msg;
       }; */
   private:
+    void    _print(void) const;
     bool _foundServer;
     void _parse(std::ifstream &configurationFile);
     std::string _extractElements(std::string &line, std::ifstream &configurationFile);

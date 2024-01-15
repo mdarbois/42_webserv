@@ -7,6 +7,7 @@ ServerConfig::ServerConfig(){
 
 ServerConfig::ServerConfig(std::stringstream &serverStream, int index, std::map<std::string, LocationConfig> locations) : _port(0), _ports(), _host (""), _root(""), _serverName(""), _clientMaxBodySize(0), _ip(0), _errorPages(), _locations(locations)
 {
+  	std::cout << "ServerConfig fancy constructor called" << std::endl;
   _parseServer(serverStream);
   _ip = _ipConvert(_host);
   _setDefault(index);
@@ -79,9 +80,10 @@ std::vector<unsigned int> ServerConfig::_extractPorts(std::string &line, size_t 
 {
   if (pos != std::string::npos)
 		line.erase(pos, length);
+  if (line.find(";") != std::string::npos)
+  	line.erase(line.find(";"), 1);
+  std::vector<unsigned int>    values;
 	trimSpaces(line);
-  line.erase(line.find(";"), 1);
-	std::vector<unsigned int>    values;
   std::istringstream  lineStream(line);
   int portNumber;
   lineStream >> portNumber;
@@ -190,6 +192,11 @@ std::map<unsigned int, std::string>  ServerConfig::getErrorPages(void) const
 std::map<std::string,LocationConfig> ServerConfig::getLocations(void) const
 {
     return (_locations);
+}
+
+void	ServerConfig::setPort(const int &p)
+{
+	_port = p;
 }
 
 std::ostream& operator<<(std::ostream& os, const ServerConfig& serverConfig) 

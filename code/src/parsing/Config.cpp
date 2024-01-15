@@ -22,7 +22,7 @@ Config::Config(std::string path) {
   _parse(configurationFile);
   
   configurationFile.close();
-
+  _print();
 }
 
 Config::Config(Config const &src) {
@@ -97,7 +97,6 @@ std::string Config::_extractElements(std::string &line, std::ifstream &configura
     start = line.find_first_of("{", start) + 1;
     substr = line.substr(start, end - start);
     std::getline(configurationFile, line, '}');
-	printf("line = %s\n", (substr + line).c_str());
     return (substr + line);
 }
 
@@ -110,7 +109,32 @@ std::string Config::_extractPath(std::string &line, size_t pos, size_t length)
 	return (line);
 }
 
+void    Config::_print(void) const
+{
+    for (size_t i = 0; i < servers().size(); ++i) 
+    {
+        std::cout   << servers()[i] << "\n";
+    }
+}
 
+std::vector<ServerConfig> Config::servers(void) const
+{
+    std::vector<ServerConfig>   extendedServers;
+
+    for (size_t i = 0; i < _servers.size(); i++)
+    {
+        for (size_t j = 0; j < _servers[i].getPorts().size(); j++)
+        {
+            ServerConfig    tmp(_servers[i]);
+			int port;
+
+			port = _servers[i].getPorts()[j];
+			tmp.setPort(port);
+            extendedServers.push_back(tmp);
+        }
+    }
+    return (extendedServers);
+}
 
 /* void Config::extractServers(std::string &content)
 {
@@ -177,3 +201,4 @@ std::string Config::_extractPath(std::string &line, size_t pos, size_t length)
 	return (start);
 }
  */
+
