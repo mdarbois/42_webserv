@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 21:59:12 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/15 10:19:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerSocket::ServerSocket(int port, int ip): Socket()
+ServerSocket::ServerSocket(int port, int ip)
 {
 	_type = SERVER;
 	_port = port;
@@ -88,13 +88,16 @@ void	ServerSocket::setUpSocket()
 		std::exit(EXIT_FAILURE);
 	}
 
-	// Set socket to non-blocking. Otherwise accept on the _pollFD.fd would block it.
-	if( fcntl(_pollFD.fd, F_SETFL, O_NONBLOCK) < 0 )
-	{
-		std::cerr << "Error: setup server (fcntl() failed)" << std::endl;
-		std::exit(EXIT_FAILURE);
+	/*
+		fctnl = file control system call to set options on file descriptor.
+		F_SETFL: Specifies, that we want to set FLAGS on the fd
+		O_NONBLOCK: Option non-blocking, operations on the fd wont block
+	*/
+	if ( fcntl(_pollFD.fd, F_SETFL, O_NONBLOCK) < 0 ) {
+		std::cerr << "Error accepting connection\n";
+		exit(EXIT_FAILURE);
 	}
-
+	
 	// Set up server address structure
 	memset( &_serverSockAddr, 0, sizeof(_serverSockAddr) );
 	_serverSockAddr.sin_family = AF_INET;
@@ -114,7 +117,7 @@ void	ServerSocket::setUpSocket()
 		close(_pollFD.fd);
 		exit(EXIT_FAILURE);
 	}
-	std::cout << "Created Server Socket listening to port" << _port << std::endl;
+	std::cout << "Created Server Socket with FD: " << _pollFD.fd << " listening to port: " << _port << std::endl;
 }
 
 /*

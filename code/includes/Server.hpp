@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 22:12:44 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/15 12:16:37 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 #define TIMEOUT_POLL 500
 
 const int serverIPs[] = {2130706433, 2130706433, 2130706433}; 	/* 127.0.0.1 converted to int */
-const int serverPorts[] = {18000, 20000, 19000};
+const int serverPorts[] = {18000, 18001, 18002};
 const int nbrServers = sizeof(serverPorts) / sizeof(serverPorts[0]);
 //end
 
@@ -50,6 +50,8 @@ class Server
 		std::vector<Socket *>	_sockets;
 		struct pollfd			_pollFDs[MAX_CONNECTIONS]; //Should we just count the numbers of Clients or also the servers?
 		void					_acceptNewClient(ServerSocket *socket);
+		void					_receiveRequest(ClientSocket *client);
+		void					_sendResponse(ClientSocket *client);
 		void					_updatePollFDArray();
 };
 

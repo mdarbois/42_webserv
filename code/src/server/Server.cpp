@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 22:11:39 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/15 13:06:08 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,14 @@ std::string	_buildResponse(std::string body)
 	return response;
 }
 
+void	printPOLLFDARR(struct pollfd *arr, std::vector<Socket *> sockets)
+{
+	std::cout << "POLL FD ARR: [";
+	for (int i = 0; i < sockets.size(); i++)
+		std::cout << " " << arr[i].fd << " ";
+	std::cout << " ]" << std::endl;
+}
+
 void	Server::_acceptNewClient(ServerSocket *socket)
 {
 	ClientSocket	*newClient;
@@ -109,15 +117,31 @@ void	Server::_acceptNewClient(ServerSocket *socket)
 		std::exit(EXIT_FAILURE);
 	}
 	_sockets.push_back(newClient);
+	_updatePollFDArray();
+	std::cout << "SOCKETS SIZE: " << _sockets.size() << std::endl;
+	//close(newClient->getFD());
+}
 
-	//For Testing purposes - just send a respond to the client 
-	{
-		std::string	response = _buildResponse("Hello from Server " + std::to_string(socket->getPort()));
-		send(newClient->getFD(), response.c_str(), strlen(response.c_str()), 0);
-		close(newClient->getFD());
-		std::cerr << "Sent response" << std::endl;
-		delete newClient;
-	}
+void	Server::_receiveRequest(ClientSocket *client)
+{
+	//Print HTTP Request - Testing
+	char buffer[1024];
+	std::string receivedString;
+	ssize_t bytesRead = recv(client->getFD(), buffer, sizeof(buffer), 0);
+	receivedString += std::string(buffer, bytesRead);
+	// Print the received string
+	std::cout << "Received string: " << receivedString << std::endl;
+	client->setPollFD(client->getFD(), POLLOUT, 0);
+}
+
+void	Server::_sendResponse(ClientSocket *client)
+{
+	//For Testing purposes - just send a simple respond to the client 
+	std::string	response = _buildResponse("Hello");
+	send(client->getFD(), response.c_str(), strlen(response.c_str()), 0);
+	
+	std::cerr << "Sent response" << std::endl;
+	//delete newClient;
 }
 
 void	Server::run()
@@ -149,15 +173,16 @@ void	Server::run()
 
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request
-			//if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == CLIENT)
-				//receive the request --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
+			else if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == CLIENT)
+				_receiveRequest(dynamic_cast<ClientSocket *>(_sockets[i]));//receive the request --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
 			
 			//Check if the client socket is writeable non-blocking: POLLOUT.
 			//Server is sending HTTP response
-			//if ( _pollFDs[i].revents & POLLOUT && _sockets[i]->getType() == CLIENT)
-				//Send response to the client fd
-			
+			else if ( _pollFDs[i].revents & POLLOUT && _sockets[i]->getType() == CLIENT)
+				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i]));
+
 			//Check if the client has a timeout
+			//TBD
 		}
 	}
 	// Close the server socket

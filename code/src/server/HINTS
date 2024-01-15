@@ -1,0 +1,2 @@
+- there can be a null byte in the middle of the request, but then we shouldnt stop reading!
+- HTTP Requests and responses can be sent in chunks
