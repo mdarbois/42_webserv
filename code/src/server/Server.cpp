@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 13:06:08 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/15 19:07:42 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,16 +93,9 @@ std::string	_buildResponse(std::string body)
 	return response;
 }
 
-void	printPOLLFDARR(struct pollfd *arr, std::vector<Socket *> sockets)
-{
-	std::cout << "POLL FD ARR: [";
-	for (int i = 0; i < sockets.size(); i++)
-		std::cout << " " << arr[i].fd << " ";
-	std::cout << " ]" << std::endl;
-}
-
 void	Server::_acceptNewClient(ServerSocket *socket)
 {
+	std::cout << "TRY TO ACCEPT NEW CLIENT" << std::endl;
 	ClientSocket	*newClient;
 	if (_sockets.size() == MAX_CONNECTIONS)
 	{
@@ -118,30 +111,54 @@ void	Server::_acceptNewClient(ServerSocket *socket)
 	}
 	_sockets.push_back(newClient);
 	_updatePollFDArray();
-	std::cout << "SOCKETS SIZE: " << _sockets.size() << std::endl;
-	//close(newClient->getFD());
 }
 
 void	Server::_receiveRequest(ClientSocket *client)
 {
+	std::cout << "TRY TO RECV REQUEST" << std::endl;
 	//Print HTTP Request - Testing
 	char buffer[1024];
 	std::string receivedString;
 	ssize_t bytesRead = recv(client->getFD(), buffer, sizeof(buffer), 0);
 	receivedString += std::string(buffer, bytesRead);
 	// Print the received string
-	std::cout << "Received string: " << receivedString << std::endl;
+	std::cout << "************HTTP-REQUEST**************************" << std::endl;
+	std::cout << receivedString << std::endl;
+	std::cout << "**************************************************" << std::endl << std::endl;
 	client->setPollFD(client->getFD(), POLLOUT, 0);
+	_updatePollFDArray();
 }
 
 void	Server::_sendResponse(ClientSocket *client)
 {
+	std::cout << "TRY TO SEND SIMPLE RESPONSE" << std::endl;
 	//For Testing purposes - just send a simple respond to the client 
-	std::string	response = _buildResponse("Hello");
+	std::string	response = _buildResponse("Hello Client: " + std::to_string(client->getFD()));
 	send(client->getFD(), response.c_str(), strlen(response.c_str()), 0);
-	
+	client->setPollFD(client->getFD(), POLLIN, 0);
+	_updatePollFDArray();
 	std::cerr << "Sent response" << std::endl;
-	//delete newClient;
+	_deleteClient(client);
+}
+
+void	Server::_deleteClient(ClientSocket *client)
+{
+	for (std::vector<Socket *>::iterator it = _sockets.begin() ; it != _sockets.end(); it++)
+	{
+		if ((*it)->getFD() == client->getFD())
+		{
+			std::cout << "TRY to DELETE client." << std::endl;
+			_sockets.erase(it);
+			std::cout << "erased client with fd: " << client->getFD() << ". New socket size: " << _sockets.size() << std::endl;
+			close(client->getFD());
+			std::cout << "closed client with fd: " << client->getFD() << std::endl;
+			delete client;
+			std::cout << "closed client with fd: " << client->getFD() << std::endl;
+			_updatePollFDArray();
+			std::cout << "closed client with fd: " << client->getFD() << std::endl;
+			return ;
+		}
+	}
 }
 
 void	Server::run()

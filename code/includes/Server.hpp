@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 12:16:37 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:14:31 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Server
 		std::vector<Socket *>	_sockets;
 		struct pollfd			_pollFDs[MAX_CONNECTIONS]; //Should we just count the numbers of Clients or also the servers?
 		void					_acceptNewClient(ServerSocket *socket);
+		void					_deleteClient(ClientSocket *client);
 		void					_receiveRequest(ClientSocket *client);
 		void					_sendResponse(ClientSocket *client);
 		void					_updatePollFDArray();
