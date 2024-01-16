@@ -22,7 +22,7 @@ class ServerSocket: public Socket
 {
 
 	public:
-		ServerSocket(int port, int ip);
+		ServerSocket(unsigned int port, int ip);
 		~ServerSocket();
 		ServerSocket();
 		ServerSocket &		operator=( ServerSocket const & rhs );

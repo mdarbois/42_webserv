@@ -17,4 +17,6 @@ void trimSpaces(std::string &content);
 std::string extractString(std::string &line, size_t pos, size_t length);
 unsigned int extractInt(std::string &line, size_t pos, size_t length);
 bool checkSemiColon(const std::string& line);
+std::string intToString(const int &number);
+
 #endif

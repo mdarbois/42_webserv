@@ -3,6 +3,11 @@
 #include "code/includes/Config.hpp"
 #include "code/includes/LocationConfig.hpp"
 #include "code/includes/utils.hpp"
+#include "code/includes/ClientSocket.hpp"
+#include "code/includes/ParserHTTP.hpp"
+#include "code/includes/Server.hpp"
+#include "code/includes/ServerSocket.hpp"
+#include "code/includes/Socket.hpp"
 
 int main(int argc, char **argv)
 {
@@ -21,6 +26,8 @@ int main(int argc, char **argv)
       else
         path = argv[1];
       Config config(path);
+      Server server(config);
+      server.run();
     }
     catch(const std::exception& e)
     {
@@ -28,9 +35,7 @@ int main(int argc, char **argv)
       return (1);
     }
   }
-
-
-
+  
 
   return (0);
 }

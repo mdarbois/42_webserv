@@ -21,7 +21,7 @@ class ServerConfig {
     ServerConfig &operator=(ServerConfig const &rhs);
     ~ServerConfig();
     void _parseServer(std::stringstream &serverStream);
-    std::vector<unsigned int> _extractPorts(std::string &line, size_t pos, size_t length);
+    void _extractPorts(std::string &line, size_t pos, size_t length);
     void _parseErrorPages(std::string &line);
     unsigned int _ipConvert(const std::string host);
     void _setDefault(int index);

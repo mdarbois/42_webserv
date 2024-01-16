@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerSocket::ServerSocket(int port, int ip)
+ServerSocket::ServerSocket(unsigned int port, int ip)
 {
 	_type = SERVER;
 	_port = port;
@@ -29,6 +29,7 @@ ServerSocket::ServerSocket(int port, int ip)
 
 ServerSocket::ServerSocket( const ServerSocket & src )
 {
+	(void)src;
 }
 
 ServerSocket::ServerSocket()
@@ -64,6 +65,7 @@ ServerSocket &				ServerSocket::operator=( ServerSocket const & rhs )
 std::ostream &			operator<<( std::ostream & o, ServerSocket const & i )
 {
 	//o << "Value = " << i.getValue();
+	(void)i;
 	return o;
 }
 
@@ -84,7 +86,7 @@ void	ServerSocket::setUpSocket()
 	int on = 1;
 	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
 	{
-		perror("setsockop()");
+		//perror("setsockop()");
 		std::exit(EXIT_FAILURE);
 	}
 

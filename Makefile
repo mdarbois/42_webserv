@@ -1,6 +1,12 @@
-SRCS = main.cpp ./code/src/parsing/Config.cpp ./code/src/parsing/ServerConfig.cpp ./code/src/parsing/LocationConfig.cpp ./code/src/parsing/utils.cpp
+SRCS = main.cpp $(PARSING)Config.cpp $(PARSING)ServerConfig.cpp $(PARSING)LocationConfig.cpp $(PARSING)utils.cpp $(SERVER)ClientSocket.cpp $(SERVER)Server.cpp $(SERVER)ServerSocket.cpp $(SERVER)Socket.cpp
 
-INCS = ./code/includes/Config.hpp ./code/includes/ServerConfig.hpp ./code/includes/LocationConfig.hpp ./code/includes/utils.hpp
+PARSING = ./code/src/parsing/
+
+SERVER = ./code/src/server/
+
+INCS = $(INCLUDE)Config.hpp $(INCLUDE)ServerConfig.hpp $(INCLUDE)LocationConfig.hpp $(INCLUDE)utils.hpp $(INCLUDE)ClientSocket.hpp $(INCLUDE)ParserHTTP.hpp $(INCLUDE)Server.hpp $(INCLUDE)ServerSocket.hpp $(INCLUDE)Socket.hpp
+
+INCLUDE = ./code/includes/
 
 OBJS = $(SRCS:.cpp=.o)
 

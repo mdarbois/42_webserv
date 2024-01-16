@@ -35,6 +35,7 @@ Socket::~Socket() {}
 std::ostream &			operator<<( std::ostream & o, Socket const & i )
 {
 	//o << "Value = " << i.getValue();
+	(void)i;
 	return o;
 }
 
