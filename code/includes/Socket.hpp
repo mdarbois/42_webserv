@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 17:44:08 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 19:20:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,32 @@ typedef enum e_ComminationStatus
 	COM_DONE,
 	COM_CONN_CLOSED
 }CommunicationStatus;
+
+typedef enum e_HttpStatus
+{
+	NO_ERROR = 0,
+	HTTP_200 = 200,
+	HTTP_201 = 201,
+	HTTP_202 = 202,
+	HTTP_204 = 204,
+	HTTP_206 = 206,
+	HTTP_300 = 300,
+	HTTP_301 = 301,
+	HTTP_302 = 302,
+	HTTP_303 = 303,
+	HTTP_304 = 304,
+	HTTP_307 = 307,
+	HTTP_308 = 308,
+	HTTP_400 = 400,
+	HTTP_403 = 403,
+	HTTP_404 = 404,
+	HTTP_405 = 405,
+	HTTP_408 = 408,
+	HTTP_413 = 413,
+	HTTP_500 = 500,
+	HTTP_504 = 504,
+	HTTP_505 = 505
+} HttpStatus;
 
 class Socket
 {

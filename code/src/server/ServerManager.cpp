@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 16:27:10 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 19:29:57 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,17 +110,15 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 
 void	ServerManager::_receiveRequest(ClientSocket *client)
 {
-	std::cout << "TRY TO RECV REQUEST" << std::endl;
-	//Print HTTP Request - Testing
-	char buffer[1024];
-	std::string receivedString;
-	ssize_t bytesRead = recv(client->getFD(), buffer, sizeof(buffer), 0);
-	receivedString += std::string(buffer, bytesRead);
-	// Print the received string
-	std::cout << "************HTTP-REQUEST**************************" << std::endl;
-	std::cout << receivedString << std::endl;
-	std::cout << "**************************************************" << std::endl << std::endl;
-	client->setPollFD(client->getFD(), POLLOUT, 0);
+	CommunicationStatus	status = client->receiveRequest();
+	if (status == COM_CONN_CLOSED)
+		_deleteClient(client, NO_ERROR);
+	else if (status == COM_ERROR)
+		_deleteClient(client, HTTP_400);
+	else if (status == COM_DONE)
+		client->setPollFD(client->getFD(), POLLOUT, 0);
+	else if (status == COM_IN_PROGRESS)
+		client->setPollFD(client->getFD(), POLLOUT, 0);
 	_updatePollFDArray();
 }
 
@@ -133,11 +131,13 @@ void	ServerManager::_sendResponse(ClientSocket *client)
 	client->setPollFD(client->getFD(), POLLIN, 0);
 	_updatePollFDArray();
 	std::cerr << "Sent response" << std::endl;
-	_deleteClient(client);
+	_deleteClient(client, HTTP_200); //TESTING
 }
 
-void	ServerManager::_deleteClient(ClientSocket *client)
+void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 {
+	if (code < 0)
+		return ;
 	for (std::vector<Socket *>::iterator it = _sockets.begin() ; it != _sockets.end(); it++)
 	{
 		if ((*it)->getFD() == client->getFD())
@@ -166,7 +166,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 	{
 		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
 		{
-			_deleteClient(dynamic_cast<ClientSocket *>(socket));
+			_deleteClient(dynamic_cast<ClientSocket *>(socket), HTTP_500);
 			return (true);
 		}
 		return (false);
@@ -176,7 +176,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 
 void	ServerManager::run()
 {
-	int				pollResult;
+	int	pollResult;
 	
 	//Main server loop
 	while (4242) //react to sigint later
@@ -209,7 +209,7 @@ void	ServerManager::run()
 			//Check if the client socket is writeable non-blocking: POLLOUT.
 			//Server is sending HTTP response
 			else if ( _pollFDs[i].revents & POLLOUT && _sockets[i]->getType() == CLIENT)
-				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i]));
+				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i])); //send the response --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
 
 			//Check if the client has a timeout
 			//TBD

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 15:31:41 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 19:15:39 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class ServerManager
 		struct pollfd			_pollFDs[MAX_CONNECTIONS]; //Should we just count the numbers of Clients or also the servers?
 		int						_numberServers;
 		void					_acceptNewClient(ServerSocket *socket);
-		void					_deleteClient(ClientSocket *client);
+		void					_deleteClient(ClientSocket *client, HttpStatus code);
 		void					_receiveRequest(ClientSocket *client);
 		bool					_checkPollErrors(Socket *socket, short int revent);
 		void					_sendResponse(ClientSocket *client);

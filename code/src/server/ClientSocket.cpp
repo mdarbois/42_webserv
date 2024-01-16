@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 17:44:34 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 19:28:17 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ void	ClientSocket::_resetRequest()
 {
 	_request.readBytes = 0;
 	_request.contentLength = 0;
-	_request.buffer.clear()
+	_request.buffer.clear();
 }
 
 CommunicationStatus	ClientSocket::receiveRequest()
@@ -104,15 +104,28 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	char	buffer[1024]; //SIZE NEEDS TO BE RETHOUGHT
 	size_t	bytesRead;
 	
+	/*
+		The O_NONBLOCK flag suggests that the socket is set to non-blocking mode. 
+		If no data is available for reading, recv may return -1 with errno set to EAGAIN or EWOULDBLOCK. 
+		In non-blocking mode, this is not necessarily an error, and you might want to handle it differently 
+		(e.g., return COM_IN_PROGRESS or retry later).
+	*/
 	if ((bytesRead = recv(_pollFD.fd, &buffer, 1024, O_NONBLOCK)) < 0)
 		return (COM_ERROR);
 	if (bytesRead == 0)
 		return (COM_CONN_CLOSED);
-	//fflush(stdout)
-
 	_request.readBytes += bytesRead;
 	_request.buffer.append(std::string(buffer, bytesRead));
-	
+
+	size_t	clPos = _request.buffer.find("Content-Length: ");
+	if (clPos != std::string::npos)
+		_request.contentLength = static_cast<size_t>(std::atoi(_request.buffer.substr(clPos + 16).c_str()));
+	else
+		_request.contentLength = 0;
+	if (_request.buffer.find("\r\n\r\n") != std::string::npos)
+		return (COM_DONE);
+	else
+		return (COM_IN_PROGRESS);
 }
 
 /*
