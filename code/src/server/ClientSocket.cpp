@@ -27,6 +27,7 @@ ClientSocket::ClientSocket(int connectingServerFD)
 
 ClientSocket::ClientSocket( const ClientSocket & src )
 {
+	(void)src;
 }
 
 ClientSocket::ClientSocket()
@@ -53,12 +54,14 @@ ClientSocket &				ClientSocket::operator=( ClientSocket const & rhs )
 	//{
 		//this->_value = rhs.getValue();
 	//}
+	(void)rhs;
 	return *this;
 }
 
 std::ostream &			operator<<( std::ostream & o, ClientSocket const & i )
 {
 	//o << "Value = " << i.getValue();
+	(void)i;
 	return o;
 }
 

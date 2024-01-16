@@ -22,6 +22,9 @@
 #include <poll.h>
 #include "ServerSocket.hpp"
 #include "ClientSocket.hpp"
+#include "Config.hpp"
+#include "ServerConfig.hpp"
+#include "utils.hpp"
 
 
 //For Testing - later set up by config
@@ -39,6 +42,7 @@ class Server
 
 	public:
 		Server();
+		Server(Config const &config);
 		~Server();
 		Server( Server const & src );
 		Server &		operator=( Server const & rhs );

@@ -61,3 +61,11 @@ bool checkSemiColon(const std::string& line) {
 	else
 		return true;
 }
+
+std::string intToString(const int &number)
+{
+
+    std::stringstream ss;
+    ss << number;
+	return (ss.str());
+}

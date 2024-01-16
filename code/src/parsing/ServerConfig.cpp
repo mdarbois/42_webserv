@@ -57,7 +57,7 @@ void ServerConfig::_parseServer(std::stringstream &serverStream)
         if (line.empty())
             continue;
         if (line.find("listen") != std::string::npos)
-            _ports = _extractPorts(line, line.find("listen"), strlen("listen"));
+          _extractPorts(line, line.find("listen"), strlen("listen"));
         else if (line.find("server_name") != std::string::npos)
             _serverName = extractString(line, line.find("server_name"), strlen("server_name"));
         else if (line.find("host") != std::string::npos)
@@ -76,19 +76,17 @@ void ServerConfig::_parseServer(std::stringstream &serverStream)
     }
 }
 
-std::vector<unsigned int> ServerConfig::_extractPorts(std::string &line, size_t pos, size_t length) 
+void ServerConfig::_extractPorts(std::string &line, size_t pos, size_t length) 
 {
   if (pos != std::string::npos)
 		line.erase(pos, length);
   if (line.find(";") != std::string::npos)
   	line.erase(line.find(";"), 1);
-  std::vector<unsigned int>    values;
-	trimSpaces(line);
+  trimSpaces(line);
   std::istringstream  lineStream(line);
   int portNumber;
   lineStream >> portNumber;
-	values.push_back(portNumber);
-	return values;
+	_ports.push_back(portNumber);
 }
 
 void ServerConfig::_parseErrorPages(std::string &line)

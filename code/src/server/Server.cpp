@@ -24,8 +24,25 @@ Server::Server()
 	_updatePollFDArray();
 }
 
+Server::Server(Config const &config)
+{
+	std::vector<ServerConfig> serversList = config.servers();
+	std::vector<ServerConfig>::iterator it = serversList.begin();
+	for (; it != serversList.end(); ++it)
+	{
+		std::vector<unsigned int> portsList = (*it).getPorts();
+		std::vector<unsigned int>::iterator portIT = portsList.begin();
+		for (; portIT != portsList.end(); ++portIT)
+		{
+			_sockets.push_back(new ServerSocket((*portIT), (*it).getIp()));
+			//std::cout << *portIT << std::endl;
+		}
+	}
+
+}
 Server::Server( const Server & src )
 {
+	(void)src;
 }
 
 
@@ -48,12 +65,14 @@ Server &				Server::operator=( Server const & rhs )
 	//{
 		//this->_value = rhs.getValue();
 	//}
+	(void)rhs;
 	return *this;
 }
 
 std::ostream &			operator<<( std::ostream & o, Server const & i )
 {
 	//o << "Value = " << i.getValue();
+	(void)i;
 	return o;
 }
 
@@ -69,7 +88,7 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 */
 void	Server::_updatePollFDArray()
 {
-	for (int i = 0; i < MAX_CONNECTIONS; i++)
+	for (size_t i = 0; i < MAX_CONNECTIONS; i++)
 	{
 		memset(&_pollFDs[i], 0, sizeof(struct pollfd));
 		if (i < _sockets.size())
@@ -81,7 +100,7 @@ std::string	_buildResponse(std::string body)
 {
 	std::string	crlf = "\r\n";
 	std::string	response;
-	std::string	lengthStr = std::to_string(body.length());
+	std::string	lengthStr = intToString(static_cast<int>(body.length()));
 
 	response += "HTTP/1.1 200 OK" + crlf;			// Status-Line
 	response += "Content-Type: text/html" + crlf;	// Entity-Header-Field
@@ -133,7 +152,7 @@ void	Server::_sendResponse(ClientSocket *client)
 {
 	std::cout << "TRY TO SEND SIMPLE RESPONSE" << std::endl;
 	//For Testing purposes - just send a simple respond to the client 
-	std::string	response = _buildResponse("Hello Client: " + std::to_string(client->getFD()));
+	std::string	response = _buildResponse("Hello Client: " + intToString(client->getFD()));
 	send(client->getFD(), response.c_str(), strlen(response.c_str()), 0);
 	client->setPollFD(client->getFD(), POLLIN, 0);
 	_updatePollFDArray();
@@ -164,7 +183,7 @@ void	Server::_deleteClient(ClientSocket *client)
 void	Server::run()
 {
 	int				pollResult;
-	int				currPollFDIndex;
+	//int				currPollFDIndex;
 	
 	//Main server loop
 	while (4242) //react to sigint later

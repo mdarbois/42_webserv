@@ -6,12 +6,12 @@
 
 LocationConfig::LocationConfig() : _methods(), _redirection(""), _root(""), _index(""), _autoindex(false),  _uploads("") 
 {
-	std::cout << "LocationConfigonfig default constructor called" << std::endl;
+	//std::cout << "LocationConfigonfig default constructor called" << std::endl;
 }
 
 LocationConfig::LocationConfig(std::stringstream &elements)
 {
-	std::cout << "LocationConfig fancy constructor called" << std::endl;
+	//std::cout << "LocationConfig fancy constructor called" << std::endl;
 	std::string line;
 	while (std::getline(elements, line))
 	{

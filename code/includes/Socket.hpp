@@ -30,7 +30,7 @@ class Socket
 {
 
 	public:
-		~Socket();
+		virtual ~Socket();
 		Socket();
 		Socket( Socket const & src );
 		Socket &		operator=( Socket const & rhs );
