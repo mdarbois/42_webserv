@@ -121,6 +121,11 @@ void    Config::_print(void) const
     }
 }
 
+std::vector<ServerConfig> Config::getServers() const
+{
+	return (_servers);
+}
+
 std::vector<ServerConfig> Config::servers(void) const
 {
     std::vector<ServerConfig>   extendedServers;

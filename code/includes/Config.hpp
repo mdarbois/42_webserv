@@ -15,6 +15,7 @@ class Config
       Config &operator=(Config const &rhs);
       ~Config();
       std::vector<ServerConfig> servers(void) const;
+      std::vector<ServerConfig> getServers() const;
 
 /* 
       class ConfigException : public std::exception {

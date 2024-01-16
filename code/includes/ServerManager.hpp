@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   ServerManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 17:14:31 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 12:14:38 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef SERVERMANAGER_HPP
+# define SERVERMANAGER_HPP
 
 #include <iostream>
 #include <cstdlib>
@@ -32,20 +32,13 @@
 # define MAX_CONNECTIONS 10
 #define TIMEOUT_POLL 500
 
-const int serverIPs[] = {2130706433, 2130706433, 2130706433}; 	/* 127.0.0.1 converted to int */
-const int serverPorts[] = {18000, 18001, 18002};
-const int nbrServers = sizeof(serverPorts) / sizeof(serverPorts[0]);
-//end
-
-class Server
+class ServerManager
 {
 
 	public:
-		Server();
-		Server(Config const &config);
-		~Server();
-		Server( Server const & src );
-		Server &		operator=( Server const & rhs );
+		
+		ServerManager(Config const &config);
+		~ServerManager();
 
 		void	run();
 		void	shutdown();
@@ -53,13 +46,18 @@ class Server
 	private:
 		std::vector<Socket *>	_sockets;
 		struct pollfd			_pollFDs[MAX_CONNECTIONS]; //Should we just count the numbers of Clients or also the servers?
+		int						_numberServers;
 		void					_acceptNewClient(ServerSocket *socket);
 		void					_deleteClient(ClientSocket *client);
 		void					_receiveRequest(ClientSocket *client);
 		void					_sendResponse(ClientSocket *client);
 		void					_updatePollFDArray();
+
+		ServerManager();
+		ServerManager( ServerManager const & src );
+		ServerManager &		operator=( ServerManager const & rhs );
 };
 
-std::ostream &			operator<<( std::ostream & o, Server const & i );
+std::ostream &			operator<<( std::ostream & o, ServerManager const & i );
 
 #endif /* ********************************************************** SERVER_H */

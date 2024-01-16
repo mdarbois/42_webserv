@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:52 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/13 13:48:22 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:47:29 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class ServerSocket: public Socket
 {
 
 	public:
-		ServerSocket(unsigned int port, int ip);
+		ServerSocket(int port, int ip);
 		~ServerSocket();
 		ServerSocket();
 		ServerSocket &		operator=( ServerSocket const & rhs );

@@ -1,48 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 09:21:55 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 12:16:00 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/Server.hpp"
+#include "../../includes/ServerManager.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Server::Server()
+ServerManager::ServerManager(Config const &config)
 {
-	//This should be set later according to the config file
-	for (int i = 0; i < nbrServers; i++)
-		_sockets.push_back(new ServerSocket(serverPorts[i], serverIPs[i]));
-	_updatePollFDArray();
-}
-
-Server::Server(Config const &config)
-{
-	std::vector<ServerConfig> serversList = config.servers();
+	_numberServers = config.getServers().size();
+	std::vector<ServerConfig> serversList = config.getServers();
 	std::vector<ServerConfig>::iterator it = serversList.begin();
 	for (; it != serversList.end(); ++it)
 	{
 		std::vector<unsigned int> portsList = (*it).getPorts();
 		std::vector<unsigned int>::iterator portIT = portsList.begin();
 		for (; portIT != portsList.end(); ++portIT)
-		{
-			_sockets.push_back(new ServerSocket((*portIT), (*it).getIp()));
-			//std::cout << *portIT << std::endl;
-		}
+			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp()));
 	}
-
-}
-Server::Server( const Server & src )
-{
-	(void)src;
+	_updatePollFDArray();
 }
 
 
@@ -50,7 +36,7 @@ Server::Server( const Server & src )
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Server::~Server()
+ServerManager::~ServerManager()
 {
 }
 
@@ -59,17 +45,7 @@ Server::~Server()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-Server &				Server::operator=( Server const & rhs )
-{
-	//if ( this != &rhs )
-	//{
-		//this->_value = rhs.getValue();
-	//}
-	(void)rhs;
-	return *this;
-}
-
-std::ostream &			operator<<( std::ostream & o, Server const & i )
+std::ostream &			operator<<( std::ostream & o, ServerManager const & i )
 {
 	//o << "Value = " << i.getValue();
 	(void)i;
@@ -86,7 +62,7 @@ std::ostream &			operator<<( std::ostream & o, Server const & i )
 	After each deletion or adding of a socket to the _sockets, the pollFD Arr needs to be updated.
 	The poll method needs the the pollFD Array.
 */
-void	Server::_updatePollFDArray()
+void	ServerManager::_updatePollFDArray()
 {
 	for (size_t i = 0; i < MAX_CONNECTIONS; i++)
 	{
@@ -112,7 +88,7 @@ std::string	_buildResponse(std::string body)
 	return response;
 }
 
-void	Server::_acceptNewClient(ServerSocket *socket)
+void	ServerManager::_acceptNewClient(ServerSocket *socket)
 {
 	std::cout << "TRY TO ACCEPT NEW CLIENT" << std::endl;
 	ClientSocket	*newClient;
@@ -132,7 +108,7 @@ void	Server::_acceptNewClient(ServerSocket *socket)
 	_updatePollFDArray();
 }
 
-void	Server::_receiveRequest(ClientSocket *client)
+void	ServerManager::_receiveRequest(ClientSocket *client)
 {
 	std::cout << "TRY TO RECV REQUEST" << std::endl;
 	//Print HTTP Request - Testing
@@ -148,7 +124,7 @@ void	Server::_receiveRequest(ClientSocket *client)
 	_updatePollFDArray();
 }
 
-void	Server::_sendResponse(ClientSocket *client)
+void	ServerManager::_sendResponse(ClientSocket *client)
 {
 	std::cout << "TRY TO SEND SIMPLE RESPONSE" << std::endl;
 	//For Testing purposes - just send a simple respond to the client 
@@ -160,7 +136,7 @@ void	Server::_sendResponse(ClientSocket *client)
 	_deleteClient(client);
 }
 
-void	Server::_deleteClient(ClientSocket *client)
+void	ServerManager::_deleteClient(ClientSocket *client)
 {
 	for (std::vector<Socket *>::iterator it = _sockets.begin() ; it != _sockets.end(); it++)
 	{
@@ -180,7 +156,7 @@ void	Server::_deleteClient(ClientSocket *client)
 	}
 }
 
-void	Server::run()
+void	ServerManager::run()
 {
 	int				pollResult;
 	//int				currPollFDIndex;
@@ -222,7 +198,7 @@ void	Server::run()
 		}
 	}
 	// Close the server socket
-	for (int i = 0; i < nbrServers; i++)
+	for (int i = 0; i < _numberServers; i++)
 		close(_sockets[i]->getFD());
 }
 /*

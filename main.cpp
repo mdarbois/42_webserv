@@ -5,7 +5,7 @@
 #include "code/includes/utils.hpp"
 #include "code/includes/ClientSocket.hpp"
 #include "code/includes/ParserHTTP.hpp"
-#include "code/includes/Server.hpp"
+#include "code/includes/ServerManager.hpp"
 #include "code/includes/ServerSocket.hpp"
 #include "code/includes/Socket.hpp"
 
@@ -22,12 +22,12 @@ int main(int argc, char **argv)
     {
       std::string path;
       if (argc == 1)
-        path = "./resources/configuration_file.txt";
+        path = "./configs/configuration_file.txt";
       else
         path = argv[1];
       Config config(path);
-      Server server(config);
-      server.run();
+      ServerManager sm(config);
+      sm.run();
     }
     catch(const std::exception& e)
     {
