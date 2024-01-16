@@ -1,32 +1,41 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
-#include <map>
-#include <vector>
-#include <iostream>
-#include <unistd.h>
-#include <string>
+#include "utils.hpp"
 
-class Server {
+
+class ServerConfig;
+
+class Config
+{
   public:
-      Server();
-      Server(Server const &src);
-      Server &operator=(Server const &rhs);
-      ~Server();
-  private:
-    std::string _ip;
-    unsigned int _clientMaxBodySize;
-    unsigned int _port;
-    unsigned int _host;
-    std::string _server_names;
-	  std::map<int, std::string> _errorPages;
-	  std::string _key;
-	  std::vector<std::string> _methods;
-	  std::string _redirection;
-	  std::string _root;
-	  std::string _uploads;
-	  bool _autoindex;
-	  std::string _index;
+      Config();
+      Config(std::string path);
+      Config(Config const &src);
+      Config &operator=(Config const &rhs);
+      ~Config();
+      std::vector<ServerConfig> servers(void) const;
 
+/* 
+      class ConfigException : public std::exception {
+        public:
+          ConfigException(std::string message) throw()
+          {
+            _msg = "Config Parsing problem: " + message;
+          };
+          virtual const char* what() const throw()
+          {
+            return(_msg.c_str());
+          }
+        private:
+          std::string _msg;
+      }; */
+  private:
+    void    _print(void) const;
+    bool _foundServer;
+    void _parse(std::ifstream &configurationFile);
+    std::string _extractElements(std::string &line, std::ifstream &configurationFile);
+    std::string _extractPath(std::string &line, size_t pos, size_t length);
+    std::vector<ServerConfig> _servers;
 };
 #endif

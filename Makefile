@@ -1,6 +1,6 @@
-SRCS = main.cpp Parsing.cpp Server.cpp
+SRCS = main.cpp ./code/src/parsing/Config.cpp ./code/src/parsing/ServerConfig.cpp ./code/src/parsing/LocationConfig.cpp ./code/src/parsing/utils.cpp
 
-INCS = Parsing.hpp Server.hpp
+INCS = ./code/includes/Config.hpp ./code/includes/ServerConfig.hpp ./code/includes/LocationConfig.hpp ./code/includes/utils.hpp
 
 OBJS = $(SRCS:.cpp=.o)
 
