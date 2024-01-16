@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 11:47:23 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 15:08:34 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void	ServerSocket::setUpSocket()
 
 	// Reusable Port and Socket
 	int on = 1;
-	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
+	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
 	{
 		//perror("setsockop()");
 		std::exit(EXIT_FAILURE);
@@ -103,7 +103,7 @@ void	ServerSocket::setUpSocket()
 	// Set up server address structure
 	memset( &_serverSockAddr, 0, sizeof(_serverSockAddr) );
 	_serverSockAddr.sin_family = AF_INET;
-	_serverSockAddr.sin_addr.s_addr = INADDR_ANY; //should be replaced by the ip adress later
+	_serverSockAddr.sin_addr.s_addr = htonl(_ip);
 	_serverSockAddr.sin_port = htons(_port);
 
 	// Bind the socket
