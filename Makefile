@@ -24,6 +24,8 @@ $(NAME): $(OBJS)
 
 clean:
 	rm -f *.o
+	rm -f $(PARSING)*.o
+	rm -f $(SERVER)*.o
 
 fclean: clean
 	rm -f $(NAME)
