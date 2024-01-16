@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 11:44:12 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 17:44:34 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ ClientSocket::ClientSocket(int connectingServerFD)
 	_pollFD.events = 0;
 	_pollFD.revents = 0;
 	_pollFD.events = _pollFD.events | POLLIN; //set tot POLLIN, to listen to the request
+	_resetRequest();
 	setUpSocket();
 }
 
@@ -89,6 +90,29 @@ void	ClientSocket::setUpSocket()
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "Client socket created with FD: " << _pollFD.fd << std::endl;
+}
+
+void	ClientSocket::_resetRequest()
+{
+	_request.readBytes = 0;
+	_request.contentLength = 0;
+	_request.buffer.clear()
+}
+
+CommunicationStatus	ClientSocket::receiveRequest()
+{
+	char	buffer[1024]; //SIZE NEEDS TO BE RETHOUGHT
+	size_t	bytesRead;
+	
+	if ((bytesRead = recv(_pollFD.fd, &buffer, 1024, O_NONBLOCK)) < 0)
+		return (COM_ERROR);
+	if (bytesRead == 0)
+		return (COM_CONN_CLOSED);
+	//fflush(stdout)
+
+	_request.readBytes += bytesRead;
+	_request.buffer.append(std::string(buffer, bytesRead));
+	
 }
 
 /*

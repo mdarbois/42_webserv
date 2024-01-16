@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 12:14:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 15:31:41 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class ServerManager
 		void					_acceptNewClient(ServerSocket *socket);
 		void					_deleteClient(ClientSocket *client);
 		void					_receiveRequest(ClientSocket *client);
+		bool					_checkPollErrors(Socket *socket, short int revent);
 		void					_sendResponse(ClientSocket *client);
 		void					_updatePollFDArray();
 

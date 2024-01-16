@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 12:16:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 16:27:10 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,24 +142,41 @@ void	ServerManager::_deleteClient(ClientSocket *client)
 	{
 		if ((*it)->getFD() == client->getFD())
 		{
-			std::cout << "TRY to DELETE client." << std::endl;
 			_sockets.erase(it);
-			std::cout << "erased client with fd: " << client->getFD() << ". New socket size: " << _sockets.size() << std::endl;
 			close(client->getFD());
-			std::cout << "closed client with fd: " << client->getFD() << std::endl;
 			delete client;
-			std::cout << "deleted client" << std::endl;
 			_updatePollFDArray();
-			std::cout << "updated the pollfd array" << std::endl;
 			return ;
 		}
 	}
 }
 
+bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
+{
+	if (socket->getType() == SERVER)
+	{
+		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
+		{
+			dynamic_cast<ServerSocket *>(socket)->restartServerSocket();
+			return (true);
+		}
+		return (false);
+	}
+	else if (socket->getType() == CLIENT)
+	{
+		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
+		{
+			_deleteClient(dynamic_cast<ClientSocket *>(socket));
+			return (true);
+		}
+		return (false);
+	}
+	return (true);
+}
+
 void	ServerManager::run()
 {
 	int				pollResult;
-	//int				currPollFDIndex;
 	
 	//Main server loop
 	while (4242) //react to sigint later
@@ -177,7 +194,8 @@ void	ServerManager::run()
 		for (int i = 0; i < static_cast<int>(_sockets.size()); i++)
 		{
 			//check for poll errors
-			//TBD
+			if (_checkPollErrors(_sockets[i], _pollFDs[i].revents))
+				continue;
 
 			//Check if there was an in comming POLL IN on the server socket, ask for a new connection
 			if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == SERVER )

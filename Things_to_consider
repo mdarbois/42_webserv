@@ -1,3 +1,4 @@
 - there can be a null byte in the middle of the request, but then we shouldnt stop reading!
 - HTTP Requests and responses can be sent in chunks
 - use the actual passed address instead of INET_ANY!
+- how to check client timeout?

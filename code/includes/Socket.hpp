@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 21:55:55 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 17:44:08 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,14 @@ typedef enum eSocketType
 	CLIENT,
 	SERVER
 }t_socketType;
+
+typedef enum e_ComminationStatus
+{
+	COM_ERROR = -1,
+	COM_IN_PROGRESS,
+	COM_DONE,
+	COM_CONN_CLOSED
+}CommunicationStatus;
 
 class Socket
 {

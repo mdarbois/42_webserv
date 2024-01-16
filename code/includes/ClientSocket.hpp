@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/10 15:47:55 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 17:32:30 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,14 @@
 
 class ServerSocket;
 
+typedef struct e_Request
+{
+	size_t		contentLength;
+	size_t		readBytes;
+	std::string	buffer;
+	
+}Request;
+
 class ClientSocket: public Socket
 {
 
@@ -30,10 +38,14 @@ class ClientSocket: public Socket
 		ClientSocket( ClientSocket const & src );
 		ClientSocket &		operator=( ClientSocket const & rhs );
 		
-		void	setUpSocket();
+		void				setUpSocket();
+		CommunicationStatus	receiveRequest();
 
 	private:
-		int	_connectingServerFD;
+		int		_connectingServerFD;
+		Request	_request;
+
+		void	_resetRequest();
 
 };
 

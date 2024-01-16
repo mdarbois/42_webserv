@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:52 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 11:47:29 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 16:06:47 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,16 @@ class ServerSocket: public Socket
 		ServerSocket();
 		ServerSocket &		operator=( ServerSocket const & rhs );
 
-		int	getPort() const;
-		struct sockaddr_in getAddress() const;
+		int					getPort() const;
+		struct sockaddr_in	getAddress() const;
+		void				restartServerSocket();
 
 	private:
 		struct sockaddr_in	_serverSockAddr;
 		int					_port;
 		int					_ip;
 		
-		void	setUpSocket();
+		void				setUpSocket();
 
 		ServerSocket( ServerSocket const & src );
 };

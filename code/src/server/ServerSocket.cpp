@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 15:08:34 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 16:08:48 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,6 @@ ServerSocket::ServerSocket(int port, int ip)
 	_type = SERVER;
 	_port = port;
 	_ip = ip;
-	_pollFD.events = 0;
-	_pollFD.revents = 0;
-	_pollFD.events = _pollFD.events | POLLIN;
 	setUpSocket();
 }
 
@@ -73,8 +70,19 @@ std::ostream &			operator<<( std::ostream & o, ServerSocket const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+void	ServerSocket::restartServerSocket()
+{
+	close(_pollFD.fd);
+	setUpSocket();
+}
+
 void	ServerSocket::setUpSocket()
 {
+	_pollFD.events = 0;
+	_pollFD.revents = 0;
+	_pollFD.events = _pollFD.events | POLLIN;
+	
 	// Create socket
 	_pollFD.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_pollFD.fd == -1) {
