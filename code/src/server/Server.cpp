@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 19:07:42 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/16 09:21:55 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,9 +153,9 @@ void	Server::_deleteClient(ClientSocket *client)
 			close(client->getFD());
 			std::cout << "closed client with fd: " << client->getFD() << std::endl;
 			delete client;
-			std::cout << "closed client with fd: " << client->getFD() << std::endl;
+			std::cout << "deleted client" << std::endl;
 			_updatePollFDArray();
-			std::cout << "closed client with fd: " << client->getFD() << std::endl;
+			std::cout << "updated the pollfd array" << std::endl;
 			return ;
 		}
 	}
