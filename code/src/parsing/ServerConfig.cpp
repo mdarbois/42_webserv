@@ -173,6 +173,10 @@ void ServerConfig::_validation(void) const
 {
   if (_ports.size() == 0)
     throw std::runtime_error("no port specified");
+  for (size_t i = 0; i < _ports.size(); ++i) {
+    if (_ports[i] < 1 || _ports[i] > 65535)
+      throw std::runtime_error("Port needs to be between 1 and 65.535");
+  }
   if (_host.empty())
     throw std::runtime_error("no IP (host) specified");
   if (_root.empty())
