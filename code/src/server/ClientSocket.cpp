@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 11:13:29 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 13:49:51 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void	ClientSocket::setUpSocket()
 {
 	// Accept
 	_pollFD.fd = accept(_connectingServerFD, NULL, NULL);
-	//client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
 	if (_pollFD.fd == -1) {
 		std::cerr << "Error accepting connection\n";
 		exit(EXIT_FAILURE);
@@ -94,38 +93,12 @@ void	ClientSocket::setUpSocket()
 
 void	ClientSocket::_resetRequest()
 {
-	//_request.type = UNSET;
 	_request.readBytes = 0;
 	_request.contentLength = 0;
 	_request.buffer.clear();
+	//_test = 0;
 }
 
-/* CommunicationStatus	ClientSocket::receiveRequest()
-{
-	if (_request.type = UNSET)
-	{
-		char	buffer[4096]; //SIZE NEEDS TO BE RETHOUGHT
-		size_t	bytesRead;
-		if ((bytesRead = recv(_pollFD.fd, &buffer, 20, O_NONBLOCK)) < 0)
-		{
-			//DO MORE ?
-			return (COM_ERROR);
-		}
-		if (bytesRead == 0)
-			return (COM_CONN_CLOSED);
-		_request.readBytes += bytesRead;
-		_request.buffer.append(std::string(buffer, bytesRead));
-		size_t	ctPos = _request.buffer.find("Content-Type: multipart/form-data;boundary="boundary"");
-		size_t	clPos = _request.buffer.find("Content-Length: ");
-		size_t	tePos = _request.buffer.find("Transfer-Encoding: chunked");
-		
-		if (clPos != std::string::npos)
-		{
-			_request.contentLength = static_cast<size_t>(std::atoi(_request.buffer.substr(clPos + 16).c_str()));
-			_request.type = SINGLE;
-		}
-	}
-} */
 
 /*
 	- read the header;

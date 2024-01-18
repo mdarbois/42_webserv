@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 11:13:58 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 13:55:16 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,32 +15,30 @@
 
 # include <iostream>
 # include <string>
-#include "Socket.hpp"
-#include "ServerSocket.hpp"
+# include "Socket.hpp"
+# include "ServerSocket.hpp"
 
-class ServerSocket;
+//class ServerSocket;
 
 /* typedef enum e_RequestType
 {
-	UNSET,
+	UNSET = 0,
 	SINGLE,
 	CHUNKED_ENCODING,
 	MULTIPART_FORM_DATA
-}RequestType;*/
+}RequestType; */
 
-typedef struct e_Request
+typedef struct s_Request
 {
 	size_t		contentLength;
 	size_t		readBytes;
-	//RequestType	type;
 	std::string	buffer;
-	
+	//int blah;
 }Request;
-
 
 class ClientSocket: public Socket
 {
-
+	
 	public:
 		ClientSocket(int connectingServerFD);
 		~ClientSocket();
@@ -54,6 +52,7 @@ class ClientSocket: public Socket
 	private:
 		int		_connectingServerFD;
 		Request	_request;
+		//int		_test;
 
 		void	_resetRequest();
 
