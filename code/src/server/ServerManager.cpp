@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 19:29:57 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 10:26:40 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,7 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 
 void	ServerManager::_receiveRequest(ClientSocket *client)
 {
+	std::cout << "Try to _receive in MAnager" << std::endl;
 	CommunicationStatus	status = client->receiveRequest();
 	if (status == COM_CONN_CLOSED)
 		_deleteClient(client, NO_ERROR);
@@ -118,7 +119,7 @@ void	ServerManager::_receiveRequest(ClientSocket *client)
 	else if (status == COM_DONE)
 		client->setPollFD(client->getFD(), POLLOUT, 0);
 	else if (status == COM_IN_PROGRESS)
-		client->setPollFD(client->getFD(), POLLOUT, 0);
+		client->setPollFD(client->getFD(), POLLIN, 0);
 	_updatePollFDArray();
 }
 
@@ -146,6 +147,7 @@ void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 			close(client->getFD());
 			delete client;
 			_updatePollFDArray();
+			std::cout << "Deleted client" << std::endl;
 			return ;
 		}
 	}
@@ -157,6 +159,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 	{
 		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
 		{
+			std::cout << "POLL error server" << std::endl;
 			dynamic_cast<ServerSocket *>(socket)->restartServerSocket();
 			return (true);
 		}
@@ -166,6 +169,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 	{
 		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
 		{
+			std::cout << "POLL error client" << std::endl;
 			_deleteClient(dynamic_cast<ClientSocket *>(socket), HTTP_500);
 			return (true);
 		}
@@ -181,6 +185,7 @@ void	ServerManager::run()
 	//Main server loop
 	while (4242) //react to sigint later
 	{
+
 		//Check all monitored fd with poll if an event occured
 		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
 		{
@@ -200,6 +205,7 @@ void	ServerManager::run()
 			//Check if there was an in comming POLL IN on the server socket, ask for a new connection
 			if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == SERVER )
 				_acceptNewClient(dynamic_cast<ServerSocket *>(_sockets[i]));
+
 
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request

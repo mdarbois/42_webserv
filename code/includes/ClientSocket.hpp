@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 17:32:30 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 11:13:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,23 @@
 
 class ServerSocket;
 
+/* typedef enum e_RequestType
+{
+	UNSET,
+	SINGLE,
+	CHUNKED_ENCODING,
+	MULTIPART_FORM_DATA
+}RequestType;*/
+
 typedef struct e_Request
 {
 	size_t		contentLength;
 	size_t		readBytes;
+	//RequestType	type;
 	std::string	buffer;
 	
 }Request;
+
 
 class ClientSocket: public Socket
 {

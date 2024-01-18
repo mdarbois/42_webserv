@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 19:28:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 11:13:29 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,26 +94,61 @@ void	ClientSocket::setUpSocket()
 
 void	ClientSocket::_resetRequest()
 {
+	//_request.type = UNSET;
 	_request.readBytes = 0;
 	_request.contentLength = 0;
 	_request.buffer.clear();
 }
 
+/* CommunicationStatus	ClientSocket::receiveRequest()
+{
+	if (_request.type = UNSET)
+	{
+		char	buffer[4096]; //SIZE NEEDS TO BE RETHOUGHT
+		size_t	bytesRead;
+		if ((bytesRead = recv(_pollFD.fd, &buffer, 20, O_NONBLOCK)) < 0)
+		{
+			//DO MORE ?
+			return (COM_ERROR);
+		}
+		if (bytesRead == 0)
+			return (COM_CONN_CLOSED);
+		_request.readBytes += bytesRead;
+		_request.buffer.append(std::string(buffer, bytesRead));
+		size_t	ctPos = _request.buffer.find("Content-Type: multipart/form-data;boundary="boundary"");
+		size_t	clPos = _request.buffer.find("Content-Length: ");
+		size_t	tePos = _request.buffer.find("Transfer-Encoding: chunked");
+		
+		if (clPos != std::string::npos)
+		{
+			_request.contentLength = static_cast<size_t>(std::atoi(_request.buffer.substr(clPos + 16).c_str()));
+			_request.type = SINGLE;
+		}
+	}
+} */
+
+/*
+	- read the header;
+	- if there is a content-length
+		- set content lenght to the value
+		- set status to Read in progess, to read the rest in the next poll loop
+*/
 CommunicationStatus	ClientSocket::receiveRequest()
 {
-	char	buffer[1024]; //SIZE NEEDS TO BE RETHOUGHT
+	std::cout << "Client -> receive" << std::endl;
+	char	buffer[20]; //SIZE NEEDS TO BE RETHOUGHT
 	size_t	bytesRead;
 	
-	/*
-		The O_NONBLOCK flag suggests that the socket is set to non-blocking mode. 
-		If no data is available for reading, recv may return -1 with errno set to EAGAIN or EWOULDBLOCK. 
-		In non-blocking mode, this is not necessarily an error, and you might want to handle it differently 
-		(e.g., return COM_IN_PROGRESS or retry later).
-	*/
-	if ((bytesRead = recv(_pollFD.fd, &buffer, 1024, O_NONBLOCK)) < 0)
+	if ((bytesRead = recv(_pollFD.fd, &buffer, 20, O_NONBLOCK)) < 0)
+	{
+		std::cout << "COM ERROR" << std::endl;
 		return (COM_ERROR);
+	}
 	if (bytesRead == 0)
+	{
+		std::cout << "CONN CLOSED" << std::endl;
 		return (COM_CONN_CLOSED);
+	}
 	_request.readBytes += bytesRead;
 	_request.buffer.append(std::string(buffer, bytesRead));
 
@@ -123,9 +158,19 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	else
 		_request.contentLength = 0;
 	if (_request.buffer.find("\r\n\r\n") != std::string::npos)
+	{
+		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
+		std::cout << _request.buffer << std::endl;
+		std::cout << "**********************END***************************************" << std::endl;
 		return (COM_DONE);
+	}
 	else
+	{
+		std::cout << "******************TEMP REQUEST*****************************" << std::endl;
+		std::cout << _request.buffer << std::endl;
+		std::cout << "**********************END*****************************" << std::endl;	
 		return (COM_IN_PROGRESS);
+	}
 }
 
 /*
