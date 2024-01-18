@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 14:32:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 17:38:55 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 
 typedef enum e_RequestType
 {
-	SINGLE = 0,
+	UNSET,
+	SINGLE,
 	CONTENT_LENGTH,
 	CHUNKED_ENCODING,
 	MULTIPART_FORM_DATA
@@ -33,6 +34,7 @@ typedef struct s_Request
 	size_t		contentLength;
 	size_t		readBytes;
 	std::string	buffer;
+	std::string	boundary;
 	RequestType	type;
 }Request;
 
