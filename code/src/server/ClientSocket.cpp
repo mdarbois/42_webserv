@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 13:49:51 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 14:37:33 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@
 
 ClientSocket::ClientSocket(int connectingServerFD)
 {
+	_type = CLIENT;
 	_connectingServerFD = connectingServerFD;
-	_pollFD.events = 0;
 	_pollFD.revents = 0;
-	_pollFD.events = _pollFD.events | POLLIN; //set tot POLLIN, to listen to the request
-	_resetRequest();
+	_pollFD.events = POLLIN; //set tot POLLIN, to listen to the request
 	setUpSocket();
+	_resetRequest();
 }
 
 ClientSocket::ClientSocket( const ClientSocket & src )
@@ -96,7 +96,7 @@ void	ClientSocket::_resetRequest()
 	_request.readBytes = 0;
 	_request.contentLength = 0;
 	_request.buffer.clear();
-	//_test = 0;
+	_request.type = SINGLE;
 }
 
 
@@ -126,15 +126,43 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	_request.buffer.append(std::string(buffer, bytesRead));
 
 	size_t	clPos = _request.buffer.find("Content-Length: ");
+	size_t	ctPos = _request.buffer.find("Content-Type: multipart/form-data;");
+	size_t	tePos = _request.buffer.find("Transfer-Encoding: chunked");
 	if (clPos != std::string::npos)
+	{
+		_request.type = CONTENT_LENGTH,
 		_request.contentLength = static_cast<size_t>(std::atoi(_request.buffer.substr(clPos + 16).c_str()));
-	else
+	}
+	else if (ctPos != std::string::npos)
+	{
+		_request.type = MULTIPART_FORM_DATA;
 		_request.contentLength = 0;
-	if (_request.buffer.find("\r\n\r\n") != std::string::npos)
+	}
+	else if (tePos != std::string::npos)
+	{
+		_request.type = CHUNKED_ENCODING;
+		_request.contentLength = 0;
+	}
+	else
+		_request.type = SINGLE;
+	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.type == SINGLE)
 	{
 		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
 		std::cout << _request.buffer << std::endl;
 		std::cout << "**********************END***************************************" << std::endl;
+		return (COM_DONE);
+	}
+	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.type == CHUNKED_ENCODING)
+	{
+		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
+		std::cout << _request.buffer << std::endl;
+		std::cout << "**********************END***************************************" << std::endl;
+		return (COM_DONE);
+	}
+	else if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.type == MULTIPART_FORM_DATA)
+	{
+		
+		//NOTT IMPLEMENTED YET!!
 		return (COM_DONE);
 	}
 	else

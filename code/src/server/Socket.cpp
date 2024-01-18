@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:13 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/15 12:18:31 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 14:08:53 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,7 @@ bool	Socket::operator==(const Socket& other)
 */
 void	Socket::setPollFD(int fd, short events, short revents)
 {
-	_pollFD.events = 0;
-	_pollFD.events = _pollFD.events | events;
+	_pollFD.events = events;
 	_pollFD.revents = revents;
 	_pollFD.fd = fd;
 }

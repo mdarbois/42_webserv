@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 10:26:40 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/18 14:19:59 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 		}
 		return (false);
 	}
+	std::cout << "BLAH" << std::endl;
 	return (true);
 }
 
