@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 07:47:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 11:50:19 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class ClientSocket: public Socket
 		void				setUpSocket();
 		CommunicationStatus	receiveRequest();
 		bool				hasReceiveTimeOut();
+		Request				getRequest() const;
 
 	private:
 		int		_connectingServerFD;

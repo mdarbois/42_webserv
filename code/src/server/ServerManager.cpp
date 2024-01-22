@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 07:49:26 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 12:11:48 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,6 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 
 void	ServerManager::_receiveRequest(ClientSocket *client)
 {
-	std::cout << "Try to _receive in MAnager" << std::endl;
 	CommunicationStatus	status = client->receiveRequest();
 	if (status == COM_CONN_CLOSED)
 		_deleteClient(client, NO_ERROR);
@@ -125,6 +124,8 @@ void	ServerManager::_receiveRequest(ClientSocket *client)
 
 void	ServerManager::_sendResponse(ClientSocket *client)
 {
+	ParserHTTP parser(client->getRequest().buffer);
+	
 	std::cout << "TRY TO SEND SIMPLE RESPONSE" << std::endl;
 	//For Testing purposes - just send a simple respond to the client 
 	std::string	response = _buildResponse("Hello Client: " + intToString(client->getFD()));
@@ -175,7 +176,6 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 		}
 		return (false);
 	}
-	std::cout << "BLAH" << std::endl;
 	return (true);
 }
 

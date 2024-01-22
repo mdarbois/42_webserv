@@ -1,2 +1,4 @@
 - there can be a null byte in the middle of the request, but then we shouldnt stop reading! --> DONE via content length
 - HTTP Requests and responses can be sent in chunks
+- ehat if location "EMPTY" { ??
+- 

@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 10:22:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 11:49:16 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "utils.hpp"
+#include "ParserHTTP.hpp"
 
 
 //For Testing - later set up by config
