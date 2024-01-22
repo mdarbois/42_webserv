@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 17:38:55 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 07:47:00 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,24 @@
 # include "Socket.hpp"
 # include "ServerSocket.hpp"
 
-//class ServerSocket;
+# define CLIENT_RECEIVE_BUFFER_SIZE 1024
+# define CLIENT_TIMEOUT_RECEIVE 5
 
-typedef enum e_RequestType
+typedef enum e_RequestEndType
 {
 	UNSET,
 	SINGLE,
 	CONTENT_LENGTH,
-	CHUNKED_ENCODING,
-	MULTIPART_FORM_DATA
-}RequestType;
+	CHUNKED_ENCODING
+}RequestEndType;
 
 typedef struct s_Request
 {
-	size_t		contentLength;
-	size_t		readBytes;
-	std::string	buffer;
-	std::string	boundary;
-	RequestType	type;
+	size_t			contentLength;
+	size_t			readBytes;
+	std::string		buffer;
+	std::string		boundary;
+	RequestEndType	endType;
 }Request;
 
 class ClientSocket: public Socket
@@ -50,12 +50,15 @@ class ClientSocket: public Socket
 		
 		void				setUpSocket();
 		CommunicationStatus	receiveRequest();
+		bool				hasReceiveTimeOut();
 
 	private:
 		int		_connectingServerFD;
 		Request	_request;
+		time_t	_startTimeReceive;
 
 		void	_resetRequest();
+		bool	_checkContentLength();
 
 };
 

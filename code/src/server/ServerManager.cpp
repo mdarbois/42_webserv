@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 14:19:59 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 07:49:26 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,6 @@ void	ServerManager::run()
 			if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == SERVER )
 				_acceptNewClient(dynamic_cast<ServerSocket *>(_sockets[i]));
 
-
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request
 			else if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == CLIENT)
@@ -219,7 +218,8 @@ void	ServerManager::run()
 				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i])); //send the response --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
 
 			//Check if the client has a timeout
-			//TBD
+			else if ( _sockets[i]->getType() == CLIENT && dynamic_cast<ClientSocket *>(_sockets[i])->hasReceiveTimeOut())
+				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[i]), HTTP_408); // If cleients timed out, do we have to send a response to it?
 		}
 	}
 	// Close the server socket

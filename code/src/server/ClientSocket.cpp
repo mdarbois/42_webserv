@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 17:44:32 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 07:47:45 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 ClientSocket::ClientSocket(int connectingServerFD)
 {
+	_startTimeReceive = time(0);
 	_type = CLIENT;
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
@@ -96,9 +97,17 @@ void	ClientSocket::_resetRequest()
 	_request.readBytes = 0;
 	_request.contentLength = 0;
 	_request.buffer.clear();
-	_request.type = UNSET;
+	_request.endType = UNSET;
 }
 
+bool	ClientSocket::hasReceiveTimeOut()
+{
+	if (_startTimeReceive == -1)
+		return (true);
+	if (time(0) - _startTimeReceive >= CLIENT_TIMEOUT_RECEIVE)
+		return (true);
+	return (false);
+}
 
 /*
 	- read the header;
@@ -106,13 +115,26 @@ void	ClientSocket::_resetRequest()
 		- set content lenght to the value
 		- set status to Read in progess, to read the rest in the next poll loop
 */
+
+bool	ClientSocket::_checkContentLength()
+{
+	size_t		endHeader = _request.buffer.find("\r\n\r\n");
+	std::string	currentBody = _request.buffer.substr(endHeader + std::strlen("\r\n\r\n"));
+
+	if (endHeader == std::string::npos)
+		return (false);
+	if (_request.contentLength == currentBody.length())
+		return (true);
+	return (false);
+}
+
 CommunicationStatus	ClientSocket::receiveRequest()
 {
 	std::cout << "Client -> receive" << std::endl;
-	char	buffer[1024]; //SIZE NEEDS TO BE RETHOUGHT
+	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE]; //SIZE NEEDS TO BE RETHOUGHT
 	size_t	bytesRead;
 	
-	if ((bytesRead = recv(_pollFD.fd, &buffer, 1024, O_NONBLOCK)) < 0)
+	if ((bytesRead = recv(_pollFD.fd, &buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
 	{
 		std::cout << "COM ERROR" << std::endl;
 		return (COM_ERROR);
@@ -126,55 +148,36 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	_request.buffer.append(std::string(buffer, bytesRead));
 
 	size_t	clPos = _request.buffer.find("Content-Length: ");
-	size_t	ctPos = _request.buffer.find("Content-Type: multipart/form-data; ");
 	size_t	tePos = _request.buffer.find("Transfer-Encoding: chunked");
-	if (clPos != std::string::npos && _request.type == UNSET)
+	if (clPos != std::string::npos)
 	{
-		_request.type = CONTENT_LENGTH,
+		_request.endType = CONTENT_LENGTH, //POST with content length
 		_request.contentLength = static_cast<size_t>(std::atoi(_request.buffer.substr(clPos + 16).c_str()));
 	}
-	else if (ctPos != std::string::npos)
+	else if (tePos != std::string::npos)
 	{
-		size_t boundary_pos = _request.buffer.find("boundary=");
-
-		if (boundary_pos != std::string::npos) {
-		// Extract the boundary value
-		std::string boundary = _request.buffer.substr(boundary_pos + 9); // 9 is the length of "boundary="
-		size_t newline_pos = boundary.find("\r\n");
-		if (newline_pos != std::string::npos) {
-			boundary = boundary.substr(0, newline_pos);
-		}
-		_request.boundary = boundary;
-		}
-		_request.type = MULTIPART_FORM_DATA;
+		_request.endType = CHUNKED_ENCODING; //POST with chunked encoding
 		_request.contentLength = 0;
 	}
-	else if (tePos != std::string::npos && _request.type == UNSET)
-	{
-		_request.type = CHUNKED_ENCODING;
-		_request.contentLength = 0;
-	}
-	else if (_request.type == UNSET)
-		_request.type = SINGLE;
+	else
+		_request.endType = SINGLE; //DELETE OR GET
 	
-	//WRONG: CHECK CONTENT LENGTH INSTEAD!!
-	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.type == SINGLE)
+	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.endType == SINGLE)
 	{
 		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
 		std::cout << _request.buffer << std::endl;
 		std::cout << "**********************END***************************************" << std::endl;
 		return (COM_DONE);
 	}
-	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.type == CHUNKED_ENCODING)
+	else if (_request.endType == CONTENT_LENGTH && _checkContentLength())
 	{
 		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
 		std::cout << _request.buffer << std::endl;
 		std::cout << "**********************END***************************************" << std::endl;
 		return (COM_DONE);
 	}
-	else if (_request.buffer.find(_request.boundary + "--\r\n") != std::string::npos && _request.type == MULTIPART_FORM_DATA)
+	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.endType == CHUNKED_ENCODING)
 	{
-		//DOESNT ENTER HERE ? WHY ???????????????????????? Maybe the type is overwritten somewhere??
 		std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
 		std::cout << _request.buffer << std::endl;
 		std::cout << "**********************END***************************************" << std::endl;

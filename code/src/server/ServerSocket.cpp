@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 16:08:48 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/22 07:51:36 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	ServerSocket::setUpSocket()
 
 	// Reusable Port and Socket
 	int on = 1;
-	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
+	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
 	{
 		//perror("setsockop()");
 		std::exit(EXIT_FAILURE);
