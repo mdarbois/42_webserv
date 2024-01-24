@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/14 21:55:55 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:25:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,47 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <poll.h>
+#include "Config.hpp"
 
 typedef enum eSocketType
 {
 	CLIENT,
 	SERVER
 }t_socketType;
+
+typedef enum e_ComminationStatus
+{
+	COM_ERROR = -1,
+	COM_IN_PROGRESS,
+	COM_DONE,
+	COM_CONN_CLOSED
+}CommunicationStatus;
+
+typedef enum e_HttpStatus
+{
+	NO_ERROR = 0,
+	HTTP_200 = 200,
+	HTTP_201 = 201,
+	HTTP_202 = 202,
+	HTTP_204 = 204,
+	HTTP_206 = 206,
+	HTTP_300 = 300,
+	HTTP_301 = 301,
+	HTTP_302 = 302,
+	HTTP_303 = 303,
+	HTTP_304 = 304,
+	HTTP_307 = 307,
+	HTTP_308 = 308,
+	HTTP_400 = 400,
+	HTTP_403 = 403,
+	HTTP_404 = 404,
+	HTTP_405 = 405,
+	HTTP_408 = 408,
+	HTTP_413 = 413,
+	HTTP_500 = 500,
+	HTTP_504 = 504,
+	HTTP_505 = 505
+} HttpStatus;
 
 class Socket
 {
@@ -45,6 +80,7 @@ class Socket
 	protected:
 		t_socketType	_type;
 		struct pollfd	_pollFD;
+		Config			_config;
 };
 
 //std::ostream &			operator<<( std::ostream & o, Socket const & i );
