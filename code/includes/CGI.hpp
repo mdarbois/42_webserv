@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include "./ParserHTTP.hpp"
+#include "utils.hpp"
 
 class CGI {
     public:
@@ -16,8 +17,7 @@ class CGI {
         CGI &operator=(CGI const &rhs);
         int input_pipefd[2];  // Pipe for sending input to child
         int output_pipefd[2]; // Pipe for receiving output from child
-        std::vector<const  char *> getEnv(ParserHTTP &parsing);
-        std::vector<const char *> getArgs(ParserHTTP &parsing);
+        void getArgs(ParserHTTP &parsing);
         void _childProcess(int *input_pipefd, int *output_pipefd);
         void _parentProcess(ParserHTTP parsing, int pid, int *input_pipefd, int *output_pipefd, pid_t pidWait, time_t startTime);
         std::string	_readOutput(int output_pipefd[2]);

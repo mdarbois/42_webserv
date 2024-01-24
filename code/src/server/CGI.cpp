@@ -5,7 +5,7 @@ CGI::CGI(){}
 CGI::CGI(ParserHTTP &parsing) :  _length (0),  _timeOut (false), _body ("")
 {
     _env = mapToArray(parsing.getHeaderMap());
-    _args = getArgs(response);
+    getArgs(parsing);
     _php = "/usr/bin/php";
     if (pipe(input_pipefd) == -1)
         throw std::runtime_error("CGI error: input pipe failed");
@@ -45,20 +45,15 @@ bool	CGI::timeOut() const
 }
 
 
-std::vector<const char *> CGI::getArgs(ParserHTTP &parsing)
+void CGI::getArgs(ParserHTTP &parsing)
 {
-    // put the map into the vector
+
     _args.push_back(_php);
-    std::string folder = "./cgi"
+    std::string folder = "./cgi";
     const char *phpScript = folder + parsing.getPath();
     _args.push_back(phpScript);
-    std::vector<const char *> args(_args.size() + 1, NULL);
-    for (size_t i = 1; i < _args.size(); i++)
-    {
-        args[i] = _args[i].c_str();
-    }
-    args[_args.size()] = NULL;
-    return (args);
+    _args.push_back("");
+
 }
 
 void CGI::_childProcess(int *input_pipefd, int *output_pipefd)
