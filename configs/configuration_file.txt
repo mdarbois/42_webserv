@@ -1,13 +1,13 @@
 server {
 	listen 18000;
 	listen 18001;
-	listen 65535;
+	#listen 65535;
 	host 127.0.0.1;
 	root ./html;
 	error_page: 404 /error_pages/405.html; 
 	server_name coucou;
 	
-	location / {
+	location .py {
 		methods GET;
 		autoindex off;
 		root ./html;

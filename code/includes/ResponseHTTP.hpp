@@ -9,6 +9,7 @@
 # include "ParserHTTP.hpp"
 # include "Config.hpp"
 # include "Socket.hpp" //because of HTTP Codes -> has to be done cleaner
+#include "CGI.hpp"
 
 # define ALLOWED_HTTP_PROTOCOL "HTTP/1.1"
 typedef struct s_ResponseLine

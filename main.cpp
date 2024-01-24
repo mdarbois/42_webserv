@@ -9,7 +9,7 @@
 #include "code/includes/ServerSocket.hpp"
 #include "code/includes/Socket.hpp"
 
-int main(int argc, char **argv, char **env)
+int main(int argc, char **argv)
 {
   if (argc < 1 || argc > 2)
   {

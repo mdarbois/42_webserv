@@ -77,6 +77,30 @@ std::vector<std::string> mapToArray(const std::map<std::string, std::string>& my
     for (std::map<std::string, std::string>::const_iterator it = myMap.begin(); it != myMap.end(); ++it) {
         result.push_back(it->first + ": " + it->second);
     }
-    result.push_back("");
     return result;
+}
+
+char** vectorToCharArray(const std::vector<std::string>& strVector) {
+    // Create a dynamic array of char pointers
+    char** charArray = new char*[strVector.size() + 1];  // +1 for the terminating NULL pointer
+
+    // Copy each string from the vector to the dynamic array
+    for (size_t i = 0; i < strVector.size(); ++i) {
+        // Allocate memory for each string and copy it
+        charArray[i] = new char[strVector[i].length() + 1];
+        std::strcpy(charArray[i], strVector[i].c_str());
+    }
+
+    // Add a terminating NULL pointer at the end
+    charArray[strVector.size()] = NULL;
+
+    return charArray;
+}
+
+void deleteArray(char** charArray)
+{
+	for (size_t i = 0; charArray[i] != NULL; ++i) {
+			delete[] charArray[i];
+		}
+		delete[] charArray;
 }

@@ -128,10 +128,10 @@ bool	ResponseHTTP::_readFile()
 
 void	ResponseHTTP::_GET()
 {
-	/* if (_request.isCGI())
+	if (_request.isCGI())
 	{
-		//Do CGI Stuff
-	} */
+		CGI cig(_request);
+	}
 	//Check Autoindex
 	
 	//For now just test the normal Get action, to read the requested file

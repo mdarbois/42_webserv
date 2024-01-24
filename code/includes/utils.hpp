@@ -20,4 +20,6 @@ unsigned int extractInt(std::string &line, size_t pos, size_t length);
 bool checkSemiColon(const std::string& line);
 std::string intToString(const int &number);
 std::vector<std::string> mapToArray(const std::map<std::string, std::string>& myMap);
+char** vectorToCharArray(const std::vector<std::string>& strVector);
+void deleteArray(char** charArray);
 #endif
