@@ -1,10 +1,10 @@
-SRCS = main.cpp $(PARSING)Config.cpp $(PARSING)ServerConfig.cpp $(PARSING)LocationConfig.cpp $(PARSING)utils.cpp $(SERVER)ClientSocket.cpp $(SERVER)ServerManager.cpp $(SERVER)ServerSocket.cpp $(SERVER)Socket.cpp
+SRCS = main.cpp $(PARSING)Config.cpp $(PARSING)ServerConfig.cpp $(PARSING)LocationConfig.cpp $(PARSING)utils.cpp $(SERVER)ClientSocket.cpp $(SERVER)ServerManager.cpp $(SERVER)ServerSocket.cpp $(SERVER)Socket.cpp $(SERVER)CGI.cpp
 
 PARSING = ./code/src/parsing/
 
 SERVER = ./code/src/server/
 
-INCS = $(INCLUDE)Config.hpp $(INCLUDE)ServerConfig.hpp $(INCLUDE)LocationConfig.hpp $(INCLUDE)utils.hpp $(INCLUDE)ClientSocket.hpp $(INCLUDE)ParserHTTP.hpp $(INCLUDE)ServerManager.hpp $(INCLUDE)ServerSocket.hpp $(INCLUDE)Socket.hpp
+INCS = $(INCLUDE)Config.hpp $(INCLUDE)ServerConfig.hpp $(INCLUDE)LocationConfig.hpp $(INCLUDE)utils.hpp $(INCLUDE)ClientSocket.hpp $(INCLUDE)ParserHTTP.hpp $(INCLUDE)ServerManager.hpp $(INCLUDE)ServerSocket.hpp $(INCLUDE)Socket.hpp $(INCLUDE)CGI.hpp
 
 INCLUDE = ./code/includes/
 
