@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 12:16:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 11:49:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 ServerManager::ServerManager(Config const &config)
 {
+	_config = config;
 	_numberServers = config.getServers().size();
 	std::vector<ServerConfig> serversList = config.getServers();
 	std::vector<ServerConfig>::iterator it = serversList.begin();
@@ -26,7 +27,7 @@ ServerManager::ServerManager(Config const &config)
 		std::vector<unsigned int> portsList = (*it).getPorts();
 		std::vector<unsigned int>::iterator portIT = portsList.begin();
 		for (; portIT != portsList.end(); ++portIT)
-			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp()));
+			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp(), config));
 	}
 	_updatePollFDArray();
 }
@@ -56,6 +57,31 @@ std::ostream &			operator<<( std::ostream & o, ServerManager const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+void log(const std::string& message, LogColor color) {
+	const char* colorCode = "\033[0;";  // Default color
+	switch (color) {
+		case RED:
+			colorCode = "\033[91m";  // Red
+			break;
+		case GREEN:
+			colorCode = "\033[92m";  // Green
+			break;
+		case YELLOW:
+			colorCode = "\033[93m";  // Yellow
+			break;
+		case BLUE:
+			colorCode = "\033[94m";  // Blue
+			break;
+		case DEFAULT:
+			colorCode = "\033[0m";   // Default
+			break;
+	}
+
+	// Print the message with the specified color
+	// Reset color after message
+	std::cout << colorCode << message << "\033[0m" << std::endl;
+}
+
 
 /*
 	The pollfd of each socket is attatched to the socket. This makes deleting and addign new ones easaier.
@@ -72,22 +98,6 @@ void	ServerManager::_updatePollFDArray()
 	}
 }
 
-std::string	_buildResponse(std::string body)
-{
-	std::string	crlf = "\r\n";
-	std::string	response;
-	std::string	lengthStr = intToString(static_cast<int>(body.length()));
-
-	response += "HTTP/1.1 200 OK" + crlf;			// Status-Line
-	response += "Content-Type: text/html" + crlf;	// Entity-Header-Field
-	response += "Content-Length: " + lengthStr + crlf;		// Entity-Header-Field
-	response += crlf;
-	response += body + crlf;				// message-body
-	response += crlf;
-	
-	return response;
-}
-
 void	ServerManager::_acceptNewClient(ServerSocket *socket)
 {
 	std::cout << "TRY TO ACCEPT NEW CLIENT" << std::endl;
@@ -97,7 +107,7 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 		std::cerr << "Maximum amout of possible connections reached." << std::endl;
 		return ;
 	}
-	newClient = new ClientSocket(socket->getFD());
+	newClient = new ClientSocket(socket->getFD(), _config);
 	if ( newClient->getFD() < 0)
 	{
 		std::cerr << "Err creating client socket" << std::endl;
@@ -110,60 +120,82 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 
 void	ServerManager::_receiveRequest(ClientSocket *client)
 {
-	std::cout << "TRY TO RECV REQUEST" << std::endl;
-	//Print HTTP Request - Testing
-	char buffer[1024];
-	std::string receivedString;
-	ssize_t bytesRead = recv(client->getFD(), buffer, sizeof(buffer), 0);
-	receivedString += std::string(buffer, bytesRead);
-	// Print the received string
-	std::cout << "************HTTP-REQUEST**************************" << std::endl;
-	std::cout << receivedString << std::endl;
-	std::cout << "**************************************************" << std::endl << std::endl;
-	client->setPollFD(client->getFD(), POLLOUT, 0);
+	CommunicationStatus	status = client->receiveRequest();
+	if (status == COM_CONN_CLOSED)
+		_deleteClient(client, NO_ERROR);
+	else if (status == COM_ERROR)
+		_deleteClient(client, HTTP_400);
+	else if (status == COM_DONE)
+		client->setPollFD(client->getFD(), POLLOUT, 0);
+	else if (status == COM_IN_PROGRESS)
+		client->setPollFD(client->getFD(), POLLIN, 0);
 	_updatePollFDArray();
 }
 
 void	ServerManager::_sendResponse(ClientSocket *client)
 {
-	std::cout << "TRY TO SEND SIMPLE RESPONSE" << std::endl;
-	//For Testing purposes - just send a simple respond to the client 
-	std::string	response = _buildResponse("Hello Client: " + intToString(client->getFD()));
-	send(client->getFD(), response.c_str(), strlen(response.c_str()), 0);
-	client->setPollFD(client->getFD(), POLLIN, 0);
+	CommunicationStatus responseStatus = client->sendResponse();
+	
+	if (responseStatus == COM_DONE)
+		_deleteClient(client, HTTP_200);
+	else if (responseStatus == COM_ERROR)
+		_deleteClient(client, HTTP_500);
+	else if (responseStatus == COM_IN_PROGRESS)
+		client->setPollFD(client->getFD(), POLLOUT, 0);
 	_updatePollFDArray();
-	std::cerr << "Sent response" << std::endl;
-	_deleteClient(client);
 }
 
-void	ServerManager::_deleteClient(ClientSocket *client)
+void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 {
+	if (code < 0)
+		return ;
 	for (std::vector<Socket *>::iterator it = _sockets.begin() ; it != _sockets.end(); it++)
 	{
 		if ((*it)->getFD() == client->getFD())
 		{
-			std::cout << "TRY to DELETE client." << std::endl;
 			_sockets.erase(it);
-			std::cout << "erased client with fd: " << client->getFD() << ". New socket size: " << _sockets.size() << std::endl;
 			close(client->getFD());
-			std::cout << "closed client with fd: " << client->getFD() << std::endl;
 			delete client;
-			std::cout << "deleted client" << std::endl;
 			_updatePollFDArray();
-			std::cout << "updated the pollfd array" << std::endl;
+			std::cout << "Deleted client" << std::endl;
 			return ;
 		}
 	}
 }
 
+bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
+{
+	if (socket->getType() == SERVER)
+	{
+		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
+		{
+			std::cout << "POLL error server" << std::endl;
+			dynamic_cast<ServerSocket *>(socket)->restartServerSocket();
+			return (true);
+		}
+		return (false);
+	}
+	else if (socket->getType() == CLIENT)
+	{
+		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
+		{
+			std::cout << "POLL error client" << std::endl;
+			_deleteClient(dynamic_cast<ClientSocket *>(socket), HTTP_500);
+			return (true);
+		}
+		return (false);
+	}
+	return (true);
+}
+
 void	ServerManager::run()
 {
-	int				pollResult;
-	//int				currPollFDIndex;
+	int	pollResult;
 	
 	//Main server loop
 	while (4242) //react to sigint later
 	{
+
 		//Check all monitored fd with poll if an event occured
 		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
 		{
@@ -177,7 +209,8 @@ void	ServerManager::run()
 		for (int i = 0; i < static_cast<int>(_sockets.size()); i++)
 		{
 			//check for poll errors
-			//TBD
+			if (_checkPollErrors(_sockets[i], _pollFDs[i].revents))
+				continue;
 
 			//Check if there was an in comming POLL IN on the server socket, ask for a new connection
 			if ( _pollFDs[i].revents & POLLIN && _sockets[i]->getType() == SERVER )
@@ -191,10 +224,11 @@ void	ServerManager::run()
 			//Check if the client socket is writeable non-blocking: POLLOUT.
 			//Server is sending HTTP response
 			else if ( _pollFDs[i].revents & POLLOUT && _sockets[i]->getType() == CLIENT)
-				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i]));
+				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[i])); //send the response --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
 
 			//Check if the client has a timeout
-			//TBD
+			else if ( _sockets[i]->getType() == CLIENT && dynamic_cast<ClientSocket *>(_sockets[i])->hasCommunicationTimeOut())
+				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[i]), HTTP_408); // If cleients timed out, do we have to send a response to it?
 		}
 	}
 	// Close the server socket

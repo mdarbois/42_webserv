@@ -1,4 +1,5 @@
-SRCS = main.cpp $(PARSING)Config.cpp $(PARSING)ServerConfig.cpp $(PARSING)LocationConfig.cpp $(PARSING)utils.cpp $(SERVER)ClientSocket.cpp $(SERVER)ServerManager.cpp $(SERVER)ServerSocket.cpp $(SERVER)Socket.cpp $(SERVER)CGI.cpp
+
+SRCS = main.cpp $(PARSING)Config.cpp $(PARSING)ServerConfig.cpp $(PARSING)LocationConfig.cpp $(PARSING)utils.cpp $(SERVER)ClientSocket.cpp $(SERVER)ServerManager.cpp $(SERVER)ServerSocket.cpp $(SERVER)Socket.cpp $(SERVER)ParserHTTP.cpp $(SERVER)ResponseHTTP.cpp $(SERVER)CGI.cpp
 
 PARSING = ./code/src/parsing/
 

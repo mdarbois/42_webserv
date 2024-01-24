@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 15:08:34 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:28:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,12 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerSocket::ServerSocket(int port, int ip)
+ServerSocket::ServerSocket(int port, int ip, Config config)
 {
 	_type = SERVER;
 	_port = port;
 	_ip = ip;
-	_pollFD.events = 0;
-	_pollFD.revents = 0;
-	_pollFD.events = _pollFD.events | POLLIN;
+	_config = config;
 	setUpSocket();
 }
 
@@ -73,8 +71,19 @@ std::ostream &			operator<<( std::ostream & o, ServerSocket const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+void	ServerSocket::restartServerSocket()
+{
+	close(_pollFD.fd);
+	setUpSocket();
+}
+
 void	ServerSocket::setUpSocket()
 {
+	_pollFD.events = 0;
+	_pollFD.revents = 0;
+	_pollFD.events = _pollFD.events | POLLIN;
+	
 	// Create socket
 	_pollFD.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_pollFD.fd == -1) {
@@ -84,7 +93,7 @@ void	ServerSocket::setUpSocket()
 
 	// Reusable Port and Socket
 	int on = 1;
-	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT
+	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
 	{
 		//perror("setsockop()");
 		std::exit(EXIT_FAILURE);

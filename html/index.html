@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Apple-Style HTML with GIFs</title>
+	<style>
+		body {
+			font-family: 'Helvetica Neue', sans-serif;
+			background-color: #f4f4f4;
+			color: #333;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+
+		.container {
+			text-align: center;
+			position: relative;
+		}
+
+		h1 {
+			color: #333;
+			margin-bottom: 20px;
+		}
+
+		p {
+			font-size: 18px;
+			line-height: 1.6;
+			color: #666;
+		}
+
+		img {
+			max-width: 100%;
+			height: auto;
+			border-radius: 10px;
+			margin-top: 20px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.corner {
+			position: absolute;
+			width: 200px; /* Adjust the size as needed */
+			height: 200px; /* Adjust the size as needed */
+			border-radius: 50%;
+		}
+
+		.top-left {
+			top: 0;
+			left: 0;
+		}
+
+		.top-right {
+			top: 0;
+			right: 0;
+		}
+
+		.bottom-left {
+			bottom: 0;
+			left: 0;
+		}
+
+		.bottom-right {
+			bottom: 0;
+			right: 0;
+		}
+
+		.corner img {
+			max-width: 100%;
+			height: auto;
+			border-radius: 50%;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Welcome to Germknödel</h1>
+		<p>Enjoy watching the Knödel</p>
+		<img src="https://www.gusto.at/_storage/asset/6972828/storage/preview/file/109907018/2005-02-022.jpg" alt="Fancy Image">
+
+		<div class="corner top-left">
+			<img src="https://media3.giphy.com/media/Xcv41ydT1fnjQt7blY/giphy.webp?cid=ecf05e47fufshhglrxpsrf3dr8h00maqp1ny2grfwmzf2zjk&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 1">
+		</div>
+
+		<div class="corner top-right">
+			<img src="https://media0.giphy.com/media/Mgdr3suayJD5S/giphy.webp?cid=ecf05e47ubae2tgpfxdjk4o8k8ew9phg5ioqvf7wjj73ly1o&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 2">
+		</div>
+
+		<div class="corner bottom-left">
+			<img src="https://media4.giphy.com/media/BgwhabIL5MBFe/giphy.webp?cid=ecf05e47cysule5w7yn4se1v9ekunwdyq37q585kr4i87w2y&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 3">
+		</div>
+
+		<div class="corner bottom-right">
+			<img src="https://media2.giphy.com/media/QynMX1WxnYFbb2OHnJ/200w.webp?cid=ecf05e47jez7kygjoayf5vq5d4c31w3o20zc15lf40e6kn7x&ep=v1_gifs_search&rid=200w.webp&ct=g" alt="GIF 4">
+		</div>
+	</div>
+</body>
+</html>
