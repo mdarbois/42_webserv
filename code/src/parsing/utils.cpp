@@ -69,3 +69,14 @@ std::string intToString(const int &number)
     ss << number;
 	return (ss.str());
 }
+
+std::vector<std::string> mapToArray(const std::map<std::string, std::string>& myMap)
+{
+    std::vector<std::string> result;
+
+    for (std::map<std::string, std::string>::const_iterator it = myMap.begin(); it != myMap.end(); ++it) {
+        result.push_back(it->first + ": " + it->second);
+    }
+    result.push_back("");
+    return result;
+}
