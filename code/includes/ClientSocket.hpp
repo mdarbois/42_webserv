@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 11:50:19 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 09:17:17 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <string>
 # include "Socket.hpp"
 # include "ServerSocket.hpp"
+# include "ParserHTTP.hpp"
+# include "ResponseHTTP.hpp"
 
 # define CLIENT_RECEIVE_BUFFER_SIZE 1024
 # define CLIENT_TIMEOUT_RECEIVE 5
@@ -38,28 +40,40 @@ typedef struct s_Request
 	RequestEndType	endType;
 }Request;
 
+typedef struct s_ResponseData
+{
+	ResponseHTTP	response;
+	bool			sendInProgress;
+	int				bytesSent;
+}ResponseData;
+
+
 class ClientSocket: public Socket
 {
 	
 	public:
-		ClientSocket(int connectingServerFD);
+		ClientSocket(int connectingServerFD, Config config);
 		~ClientSocket();
 		ClientSocket();
 		ClientSocket( ClientSocket const & src );
+		
 		ClientSocket &		operator=( ClientSocket const & rhs );
 		
 		void				setUpSocket();
 		CommunicationStatus	receiveRequest();
-		bool				hasReceiveTimeOut();
+		CommunicationStatus	sendResponse();
+		bool				hasCommunicationTimeOut();
 		Request				getRequest() const;
 
 	private:
-		int		_connectingServerFD;
-		Request	_request;
-		time_t	_startTimeReceive;
+		int					_connectingServerFD;
+		Request				_request;
+		time_t				_startTimeCommunication;
 
-		void	_resetRequest();
-		bool	_checkContentLength();
+		ResponseData		_responseData;
+
+		void				_resetRequest();
+		bool				_checkContentLength();
 
 };
 

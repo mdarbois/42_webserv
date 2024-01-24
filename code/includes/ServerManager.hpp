@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 11:49:16 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 11:48:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,15 @@
 # define MAX_CONNECTIONS 10
 #define TIMEOUT_POLL 500
 
+// Enum to represent different colors
+enum LogColor {
+	RED,
+	GREEN,
+	YELLOW,
+	BLUE,
+	DEFAULT // Default color (usually white or terminal default)
+};
+
 class ServerManager
 {
 
@@ -42,12 +51,14 @@ class ServerManager
 		~ServerManager();
 
 		void	run();
+		void	log(const std::string& message, LogColor color);
 		void	shutdown();
 
 	private:
 		std::vector<Socket *>	_sockets;
 		struct pollfd			_pollFDs[MAX_CONNECTIONS]; //Should we just count the numbers of Clients or also the servers?
 		int						_numberServers;
+		Config					_config;
 		void					_acceptNewClient(ServerSocket *socket);
 		void					_deleteClient(ClientSocket *client, HttpStatus code);
 		void					_receiveRequest(ClientSocket *client);

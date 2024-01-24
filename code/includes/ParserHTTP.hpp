@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 09:24:12 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 11:34:37 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 12:40:04 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,24 @@ class ParserHTTP
 	public:
 		ParserHTTP(std::string requestString);
 		~ParserHTTP();
-
+		ParserHTTP();
+		ParserHTTP( ParserHTTP const & src );
+		ParserHTTP &		operator=( ParserHTTP const & rhs );
+		
 		void	parseRequest();
 		HttpMethod							getMethod() const;
 		std::string							getMethodString() const;
 		std::string							getPath() const;
 		std::string							getProtocol() const;
-		bool								getCGIStatus() const;
-		bool								getUploadStatus() const;
+		bool								isCGI() const;
+		bool								isUpload() const;
 		std::string							getBody() const;
 		std::map<std::string, std::string>	getHeaderMap() const;
+		std::map<std::string, std::string>	getCGIParamMap() const;
+
+		void								overrideReqPathtoErrorPath(std::string errorPath);
 		
 	private:
-		ParserHTTP();
-		ParserHTTP( ParserHTTP const & src );
-		ParserHTTP &		operator=( ParserHTTP const & rhs );
 		std::string							_requestString;
 		HttpMethod							_method;
 		std::string							_path;
@@ -57,6 +60,7 @@ class ParserHTTP
 		bool								_isUpload;
 		std::string							_body;
 		std::map<std::string, std::string>	_header;
+		std::map<std::string, std::string>	_cgiParams;
 };
 
 std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i );

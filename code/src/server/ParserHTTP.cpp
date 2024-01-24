@@ -16,13 +16,14 @@ ParserHTTP::ParserHTTP(std::string requestString)
 	std::cout << *this;
 }
 
-/* ParserHTTP::ParserHTTP()
+ParserHTTP::ParserHTTP()
 {
-} */
+}
 
-/* ParserHTTP::ParserHTTP( const ParserHTTP & src )
+ParserHTTP::ParserHTTP( const ParserHTTP & src )
 {
-} */
+	*this = src;
+}
 
 
 /*
@@ -38,14 +39,22 @@ ParserHTTP::~ParserHTTP()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-/* ParserHTTP &				ParserHTTP::operator=( ParserHTTP const & rhs )
+ParserHTTP &				ParserHTTP::operator=( ParserHTTP const & rhs )
 {
-	//if ( this != &rhs )
-	//{
-		//this->_value = rhs.getValue();
-	//}
+	if ( this != &rhs )
+	{
+		_requestString = rhs._requestString;
+		_method = rhs._method;
+		_path = rhs._path;
+		_httpProtocol = rhs._httpProtocol;
+		_isCGI = rhs._isCGI;
+		_isUpload = rhs._isUpload;
+		_body = rhs._body;
+		_header = rhs._header;
+		_cgiParams = rhs._cgiParams;
+	}
 	return *this;
-} */
+}
 
 std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 {
@@ -65,11 +74,21 @@ std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 	if (i.getBody().empty())
 		o << "\t" << "*No Request body*" << std::endl;
 	o << std::endl << i.getBody() << std::endl << std::endl;
-	if (i.getCGIStatus())
+	if (i.isCGI())
+	{
 		o << "CGI:\tTRUE" << std::endl;
+		o << std::endl;
+		o << "CGI Param Map:" << std::endl;
+		std::map<std::string, std::string> cgiParams = i.getCGIParamMap();
+		std::map<std::string, std::string>::iterator it;
+		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
+			o << "\t-" << it->first << ": " << it->second << std::endl;
+		}
+		o << std::endl;
+	}
 	else
 		o << "CGI:\tFALSE" << std::endl;
-	if (i.getUploadStatus())
+	if (i.isUpload())
 		o << "Upload:\tTRUE" << std::endl;
 	else
 		o << "Upload:\tFALSE" << std::endl;
@@ -82,6 +101,10 @@ std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+void	ParserHTTP::overrideReqPathtoErrorPath(std::string errorPath)
+{
+	_path = errorPath;
+}
 
 std::string trimChars(const std::string& input, const std::string& charsToTrim) {
 	size_t start = input.find_first_not_of(charsToTrim);
@@ -108,9 +131,7 @@ void	ParserHTTP::parseRequest()
 		_method = DELETE;
 	else
 		_method = NONE;
-	if (_path.length() > std::strlen(".py"))
-		if (_path.substr(_path.length() - 3) == ".py")
-			_isCGI = true;
+
 	trimChars(_path, "\n\r ");
 	trimChars(_httpProtocol, "\n\r ");
 	while (std::getline(requestStream, line) && line != "\r") {
@@ -126,6 +147,31 @@ void	ParserHTTP::parseRequest()
 	}
 	std::getline(requestStream, _body, '\0');
 	trimChars(_body, "\n\r ");
+
+	//check the path
+	std::istringstream queryStream;
+	if (_path.find("?") != std::string::npos && _method == GET)
+	{
+		std::string	queryParam = _path.substr(_path.find("?") + 1);
+		_path = _path.substr(0,_path.find("?"));
+		queryStream.str(queryParam);
+		_isCGI = true;
+	}
+	if (_path.length() > std::strlen(".py") && _method == POST)
+	{
+		if (_path.substr(_path.length() - 3) == ".py")
+			_isCGI = true;
+		queryStream.str(_body);
+	}
+	std::string key_value_pair;
+	while (std::getline(queryStream, key_value_pair, '&')) {
+		size_t pos = key_value_pair.find('=');
+		if (pos != std::string::npos) {
+			std::string key = key_value_pair.substr(0, pos);
+			std::string value = key_value_pair.substr(pos + 1);
+			_cgiParams[key] = value;
+		}
+	}
 }
 
 /*
@@ -156,12 +202,12 @@ std::string	ParserHTTP::getProtocol() const
 	return (_httpProtocol);
 }
 
-bool	ParserHTTP::getCGIStatus() const
+bool	ParserHTTP::isCGI() const
 {
 	return (_isCGI);
 }
 
-bool	ParserHTTP::getUploadStatus() const
+bool	ParserHTTP::isUpload() const
 {
 	return (_isUpload);
 }
@@ -174,6 +220,11 @@ std::string	ParserHTTP::getBody() const
 std::map<std::string, std::string>	ParserHTTP::getHeaderMap() const
 {
 	return (_header);
+}
+
+std::map<std::string, std::string>	ParserHTTP::getCGIParamMap() const
+{
+	return (_cgiParams);
 }
 
 /* ************************************************************************** */

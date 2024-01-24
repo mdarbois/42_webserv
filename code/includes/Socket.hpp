@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/16 19:20:25 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:25:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <poll.h>
+#include "Config.hpp"
 
 typedef enum eSocketType
 {
@@ -79,6 +80,7 @@ class Socket
 	protected:
 		t_socketType	_type;
 		struct pollfd	_pollFD;
+		Config			_config;
 };
 
 //std::ostream &			operator<<( std::ostream & o, Socket const & i );

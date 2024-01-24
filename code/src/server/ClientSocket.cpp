@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/22 14:34:13 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 14:40:46 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,13 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ClientSocket::ClientSocket(int connectingServerFD)
+ClientSocket::ClientSocket(int connectingServerFD, Config config)
 {
-	_startTimeReceive = time(0);
+	_startTimeCommunication = time(0);
+	_responseData.bytesSent = 0;
+	_responseData.sendInProgress = false;
 	_type = CLIENT;
+	_config = config;
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
 	_pollFD.events = POLLIN; //set tot POLLIN, to listen to the request
@@ -100,11 +103,11 @@ void	ClientSocket::_resetRequest()
 	_request.endType = UNSET;
 }
 
-bool	ClientSocket::hasReceiveTimeOut()
+bool	ClientSocket::hasCommunicationTimeOut()
 {
-	if (_startTimeReceive == -1)
+	if (_startTimeCommunication == -1)
 		return (true);
-	if (time(0) - _startTimeReceive >= CLIENT_TIMEOUT_RECEIVE)
+	if (time(0) - _startTimeCommunication >= CLIENT_TIMEOUT_RECEIVE)
 		return (true);
 	return (false);
 }
@@ -163,33 +166,48 @@ CommunicationStatus	ClientSocket::receiveRequest()
 		_request.endType = SINGLE; //DELETE OR GET
 	
 	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.endType == SINGLE)
-	{
-		/* std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
-		std::cout << _request.buffer << std::endl;
-		std::cout << "**********************END***************************************" << std::endl; */
 		return (COM_DONE);
-	}
 	else if (_request.endType == CONTENT_LENGTH && _checkContentLength())
-	{
-		/* std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
-		std::cout << _request.buffer << std::endl;
-		std::cout << "**********************END***************************************" << std::endl; */
 		return (COM_DONE);
-	}
 	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.endType == CHUNKED_ENCODING)
-	{
-		/* std::cout << "******************COMPLETED REQUEST*****************************" << std::endl;
-		std::cout << _request.buffer << std::endl;
-		std::cout << "**********************END***************************************" << std::endl; */
 		return (COM_DONE);
-	}
 	else
-	{
-		std::cout << "******************TEMP REQUEST*****************************" << std::endl;
-		std::cout << _request.buffer << std::endl;
-		std::cout << "**********************END*****************************" << std::endl;	
 		return (COM_IN_PROGRESS);
+}
+
+CommunicationStatus	ClientSocket::sendResponse()
+{
+	if (!_responseData.sendInProgress)
+	{
+		//TBD: Timer!
+		_startTimeCommunication = time(0);
+		
+		//Parse the request string
+		ParserHTTP parser(_request.buffer);
+
+		//Make a HTTP-Response
+		try
+		{
+			_responseData.response = ResponseHTTP(parser, _config);
+			_responseData.sendInProgress = true;
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+			_responseData.response.setResponseLine(HTTP_500, "Internal Server Error");
+		}
 	}
+	const std::string& fullResponse = _responseData.response.getFullResponseString();
+	int sendReturn = send(
+		_pollFD.fd, fullResponse.c_str() + _responseData.bytesSent,
+		_responseData.response.getResponseLength() - _responseData.bytesSent,
+		0);
+	if (sendReturn <= 0)
+		return (COM_ERROR);
+	_responseData.bytesSent += sendReturn;
+	if (_responseData.bytesSent >= static_cast<int>(fullResponse.size()))
+		return (COM_DONE);
+	return (COM_IN_PROGRESS);
 }
 
 /*
