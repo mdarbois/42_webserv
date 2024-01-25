@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/25 10:08:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/25 10:57:14 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Very basic. A lot of cheecks have to be performed
 	if (!_isValidRequest())
 		_createErrorResponse();
-	if (_request.isCGI())
+	else if (_request.isCGI())
 		std::cout << "Handle CGI later :)" << std::endl;
 	else if (request.getMethod() == GET)
 		_GET();
@@ -151,9 +151,9 @@ void	ResponseHTTP::_POST()
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
 		setResponseLine(HTTP_400, "Bad Request");
 
-	//check if the folder is accessible
+	//check if the folder is accessible and the rights to post a file 
 	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
-	if (access(fullPath.c_str(), F_OK) != 0)
+	if (access(fullPath.c_str(), F_OK | W_OK) != 0)
 		setResponseLine(HTTP_404, "Not Found");
 
 	//check if the location supports POST
@@ -161,8 +161,7 @@ void	ResponseHTTP::_POST()
 		setResponseLine(HTTP_403, "Forbidden");
 
 	//create a new file
-	
-	
+	std::ofstream	newFile("./testUpload");
 }
 
 void	ResponseHTTP::_DELETE()
