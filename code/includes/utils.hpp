@@ -19,15 +19,8 @@ unsigned int extractInt(std::string &line, size_t pos, size_t length);
 bool checkSemiColon(const std::string& line);
 std::string intToString(const int &number);
 
-template <typename Iterator, typename T>
-bool containsValue(const std::vector<T>& vec, T value)
-{
-	for (Iterator it = vec.begin(); it != vec.end(); ++it) {
-		if (*it == value) {
-			return true;  // Value found
-		}
-	}
-	return false;  // Value not found
+template <typename T>
+bool	containsValue(const std::vector<T>& vec, const T& value) {
+	return std::find(vec.begin(), vec.end(), value) != vec.end();
 }
-
 #endif

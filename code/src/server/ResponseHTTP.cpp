@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 17:29:19 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/25 10:08:09 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,11 +157,11 @@ void	ResponseHTTP::_POST()
 		setResponseLine(HTTP_404, "Not Found");
 
 	//check if the location supports POST
-	if (!containsValue(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
+	if (!containsValue<std::string>(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
 		setResponseLine(HTTP_403, "Forbidden");
 
 	//create a new file
-
+	
 	
 }
 
