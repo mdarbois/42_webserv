@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 09:17:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:53:00 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class ClientSocket: public Socket
 {
 	
 	public:
-		ClientSocket(int connectingServerFD, Config config);
+		ClientSocket(int connectingServerFD, ServerConfig config);
 		~ClientSocket();
 		ClientSocket();
 		ClientSocket( ClientSocket const & src );
