@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:52 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/23 15:28:04 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:51:12 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class ServerSocket: public Socket
 {
 
 	public:
-		ServerSocket(int port, int ip, Config config);
+		ServerSocket(int port, int ip, ServerConfig config);
 		~ServerSocket();
 		ServerSocket();
 		ServerSocket &		operator=( ServerSocket const & rhs );

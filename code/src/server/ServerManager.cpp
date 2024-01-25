@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 11:49:58 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:58:46 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ ServerManager::ServerManager(Config const &config)
 		std::vector<unsigned int> portsList = (*it).getPorts();
 		std::vector<unsigned int>::iterator portIT = portsList.begin();
 		for (; portIT != portsList.end(); ++portIT)
-			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp(), config));
+			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp(), *it));
 	}
 	_updatePollFDArray();
 }
@@ -107,7 +107,7 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 		std::cerr << "Maximum amout of possible connections reached." << std::endl;
 		return ;
 	}
-	newClient = new ClientSocket(socket->getFD(), _config);
+	newClient = new ClientSocket(socket->getFD(), socket->getServerConfig());
 	if ( newClient->getFD() < 0)
 	{
 		std::cerr << "Err creating client socket" << std::endl;

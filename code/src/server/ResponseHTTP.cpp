@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 15:51:23 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 17:29:19 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 */
 ResponseHTTP::ResponseHTTP() {}
 
-ResponseHTTP::ResponseHTTP(ParserHTTP request, Config config)
+ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 {
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
@@ -149,14 +149,16 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-	{
 		setResponseLine(HTTP_400, "Bad Request");
-		_header["Content-Type"] = std::string("text/html");
-		return;
-	}
+
 	//check if the folder is accessible
+	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
+	if (access(fullPath.c_str(), F_OK) != 0)
+		setResponseLine(HTTP_404, "Not Found");
 
 	//check if the location supports POST
+	if (!containsValue(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
+		setResponseLine(HTTP_403, "Forbidden");
 
 	//create a new file
 

@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/23 15:28:52 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:51:25 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerSocket::ServerSocket(int port, int ip, Config config)
+ServerSocket::ServerSocket(int port, int ip, ServerConfig config)
 {
 	_type = SERVER;
 	_port = port;

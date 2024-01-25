@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:13 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/18 14:08:53 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:58:30 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,8 @@ int	Socket::getFD() const
 	return (_pollFD.fd);
 }
 
+ServerConfig	Socket::getServerConfig() const
+{
+	return (_config);
+}
 /* ************************************************************************** */

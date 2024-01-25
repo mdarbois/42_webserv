@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 14:40:46 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:53:10 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ClientSocket::ClientSocket(int connectingServerFD, Config config)
+ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 {
 	_startTimeCommunication = time(0);
 	_responseData.bytesSent = 0;

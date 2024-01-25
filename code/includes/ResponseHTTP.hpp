@@ -5,6 +5,8 @@
 # include <fstream>
 # include <string>
 # include <map>
+#include <vector>
+#include <algorithm>
 # include "utils.hpp"
 # include "ParserHTTP.hpp"
 # include "Config.hpp"
@@ -22,7 +24,7 @@ typedef struct s_ResponseLine
 class ResponseHTTP
 {
 	public:
-		ResponseHTTP(ParserHTTP	request, Config config);
+		ResponseHTTP(ParserHTTP	request, ServerConfig config);
 		~ResponseHTTP();
 		ResponseHTTP &		operator=( ResponseHTTP const & rhs );
 		ResponseHTTP();
@@ -38,7 +40,7 @@ class ResponseHTTP
 		void								setHeader(std::string key, std::string value);
 
 	private:
-		Config								_config;
+		ServerConfig						_config;
 		ResponseLine						_responseLine;
 		std::string							_body;
 		std::map<std::string, std::string>	_header;
