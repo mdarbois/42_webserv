@@ -7,7 +7,7 @@ server {
 	error_page: 404 /error_pages/405.html; 
 	server_name coucou;
 	
-	location .py {
+	location / {
 		methods GET;
 		autoindex off;
 		root ./html;

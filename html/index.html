@@ -74,28 +74,47 @@
 			border-radius: 50%;
 			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		}
+		button {
+			width: 200px;
+			max-width: 100%;
+			height: 100px;
+			background-image: cover;
+			cursor: pointer;
+			background-size: contain;
+			border-radius: 50%;
+			border: 5px solid violet;
+			font-size: 25px;
+			color: violet;
+		}
+		button:hover{
+			color: darkblue;
+			border: 5px solid darkblue;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
-		<h1>Welcome to Germknödel</h1>
+		<div>
+			<img src="../favicon.ico" style="width: 30px">
+			<h1>Welcome to Germknödel</h1>
+		</div>
 		<p>Enjoy watching the Knödel</p>
 		<img src="https://www.gusto.at/_storage/asset/6972828/storage/preview/file/109907018/2005-02-022.jpg" alt="Fancy Image">
 
 		<div class="corner top-left">
-			<img src="https://media3.giphy.com/media/Xcv41ydT1fnjQt7blY/giphy.webp?cid=ecf05e47fufshhglrxpsrf3dr8h00maqp1ny2grfwmzf2zjk&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 1">
+			<a href="game.html" style="text-decoration: none; color: inherit;"><button style="background-image: url('https://media3.giphy.com/media/Xcv41ydT1fnjQt7blY/giphy.webp?cid=ecf05e47fufshhglrxpsrf3dr8h00maqp1ny2grfwmzf2zjk&ep=v1_gifs_search&rid=giphy.webp&ct=g')" alt="GIF 1">Game</button></a>
 		</div>
 
 		<div class="corner top-right">
-			<img src="https://media0.giphy.com/media/Mgdr3suayJD5S/giphy.webp?cid=ecf05e47ubae2tgpfxdjk4o8k8ew9phg5ioqvf7wjj73ly1o&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 2">
+			<button style="background-image: url('https://media0.giphy.com/media/Mgdr3suayJD5S/giphy.webp?cid=ecf05e47ubae2tgpfxdjk4o8k8ew9phg5ioqvf7wjj73ly1o&ep=v1_gifs_search&rid=giphy.webp&ct=g')" alt="GIF 2">Autoindex</button>
 		</div>
 
 		<div class="corner bottom-left">
-			<img src="https://media4.giphy.com/media/BgwhabIL5MBFe/giphy.webp?cid=ecf05e47cysule5w7yn4se1v9ekunwdyq37q585kr4i87w2y&ep=v1_gifs_search&rid=giphy.webp&ct=g" alt="GIF 3">
+			<button style="background-image: url('https://media4.giphy.com/media/BgwhabIL5MBFe/giphy.webp?cid=ecf05e47cysule5w7yn4se1v9ekunwdyq37q585kr4i87w2y&ep=v1_gifs_search&rid=giphy.webp&ct=g')" alt="GIF 3">Redirection</button>
 		</div>
 
 		<div class="corner bottom-right">
-			<img src="https://media2.giphy.com/media/QynMX1WxnYFbb2OHnJ/200w.webp?cid=ecf05e47jez7kygjoayf5vq5d4c31w3o20zc15lf40e6kn7x&ep=v1_gifs_search&rid=200w.webp&ct=g" alt="GIF 4">
+			<a href="file_manager.html" style="text-decoration: none; color: inherit;"><button style="background-image: url('https://media2.giphy.com/media/QynMX1WxnYFbb2OHnJ/200w.webp?cid=ecf05e47jez7kygjoayf5vq5d4c31w3o20zc15lf40e6kn7x&ep=v1_gifs_search&rid=200w.webp&ct=g')" alt="GIF 4">File Manager</button></a>
 		</div>
 	</div>
 </body>
