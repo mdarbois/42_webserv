@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Form</title>
+</head>
+<body>
+    <h1>File Upload Form</h1>
+    
+    <form id="uploadForm">
+        <label for="file">Select a file:</label>
+        <input type="file" name="file" id="file" required>
+        <br>
+        <input type="button" value="Upload" onclick="uploadFile()">
+    </form>
+
+    <script>
+        function uploadFile() {
+            // Get the file input element
+            var fileInput = document.getElementById('file');
+            
+            // Check if a file is selected
+            if (fileInput.files.length > 0) {
+                // Create a FormData object to store the file data
+                var formData = new FormData();
+                
+                // Append the file to the FormData object
+                formData.append('file', fileInput.files[0]);
+                
+                // Create a new XMLHttpRequest object
+                var xhr = new XMLHttpRequest();
+                
+                // Configure it for a POST request to 127.0.0.1:18000
+                xhr.open('POST', 'http://127.0.0.1:18000', true);
+                
+                // Set the appropriate headers for multipart/form-data
+                xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+                
+                // Define a callback function to handle the response
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        alert('File uploaded successfully!');
+                    } else {
+                        alert('Error uploading file. Status: ' + xhr.status);
+                    }
+                };
+                
+                // Send the FormData object containing the file
+                xhr.send(formData);
+            } else {
+                alert('Please select a file before uploading.');
+            }
+        }
+    </script>
+</body>
+</html>

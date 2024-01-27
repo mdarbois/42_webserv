@@ -52,6 +52,9 @@ ParserHTTP &				ParserHTTP::operator=( ParserHTTP const & rhs )
 		_body = rhs._body;
 		_header = rhs._header;
 		_cgiParams = rhs._cgiParams;
+		_uploadFilename = rhs._uploadFilename;
+		_startBoundary = rhs._startBoundary;
+		_endBoundary = rhs._endBoundary;
 	}
 	return *this;
 }
@@ -89,7 +92,11 @@ std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 	else
 		o << "CGI:\tFALSE" << std::endl;
 	if (i.isUpload())
+	{
 		o << "Upload:\tTRUE" << std::endl;
+		o << std::endl;
+		o << "Upload Filename:\t" << i.getUploadFilename() << std::endl;
+	}
 	else
 		o << "Upload:\tFALSE" << std::endl;
 	o << "----------------------------------------------------------------------------" << std::endl;
@@ -106,14 +113,15 @@ void	ParserHTTP::overrideReqPathtoErrorPath(std::string errorPath)
 	_path = errorPath;
 }
 
-std::string trimChars(const std::string& input, const std::string& charsToTrim) {
+void	trimChars(std::string& input, const std::string& charsToTrim) {
 	size_t start = input.find_first_not_of(charsToTrim);
 	size_t end = input.find_last_not_of(charsToTrim);
 
 	if (start == std::string::npos || end == std::string::npos)
-		return "";
-	return input.substr(start, end - start + 1);
+		return ;
+	input = input.substr(start, end - start + 1);
 }
+
 
 void	ParserHTTP::parseRequest()
 {
@@ -142,7 +150,13 @@ void	ParserHTTP::parseRequest()
 			trimChars(headerValue, "\n\r ");
 			_header[headerName] = headerValue;
 			if (headerValue.find("multipart/form-data") != std::string::npos)
+			{
 				_isUpload = true;
+				size_t filenameStartPos = _body.find("boundary=") + std::strlen("boundary=");
+				size_t filenameEndPos = _body.find("\r\n", filenameStartPos);
+				_startBoundary = _body.substr(filenameStartPos, filenameEndPos - filenameStartPos);
+				_endBoundary = _startBoundary + "--";
+			}
 		}
 	}
 	std::getline(requestStream, _body, '\0');
@@ -171,6 +185,15 @@ void	ParserHTTP::parseRequest()
 			std::string value = key_value_pair.substr(pos + 1);
 			_cgiParams[key] = value;
 		}
+	}
+
+	//get the filename in case of fileupload
+	if (_isUpload)
+	{
+		size_t filenameStartPos = _body.find("filename=") + std::strlen("filename=");
+		size_t filenameEndPos = _body.find("\r\n", filenameStartPos);
+		_uploadFilename = _body.substr(filenameStartPos, filenameEndPos - filenameStartPos);
+		trimChars(_uploadFilename, "\"");
 	}
 }
 
@@ -210,6 +233,21 @@ bool	ParserHTTP::isCGI() const
 bool	ParserHTTP::isUpload() const
 {
 	return (_isUpload);
+}
+
+std::string	ParserHTTP::getStartBoundary() const
+{
+	return (_startBoundary);
+}
+
+std::string	ParserHTTP::getEndBoundary() const
+{
+	return (_endBoundary);
+}
+
+std::string	ParserHTTP::getUploadFilename() const
+{
+	return (_uploadFilename);
 }
 
 std::string	ParserHTTP::getBody() const

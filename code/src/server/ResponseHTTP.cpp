@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/25 10:57:14 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/25 16:46:50 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,19 +149,23 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		setResponseLine(HTTP_400, "Bad Request");
+		return setResponseLine(HTTP_400, "Bad Request");
 
 	//check if the folder is accessible and the rights to post a file 
 	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
 	if (access(fullPath.c_str(), F_OK | W_OK) != 0)
-		setResponseLine(HTTP_404, "Not Found");
+		return setResponseLine(HTTP_404, "Not Found");
 
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
-		setResponseLine(HTTP_403, "Forbidden");
+		return setResponseLine(HTTP_403, "Forbidden");
 
 	//create a new file
-	std::ofstream	newFile("./testUpload");
+	std::string	uploadFilePath = std::string("./uploads/") + _request.getUploadFilename();
+	std::ofstream	newFile(uploadFilePath.c_str());
+	if (!newFile.is_open())
+		return setResponseLine(HTTP_500, "Internal Server Error");
+	setResponseLine(HTTP_200, "OK");
 }
 
 void	ResponseHTTP::_DELETE()

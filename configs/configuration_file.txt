@@ -8,7 +8,7 @@ server {
 	server_name coucou;
 	
 	location / {
-		methods GET;
+		methods GET POST;
 		autoindex off;
 		root ./html;
 		index index.html;
