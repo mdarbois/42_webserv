@@ -31,11 +31,11 @@ server {
 		redirection 	301 https://www.ecosia.org/;
 	}
 
-	#location /autoindex {
-	#	methods GET;
-	#	root ./html;
-	#	autoindex on;
-	#}
+	location /autoindex {
+		methods GET;
+		root ./html;
+		autoindex on;
+	}
 
 	#location .php {
 	#	methods GET POST;

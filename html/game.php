@@ -1,7 +1,6 @@
 
 <?php
 
-=
 $answer1 = getenv('answer1');
 $answer2 = getenv('answer2');
 $answer3 = getenv('answer3');
