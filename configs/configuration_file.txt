@@ -20,6 +20,11 @@ server {
 		index my_awesome_index.html;
 		uploads usr/bin/php;
 	}
+	
+	location /game.html {
+		methods GET ;
+	}
+	
 
 	location /red {
 		methods GET;
