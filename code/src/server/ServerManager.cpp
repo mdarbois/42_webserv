@@ -190,6 +190,7 @@ bool	ServerManager::_checkPollErrors(Socket *socket, short int revent)
 	return (true);
 }
 
+
 void	ServerManager::run()
 {
 	int	pollResult;
@@ -197,7 +198,6 @@ void	ServerManager::run()
 	//Main server loop
 	while (4242) //react to sigint later
 	{
-
 		//Check all monitored fd with poll if an event occured
 		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
 		{
