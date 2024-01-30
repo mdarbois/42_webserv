@@ -136,7 +136,7 @@ void	ResponseHTTP::_GET()
 	// Check redirection
 	std::string pathNoRoot = _request.getPath().erase(0,5);
 	pathNoRoot.erase(pathNoRoot.length() - 1);
-	std::cout << "PATH=" << pathNoRoot << std::endl;
+	//std::cout << "PATH=" << pathNoRoot << std::endl;
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		//std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
