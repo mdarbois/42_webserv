@@ -26,7 +26,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	if (!_isValidRequest())
 		_createErrorResponse();
 	else if (_request.isCGI())
-		std::cout << "Handle CGI later :)" << std::endl;
+		CGI cgi(_request);
 	else if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)

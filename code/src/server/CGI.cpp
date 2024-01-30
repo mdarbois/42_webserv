@@ -2,11 +2,11 @@
 
 CGI::CGI(){}
 
-CGI::CGI(ParserHTTP &parsing) :  _length (0),  _timeOut (false), _body ("")
+CGI::CGI(ParserHTTP &parsing) : _php(""), _length (0),  _timeOut (false), _body ("")
 {
-    _env = mapToArray(parsing.getHeaderMap());
+   // _env = mapToArray(parsing.getHeaderMap());
+    _addEnv(parsing);
     _addArgs(parsing);
-    _php = "/usr/bin/php";
     if (pipe(input_pipefd) == -1)
         throw std::runtime_error("CGI error: input pipe failed");
     if (pipe(output_pipefd) == -1)
@@ -14,8 +14,10 @@ CGI::CGI(ParserHTTP &parsing) :  _length (0),  _timeOut (false), _body ("")
     time_t	startTime = time(0);
     std::string output;
     int pid = fork();
+    _print(*this);
     _argsArray = vectorToCharArray(_args);
     _envArray = vectorToCharArray(_env);
+  
     if (pid == 0)
         _childProcess(input_pipefd, output_pipefd);
     else if (pid > 0)
@@ -28,7 +30,7 @@ CGI::CGI(ParserHTTP &parsing) :  _length (0),  _timeOut (false), _body ("")
     }
     if (!_timeOut)
 		_body = _readOutput(output_pipefd);
-    _print(*this);
+ 
     deleteArray(_argsArray);
     deleteArray(_envArray);
 }
@@ -74,46 +76,92 @@ bool	CGI::timeOut() const
 
 void CGI::_addArgs(ParserHTTP &parsing)
 {
-
+    _php = "/usr/bin/php";
     _args.push_back(_php);
-    std::string folder = "./cgi";
-    _args.push_back(folder + parsing.getPath());
+    std::string phpScript = ".";
+    _args.push_back(phpScript + parsing.getPath());
 
 }
 
+void CGI::_addEnv(ParserHTTP &parsing)
+{
+    if (parsing.getBody().empty())
+        _env.push_back("CONTENT_LENGTH = 0");
+    else
+    {
+        size_t length = parsing.getBody().length();
+        std::stringstream ss;
+        ss << length;
+        _env.push_back("CONTENT_LENGTH = " + ss.str());
+    }
+    std::string method;
+    if (parsing.getMethod() == GET)
+        method = "GET";
+    else if (parsing.getMethod() == POST)
+        method = "POST";
+    else
+        method = "DELETE";
+    _env.push_back("METHOD = " + method);
+    _env.push_back("UPLOAD_PATH = ." + parsing.getPath());
+    std::map<std::string, std::string> cgiParams = parsing.getCGIParamMap();
+		std::map<std::string, std::string>::iterator it;
+		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
+			std::cout << "\t-" << it->first << ": " << it->second << std::endl;
+            std::string envVar = pairToString(it->first, it->second);
+            std::cout << envVar << "\n";
+            _env.push_back(envVar);
+            //putenv(const_cast<char*>(envVar.c_str()));
+		}
+    /* std::map<std::string, std::string>::iterator iter;
+    std::cout << parsing << std::endl;
+    for (iter = parsing.getCGIParamMap().begin(); iter != parsing.getCGIParamMap().end(); ++iter) {
+        std::cout << "first=" << iter->first;
+        std::cout << "second=" << iter->second << "\n";
+        //std::string envVar = pairToString(iter->first, iter->second);
+        //std::cout << envVar << "\n";
+        //putenv(const_cast<char*>(envVar.c_str()));
+    } */
+} 
+
 void CGI::_childProcess(int *input_pipefd, int *output_pipefd)
 {
+    std::cout << "CHILD calls: " << _php << std::endl;
     close(input_pipefd[1]);
     close(output_pipefd[0]);
-    if (dup2(output_pipefd[0], 0) == -1)
+    if (dup2(input_pipefd[0], 0) == -1)
     {
         deleteArray(_argsArray);
         deleteArray(_envArray);
         throw std::runtime_error("CGI error: dup2 output pipe in child process failed");
     }
     close(input_pipefd[0]);
-    if (dup2(input_pipefd[1], 1) == -1)
+    if (dup2(output_pipefd[1], 1) == -1)
     {
         deleteArray(_argsArray);
         deleteArray(_envArray);
         throw std::runtime_error("CGI error: dup2 input pipe in child process failed");
     }
     close(output_pipefd[1]);
+    std::cerr << "coucou" << _argsArray[1] << std::endl;
     if (execve(_php, _argsArray, _envArray) == -1)
     {
         deleteArray(_argsArray);
         deleteArray(_envArray);
         throw std::runtime_error("Error: execve failed");
     }
-    std::exit(0);
+    else
+    {
+        close(input_pipefd[0]);
+        close(output_pipefd[1]);
+    }
 }
 void CGI::_parentProcess(ParserHTTP parsing, int pid, int *input_pipefd, int *output_pipefd, pid_t pidWait, time_t startTime)
 {
     close(input_pipefd[0]);
     close(output_pipefd[1]);
     std::string body = parsing.getBody();
-    if ( !write(input_pipefd[1], body.c_str(), body.length()) )
-		throw std::runtime_error("CGI error: write body");
+    if ( !write(input_pipefd[1], body.c_str(), body.length()) && !write(input_pipefd[1], "coucou", 7 ))
+		throw std::runtime_error("CGI error: write body"); 
     close(input_pipefd[1]);
     while (pidWait == 0 && time(0) - startTime <= 6) 
 		pidWait = waitpid(pid, NULL, WNOHANG);
@@ -166,14 +214,16 @@ void CGI::_print(CGI cgi)
     std::cout  << "\033[34m---------- CGI:-----------\033[0m\n";
     std::cout  << "BODY: " << cgi.getBody() << "\n";
     std::cout  << "LENGTH: " << cgi.getLength() << "\n";
-    std::cout  << "ENV:                 ";
+    std::cout  << "ENV: ";
     for (size_t i = 0; i < cgi.getEnv().size(); ++i) {
-        std::cout  << cgi.getEnv()[i] << " ";
+        std::cout << i <<":";
+        std::cout  << cgi.getEnv()[i];
     }
     std::cout  << "\n";
-    std::cout  << "ARGS:                 ";
+    std::cout  << "ARGS: ";
     for (size_t i = 0; i < cgi.getArgs().size(); ++i) {
-        std::cout  << cgi.getArgs()[i] << " ";
+        std::cout << i <<":";
+        std::cout  << cgi.getArgs()[i];
     }
     std::cout  << "\n";
 }
