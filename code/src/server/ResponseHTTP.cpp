@@ -26,6 +26,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Very basic. A lot of cheecks have to be performed
 	if (_request.isCGI())
 	{
+    //CGI cgi(_request);
 		_cgi = CGI(_request);
 		setResponseLine(HTTP_200, "OK");
 		_body = _cgi.getBody();
@@ -131,9 +132,35 @@ PathType	getPathType(std::string path)
 void	ResponseHTTP::_GET()
 {
 	//Check if the requested Resource is existing
+	std::string pathNoRoot = _request.getPath().erase(0,5);
+	pathNoRoot.erase(pathNoRoot.length() - 1);
+	std::cout << "PATH=" << pathNoRoot << std::endl;
+	std::map<std::string, LocationConfig> locations(_config.getLocations());
+	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+		std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
+        std::cout << std::endl;
+		if(it->first == pathNoRoot && !(it->second.getRedirection().empty()))
+		{
+			std::string statusCode = (it->second).getRedirection().substr(0,3);
+			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+			std::string link = (it->second).getRedirection().erase(0,3);
+			trimSpaces(link);
+			std::string htmlContent =
+				"<html>"
+				"<head>"
+				"<title>Redirecting...</title>"
+				"</head>"
+				"<body>"
+				"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+				"</body>"
+				"</html>";
+			setBody(htmlContent);
+			return ;
+		}
+	}
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
-
+	
 	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());

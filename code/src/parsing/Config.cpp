@@ -21,7 +21,7 @@ Config::Config(std::string path) {
 
   _parse(configurationFile);
   configurationFile.close();
-  _print();
+  //_print();
 }
 
 
