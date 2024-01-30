@@ -174,9 +174,9 @@ void	ParserHTTP::parseRequest()
 		queryStream.str(queryParam);
 		_isCGI = true;
 	}
-	if (_path.length() > std::strlen(".py") && _method == POST)
+	if (_path.length() > std::strlen(".php") && _method == POST)
 	{
-		if (_path.substr(_path.length() - 3) == ".py")
+		if (_path.substr(_path.length() - 4) == ".php")
 			_isCGI = true;
 		queryStream.str(_body);
 	}
