@@ -103,10 +103,12 @@ void deleteArray(char** charArray)
 			delete[] charArray[i];
 		}
 		delete[] charArray;
-}
+
+} 
 
 std::string pairToString(const std::string& key, const std::string& value) {
     std::stringstream ss;
     ss << key << "=" << value;
     return ss.str();
 }
+

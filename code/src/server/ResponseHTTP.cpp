@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/25 10:57:14 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/30 09:27:43 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
+
 	//Very basic. A lot of cheecks have to be performed
 	if (!_isValidRequest())
 		_createErrorResponse();
 	else if (_request.isCGI())
 		CGI cgi(_request);
+
 	else if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
@@ -80,30 +82,16 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	ResponseHTTP::_createErrorResponse()
+void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus status)
 {
-	//Later check which error html should be chosen
-	std::string	fullPath = "/html/404.html"; //TESTING!!! Change later
-	_request.overrideReqPathtoErrorPath(fullPath);
+	_request.overidePath(errPagePath);
 	_readFile();
-	_header["Content-Type"] = std::string("text/html");
-	setResponseLine(HTTP_404, "File Not Found");
-}
-
-bool	ResponseHTTP::_isValidRequest()
-{
-	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
-	//check if the requested resource exists
-	if (access(fullPath.c_str(), F_OK) != 0)
-		return (false);
-	return (true);
+	setResponseLine(status, "Retreive later from a lookup");
 }
 
 bool	ResponseHTTP::_readFile()
 {
-	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
-	std::ifstream	htmlFile(fullPath.c_str());
-
+	std::ifstream	htmlFile(getFullRequestedPath().c_str());
 	if (!htmlFile.is_open())
 		return (false);
 
@@ -126,22 +114,76 @@ bool	ResponseHTTP::_readFile()
 	return (true);
 }
 
+PathType	getPathType(std::string path)
+{
+	struct stat pathStat;
+	if (stat(path.c_str(), &pathStat) != 0)
+		return (PT_ERROR);
+	if (S_ISREG(pathStat.st_mode))
+		return (PT_FILE);
+	else if (S_ISDIR(pathStat.st_mode))
+		return (PT_DIR);
+	return (PT_ERROR);
+}
+
+
 void	ResponseHTTP::_GET()
 {
-	if (_request.isCGI())
+	//Check if the requested Resource is existing
+	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
+		return (_createErrorResponse("/html/404.html", HTTP_404));
+
+	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
+	//Check if file or directory is requested
+	PathType requestedResource = getPathType(getFullRequestedPath());
+	if (requestedResource == PT_ERROR)
+		throw std::runtime_error("GET: Could not determine file or dir type");
+	else if (requestedResource == PT_FILE)
 	{
-		CGI cig(_request);
+		//Reads the requested file to the body
+		if (!_readFile())
+			throw std::runtime_error("GET: Could not open file");
+		else
+			setResponseLine(HTTP_200, "OK");
 	}
-	//Check Autoindex
-	
-	//For now just test the normal Get action, to read the requested file
-	if (!_readFile())
-		throw std::runtime_error("Could not open HTML file");
-	else
+	else if (requestedResource == PT_DIR)
 	{
-		 //This needs to be set later depending on the requested resource
-		_header["Content-Type"] = std::string("text/html");
-		setResponseLine(HTTP_200, "OK");
+		if (getFullRequestedPath()[getFullRequestedPath().length() - 1] != '/')
+		{
+			std::cout << "What should we do here? :)" << std::endl;
+		}
+		else
+		{
+			if (!_config.getLocations()[_request.getPath()].getIndex().empty())
+			{
+				//override the path/
+				std::cout << "My location:" << std::endl;
+				std::cout << _config.getLocations()[_request.getPath()] << std::endl;
+				if (!_readFile())
+					throw std::runtime_error("GET: Could not open file");
+				else
+					setResponseLine(HTTP_200, "OK");
+			}
+			else
+			{
+				if (!_config.getLocations()[_request.getPath()].getAutoindex())
+				{
+					//No index and no auto index
+					//return the error page of this location or the default error page
+					//Error 403
+					_request.overidePath("/html/403.html"); //make it dynamically later
+					if (!_readFile())
+						throw std::runtime_error("GET: Could not open file");
+					else
+						setResponseLine(HTTP_403, "Forbidden");
+				}
+				else
+				{
+					//return the auto index html with all the subfolders and
+				}
+			}
+			
+		}
 	}
 }
 
@@ -149,24 +191,70 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		setResponseLine(HTTP_400, "Bad Request");
+		return setResponseLine(HTTP_400, "Bad Request");
 
 	//check if the folder is accessible and the rights to post a file 
-	std::string	fullPath = "." + _request.getPath(); //TESTING!!! Change later
-	if (access(fullPath.c_str(), F_OK | W_OK) != 0)
-		setResponseLine(HTTP_404, "Not Found");
+	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
+		return setResponseLine(HTTP_404, "Not Found");
 
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
-		setResponseLine(HTTP_403, "Forbidden");
+		return setResponseLine(HTTP_403, "Forbidden");
 
 	//create a new file
-	std::ofstream	newFile("./testUpload");
+	std::string	uploadFilePath = std::string("./uploads/") + _request.getUploadFilename();
+	std::ofstream	newFile(uploadFilePath.c_str());
+	if (!newFile.is_open())
+		throw std::runtime_error("Could not create posted file");
+	setResponseLine(HTTP_200, "OK");
 }
 
 void	ResponseHTTP::_DELETE()
 {
-	
+	//Check if the requested Resource is existing
+	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
+		_createErrorResponse("/html/404.html", HTTP_404);
+
+	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
+
+	//Check if file or directory is requested to delete
+	PathType requestedResource = getPathType(getFullRequestedPath());
+	if (requestedResource == PT_ERROR)
+		throw std::runtime_error("DELETE: Could not determine file or dir type");
+	else if (requestedResource == PT_FILE)
+	{
+		//check if the file has write rights
+		if (access(getFullRequestedPath().c_str(), W_OK) != 0)
+			return setResponseLine(HTTP_403, "Forbidden");
+		else
+		{
+			if (std::remove(getFullRequestedPath().c_str()) == 0)
+				return (setResponseLine(HTTP_200, "OK"));
+			else
+				throw std::runtime_error("DELETE: Could not delete file");
+		}
+	}
+	else if (requestedResource == PT_DIR)
+	{
+		if (getFullRequestedPath()[getFullRequestedPath().length() - 1] != '/')
+		{
+			std::cout << "What should we do here? :)" << std::endl;
+		}
+		else
+		{
+			//check if the folder has write rights
+			if (access(getFullRequestedPath().c_str(), W_OK) != 0)
+				return setResponseLine(HTTP_403, "Forbidden");
+			else
+			{
+				std::string command = "rm -rf " + getFullRequestedPath();
+				if (std::system(command.c_str()) == 0)
+					return (setResponseLine(HTTP_200, "OK"));
+				else
+					throw std::runtime_error("DELETE: Could not delete dir");
+			}
+		}
+	}
 }
 
 /*
@@ -205,6 +293,11 @@ int	ResponseHTTP::getBodyLength() const
 int	ResponseHTTP::getResponseLength() const
 {
 	return (getFullResponseString().length());
+}
+
+std::string	ResponseHTTP::getFullRequestedPath() const
+{
+	return ("." + _request.getPath()); //TESTING!!! Change later. Depends where the root is mounted
 }
 
 void	ResponseHTTP::setBody(std::string body)

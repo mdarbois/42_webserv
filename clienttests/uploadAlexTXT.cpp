@@ -30,15 +30,15 @@ std::string readFile(const std::string& filename) {
 
 // Function to create a multipart/form-data POST request
 std::string createMultipartFormDataRequest(const std::string& filename, const std::string& fileContent) {
-    std::string boundary = "boundary";
+    std::string boundary = "--boundary";
     std::string requestBody;
 
     // Build request body
-    requestBody += "--" + boundary + "\r\n";
-    requestBody += "Content-Disposition: form-data; name=\"file\"; filename=\"" + filename + "\"\r\n";
+    requestBody += boundary + "\r\n";
+    requestBody += "Content-Disposition: form-data; name=file; filename=" + filename + "\r\n";
     requestBody += "Content-Type: text/plain\r\n\r\n";
     requestBody += fileContent + "\r\n";
-    requestBody += "--" + boundary + "--\r\n";
+    requestBody += boundary + "--\r\n";
 
     // Build request headers
     std::ostringstream request;

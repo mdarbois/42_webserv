@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 09:24:12 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 12:40:04 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/27 15:05:09 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,13 @@ class ParserHTTP
 		bool								isCGI() const;
 		bool								isUpload() const;
 		std::string							getBody() const;
+		std::string							getUploadFilename() const;
+		std::string							getStartBoundary() const;
+		std::string							getEndBoundary() const;
 		std::map<std::string, std::string>	getHeaderMap() const;
 		std::map<std::string, std::string>	getCGIParamMap() const;
 
-		void								overrideReqPathtoErrorPath(std::string errorPath);
+		void								overidePath(std::string errorPath);
 		
 	private:
 		std::string							_requestString;
@@ -61,6 +64,9 @@ class ParserHTTP
 		std::string							_body;
 		std::map<std::string, std::string>	_header;
 		std::map<std::string, std::string>	_cgiParams;
+		std::string							_uploadFilename;
+		std::string							_startBoundary;
+		std::string							_endBoundary;
 };
 
 std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i );

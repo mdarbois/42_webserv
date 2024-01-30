@@ -4,14 +4,13 @@ server {
 	#listen 65535;
 	host 127.0.0.1;
 	root ./html;
-	error_page: 404 /error_pages/405.html; 
+	error_page: 404 /error_pages/405.html;
 	server_name coucou;
 	
 	location / {
-		methods GET;
+		methods GET POST;
 		autoindex off;
 		root ./html;
-		index index.html;
 		uploads usr/bin/php;
 	}
 
