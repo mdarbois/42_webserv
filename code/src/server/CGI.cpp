@@ -30,7 +30,7 @@ CGI::CGI(ParserHTTP &parsing) : _php(""), _length (0),  _timeOut (false), _body 
     }
     if (!_timeOut)
 		_body = _readOutput(output_pipefd);
- 
+    std::cout << _body << std::endl;
     deleteArray(_argsArray);
     deleteArray(_envArray);
 }
@@ -56,6 +56,10 @@ CGI &CGI::operator=(const CGI &rhs) {
         this->_timeOut = rhs._timeOut;
         this->_length = rhs._length;
         this->_body = rhs._body;
+        this->input_pipefd[0] = rhs.input_pipefd[0];
+        this->input_pipefd[1] = rhs.input_pipefd[1];
+        this->output_pipefd[0] = rhs.output_pipefd[0];
+        this->output_pipefd[1] = rhs.output_pipefd[1];
     }
     return *this;
 }
@@ -80,7 +84,6 @@ void CGI::_addArgs(ParserHTTP &parsing)
     _args.push_back(_php);
     std::string phpScript = ".";
     _args.push_back(phpScript + parsing.getPath());
-
 }
 
 void CGI::_addEnv(ParserHTTP &parsing)
@@ -125,7 +128,6 @@ void CGI::_addEnv(ParserHTTP &parsing)
 
 void CGI::_childProcess(int *input_pipefd, int *output_pipefd)
 {
-    std::cout << "CHILD calls: " << _php << std::endl;
     close(input_pipefd[1]);
     close(output_pipefd[0]);
     if (dup2(input_pipefd[0], 0) == -1)
@@ -142,7 +144,6 @@ void CGI::_childProcess(int *input_pipefd, int *output_pipefd)
         throw std::runtime_error("CGI error: dup2 input pipe in child process failed");
     }
     close(output_pipefd[1]);
-    std::cerr << "coucou" << _argsArray[1] << std::endl;
     if (execve(_php, _argsArray, _envArray) == -1)
     {
         deleteArray(_argsArray);

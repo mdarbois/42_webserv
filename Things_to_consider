@@ -4,3 +4,4 @@
 - upload a file where the name already exists
 - Can we use this: if (std::system(command.c_str()) == 0) ???
 - Which part of a path should be taken to validate the allowed methods in a location
+- We should remove the ENV for the CGI afterwards?

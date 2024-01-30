@@ -52,6 +52,7 @@ class ResponseHTTP
 
 	private:
 		ServerConfig						_config;
+		CGI									_cgi;
 		ResponseLine						_responseLine;
 		std::string							_body;
 		std::map<std::string, std::string>	_header;

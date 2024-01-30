@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 16:53:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/30 14:05:34 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,16 @@ class ClientSocket: public Socket
 		CommunicationStatus	sendResponse();
 		bool				hasCommunicationTimeOut();
 		Request				getRequest() const;
+		bool				requestedCGI() const;
+		int					getPipeToParentFd() const;
+		int					getCGIToPipeFd() const;
 
 	private:
 		int					_connectingServerFD;
 		Request				_request;
 		time_t				_startTimeCommunication;
+		int					_pipeToParentFd;
+		int					_CGIToPipeFd;
 
 		ResponseData		_responseData;
 

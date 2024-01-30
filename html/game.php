@@ -6,24 +6,15 @@ $answer2 = getenv('answer2');
 $answer3 = getenv('answer3');
 $answer4 = getenv('answer4');
 
-//echo $answer3 >> out.txt; 
-//echo $answer2  >> out.txt;
-$file = fopen("out.txt", "a");
-
-fwrite($file,  $answer1);
-fwrite($file,  $answer2);
-fwrite($file,  $answer3);
-fwrite($file,  $answer4);
-fclose($file);
-/* $color1 = $color2 = $color3 = $color4 = red;
+$color1 = $color2 = $color3 = $color4 = "red";
  if ($answer1 == 'Leberknoedel')
-    $color1 = green;
+    $color1 = "green";
 if ($answer2 == 'Semmelknoedel')
-    $color2 = green;
+    $color2 = "green";
 if ($answer3 == 'Germknoedel')
-    $color3 = green;
-if ($answer4 == 'Kloesse') 
-    $color4 = green;*/
+    $color3 = "green";
+if ($answer4 == 'Kartoffelkloesse') 
+    $color4 = "green";
 $htmlResponse = "<html>
 <head>
 <meta charset=\"UTF-8\">
@@ -92,34 +83,34 @@ $htmlResponse = "<html>
 <h1>Welcome in our Knoedel game</h1>
 
 <h2>Would you be able to guess which Knoedel it is</h2>
-
+<form action=\"./game.php\" method=\"GET\">
 <div class=\"grid-container\">
 <!-- First grid item -->
 <div class=\"grid-item\">
     <img src=\"1024px-Leberknoedelsuppe.jpg\" alt=\"Image 1\">
     <label for=\"answer1\"></label>
-    <input style=\"$color1\" type=\"text\" name=\"answer1\" placeholder=\"Enter text here\" required>
+    <input style=\"background-color:$color1\" type=\"text\" name=\"answer1\" placeholder=\"$answer1\" required>
 </div>
 
 <!-- Second grid item -->
 <div class=\"grid-item\">
     <img src=\"Semmelknoedel.jpg\" alt=\"Image 2\">
     <label for=\"answer2\"></label>
-    <input style=\"$color2\" type=\"text\" name=\"answer2\" placeholder=\"Enter text here\" required>
+    <input style=\"background-color:$color2\" type=\"text\" name=\"answer2\" placeholder=\"$answer2\" required>
 </div>
 
 <!-- Third grid item -->
 <div class=\"grid-item\">
     <img src=\"Germknoedel.jpg\" alt=\"Image 3\">
     <label for=\"answer3\"></label>
-    <input style=\"$color3\" type=\"text\" name=\"answer3\" placeholder=\"Enter text here\" required>
+    <input style=\"background-color:$color3\" type=\"text\" name=\"answer3\" placeholder=\"$answer3\" required>
 </div>
 
 <!-- Fourth grid item -->
 <div class=\"grid-item\">
     <img src=\"Kloesse.jpg\" alt=\"Image 4\">
     <label for=\"answer4\"></label>
-    <input style=\"$color4\" type=\"text\" name=\"answer4\" placeholder=\"Enter text here\" required>
+    <input style=\"background-color:$color4\" type=\"text\" name=\"answer4\" placeholder=\"$answer4\" required>
 </div>
 </div>
 <div class=\"div-button\">
@@ -130,11 +121,5 @@ $htmlResponse = "<html>
 <a href=\"index.html\">Back to Home</a>
 </body>
 </html>";
-
-// Send the HTTP response headers
-//header("Content-Type: text/html");
-//header("Content-Length: " . strlen($htmlResponse));
-
-// Output the HTML response to stdout
 echo $htmlResponse;
 ?>

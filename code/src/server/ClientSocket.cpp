@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/29 12:01:57 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/30 14:06:38 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	_startTimeCommunication = time(0);
 	_responseData.bytesSent = 0;
 	_responseData.sendInProgress = false;
+	_pipeToParentFd = -1;
+	_CGIToPipeFd = -1;
 	_type = CLIENT;
 	_config = config;
 	_connectingServerFD = connectingServerFD;

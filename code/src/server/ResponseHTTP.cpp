@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/30 09:27:43 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/30 14:21:30 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,12 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_request = request;
 
 	//Very basic. A lot of cheecks have to be performed
-
 	if (_request.isCGI())
-		CGI cgi(_request);
-
+	{
+		_cgi = CGI(_request);
+		setResponseLine(HTTP_200, "OK");
+		_body = _cgi.getBody();
+	}
 	else if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
