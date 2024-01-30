@@ -24,9 +24,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_request = request;
 
 	//Very basic. A lot of cheecks have to be performed
-	if (!_isValidRequest())
-		_createErrorResponse();
-	else if (_request.isCGI())
+
+	if (_request.isCGI())
 		CGI cgi(_request);
 
 	else if (request.getMethod() == GET)
