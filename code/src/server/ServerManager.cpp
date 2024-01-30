@@ -102,7 +102,7 @@ void	ServerManager::_updatePollFDArray()
 
 void	ServerManager::_acceptNewClient(ServerSocket *socket)
 {
-	std::cout << "TRY TO ACCEPT NEW CLIENT" << std::endl;
+	//std::cout << "TRY TO ACCEPT NEW CLIENT" << std::endl;
 	ClientSocket	*newClient;
 	if (_sockets.size() == MAX_CONNECTIONS)
 	{

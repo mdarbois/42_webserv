@@ -24,7 +24,7 @@ ServerConfig::ServerConfig(ServerConfig const &src) {
     this->_ip = src._ip;
     this->_errorPages = src._errorPages;
     this->_locations = src._locations;
-    std::cout << _locations["/"]<< std::endl;
+    //std::cout << _locations["/"]<< std::endl;
   //std::cout << "ServerConfig copy constructor called" << std::endl;
 }
 
