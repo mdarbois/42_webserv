@@ -17,10 +17,7 @@ class CGI {
         CGI &operator=(CGI const &rhs);
         int input_pipefd[2];  // Pipe for sending input to child
         int output_pipefd[2]; // Pipe for receiving output from child
-        void _addArgs(ParserHTTP &parsing);
-        void _childProcess(int *input_pipefd, int *output_pipefd);
-        void _parentProcess(ParserHTTP parsing, int pid, int *input_pipefd, int *output_pipefd, pid_t pidWait, time_t startTime);
-        std::string	_readOutput(int output_pipefd[2]);
+       
         std::string getBody() const;
         size_t	getLength() const;
         std::vector<std::string> getEnv() const;
@@ -36,6 +33,11 @@ class CGI {
         bool _timeOut;
         std::string _body;
         void _print(CGI cgi);
+        void _addArgs(ParserHTTP &parsing);
+        void _addEnv(ParserHTTP &parsing);
+        void _childProcess(int *input_pipefd, int *output_pipefd);
+        void _parentProcess(ParserHTTP parsing, int pid, int *input_pipefd, int *output_pipefd, pid_t pidWait, time_t startTime);
+        std::string	_readOutput(int output_pipefd[2]);
 };
 std::ostream& operator<<(std::ostream& os, const CGI& cgi);
 #endif

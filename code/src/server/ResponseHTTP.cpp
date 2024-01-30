@@ -22,8 +22,13 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
-	if (_request.isCGI())
-		std::cout << "Handle CGI later :)" << std::endl;
+
+	//Very basic. A lot of cheecks have to be performed
+	if (!_isValidRequest())
+		_createErrorResponse();
+	else if (_request.isCGI())
+		CGI cgi(_request);
+
 	else if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
