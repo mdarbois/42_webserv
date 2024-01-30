@@ -5,13 +5,16 @@
 # include <fstream>
 # include <string>
 # include <map>
-#include <vector>
-#include <algorithm>
+# include <vector>
+# include <cstdio>
+# include <cstdlib>
+# include <algorithm>
+# include <sys/stat.h> // to check if file or dir
 # include "utils.hpp"
 # include "ParserHTTP.hpp"
 # include "Config.hpp"
 # include "Socket.hpp" //because of HTTP Codes -> has to be done cleaner
-#include "CGI.hpp"
+# include "CGI.hpp"
 
 # define ALLOWED_HTTP_PROTOCOL "HTTP/1.1"
 typedef struct s_ResponseLine
@@ -20,6 +23,13 @@ typedef struct s_ResponseLine
 	HttpStatus	httpStatusCode;
 	std::string	reasonPhrase;
 }ResponseLine;
+
+typedef enum e_PathType
+{
+	PT_ERROR,
+	PT_FILE,
+	PT_DIR
+}PathType;
 
 
 class ResponseHTTP
@@ -35,7 +45,7 @@ class ResponseHTTP
 		std::map<std::string, std::string>	getResponseHeaderMap() const;
 		int									getBodyLength() const;
 		int									getResponseLength() const;
-
+		std::string							getFullRequestedPath() const;
 		void								setBody(std::string body);
 		void								setResponseLine(HttpStatus status, std::string reasonPhrase);
 		void								setHeader(std::string key, std::string value);
@@ -48,8 +58,7 @@ class ResponseHTTP
 		ParserHTTP							_request;
 		int									_bodyLength;
 		bool								_readFile();
-		void								_createErrorResponse();
-		bool								_isValidRequest();
+		void								_createErrorResponse(std::string errPagePath, HttpStatus status);
 		void								_GET();
 		void								_POST();
 		void								_DELETE();

@@ -1,4 +1,6 @@
 - there can be a null byte in the middle of the request, but then we shouldnt stop reading! --> DONE via content length
 - HTTP Requests and responses can be sent in chunks
-- ehat if location "EMPTY" { ??
-- 
+- what if location "EMPTY" { ??
+- upload a file where the name already exists
+- Can we use this: if (std::system(command.c_str()) == 0) ???
+- Which part of a path should be taken to validate the allowed methods in a location

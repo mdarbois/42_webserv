@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 09:24:12 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/25 14:22:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/27 15:05:09 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class ParserHTTP
 		std::map<std::string, std::string>	getHeaderMap() const;
 		std::map<std::string, std::string>	getCGIParamMap() const;
 
-		void								overrideReqPathtoErrorPath(std::string errorPath);
+		void								overidePath(std::string errorPath);
 		
 	private:
 		std::string							_requestString;

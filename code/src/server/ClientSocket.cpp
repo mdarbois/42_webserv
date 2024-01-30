@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 16:53:10 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/29 12:01:57 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,12 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.endType == SINGLE)
 		return (COM_DONE);
 	else if (_request.endType == CONTENT_LENGTH && _checkContentLength())
+	{
+		std::cout << "BODY" << std::endl;
+		std::cout << _request.buffer << std::endl;
+		std::cout << "---------------------" << std::endl;
 		return (COM_DONE);
+	}
 	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.endType == CHUNKED_ENCODING)
 		return (COM_DONE);
 	else

@@ -96,6 +96,8 @@ std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 		o << "Upload:\tTRUE" << std::endl;
 		o << std::endl;
 		o << "Upload Filename:\t" << i.getUploadFilename() << std::endl;
+		o << "Boundary String:\t" << i.getStartBoundary() << std::endl;
+		o << std::endl;
 	}
 	else
 		o << "Upload:\tFALSE" << std::endl;
@@ -108,7 +110,7 @@ std::ostream &			operator<<( std::ostream & o, ParserHTTP const & i )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
-void	ParserHTTP::overrideReqPathtoErrorPath(std::string errorPath)
+void	ParserHTTP::overidePath(std::string errorPath)
 {
 	_path = errorPath;
 }
@@ -152,9 +154,10 @@ void	ParserHTTP::parseRequest()
 			if (headerValue.find("multipart/form-data") != std::string::npos)
 			{
 				_isUpload = true;
-				size_t filenameStartPos = _body.find("boundary=") + std::strlen("boundary=");
-				size_t filenameEndPos = _body.find("\r\n", filenameStartPos);
-				_startBoundary = _body.substr(filenameStartPos, filenameEndPos - filenameStartPos);
+				//get the boundary
+				size_t boundaryStartPos = headerValue.find("boundary=") + std::strlen("boundary=");
+				size_t boundaryEndPos = headerValue.find("\r\n", boundaryStartPos);
+				_startBoundary = headerValue.substr(boundaryStartPos, boundaryEndPos - boundaryStartPos);
 				_endBoundary = _startBoundary + "--";
 			}
 		}
@@ -190,6 +193,7 @@ void	ParserHTTP::parseRequest()
 	//get the filename in case of fileupload
 	if (_isUpload)
 	{
+		//get the filename
 		size_t filenameStartPos = _body.find("filename=") + std::strlen("filename=");
 		size_t filenameEndPos = _body.find("\r\n", filenameStartPos);
 		_uploadFilename = _body.substr(filenameStartPos, filenameEndPos - filenameStartPos);

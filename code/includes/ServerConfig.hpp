@@ -13,6 +13,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
+class LocationConfig; 
+
 class ServerConfig {
   public:
     ServerConfig();

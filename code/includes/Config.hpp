@@ -16,7 +16,6 @@ class Config
       ~Config();
       std::vector<ServerConfig> servers(void) const;
       std::vector<ServerConfig> getServers() const;
-
 /* 
       class ConfigException : public std::exception {
         public:
