@@ -21,6 +21,8 @@ void trimSpaces(std::string &content)
 	while (content[i] && isspace(content[i]))
 		i++;
 	content = content.substr(i);
+	if (content.empty())
+        return;
 	i = content.length() - 1;
 	while (i > 0 && isspace(content[i]))
 		i--;

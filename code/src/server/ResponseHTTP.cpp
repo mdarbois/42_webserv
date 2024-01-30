@@ -131,14 +131,16 @@ PathType	getPathType(std::string path)
 
 void	ResponseHTTP::_GET()
 {
-	//Check if the requested Resource is existing
+	
+	
+	// Check redirection
 	std::string pathNoRoot = _request.getPath().erase(0,5);
 	pathNoRoot.erase(pathNoRoot.length() - 1);
 	std::cout << "PATH=" << pathNoRoot << std::endl;
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
-        std::cout << std::endl;
+		//std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
+        //std::cout << std::endl;
 		if(it->first == pathNoRoot && !(it->second.getRedirection().empty()))
 		{
 			std::string statusCode = (it->second).getRedirection().substr(0,3);
@@ -158,9 +160,9 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	}
+	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
-	
 	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
@@ -185,8 +187,8 @@ void	ResponseHTTP::_GET()
 			if (!_config.getLocations()[_request.getPath()].getIndex().empty())
 			{
 				//override the path/
-				std::cout << "My location:" << std::endl;
-				std::cout << _config.getLocations()[_request.getPath()] << std::endl;
+				//std::cout << "My location:" << std::endl;
+				//std::cout << _config.getLocations()[_request.getPath()] << std::endl;
 				if (!_readFile())
 					throw std::runtime_error("GET: Could not open file");
 				else

@@ -14,7 +14,7 @@ CGI::CGI(ParserHTTP &parsing) : _php(""), _length (0),  _timeOut (false), _body 
     time_t	startTime = time(0);
     std::string output;
     int pid = fork();
-    _print(*this);
+    //_print(*this);
     _argsArray = vectorToCharArray(_args);
     _envArray = vectorToCharArray(_env);
   
@@ -109,9 +109,9 @@ void CGI::_addEnv(ParserHTTP &parsing)
     std::map<std::string, std::string> cgiParams = parsing.getCGIParamMap();
 		std::map<std::string, std::string>::iterator it;
 		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
-			std::cout << "\t-" << it->first << ": " << it->second << std::endl;
+			//std::cout << "\t-" << it->first << ": " << it->second << std::endl;
             std::string envVar = pairToString(it->first, it->second);
-            std::cout << envVar << "\n";
+            //std::cout << envVar << "\n";
             _env.push_back(envVar);
             //putenv(const_cast<char*>(envVar.c_str()));
 		}
