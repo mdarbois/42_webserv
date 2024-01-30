@@ -21,7 +21,7 @@ Config::Config(std::string path) {
 
   _parse(configurationFile);
   configurationFile.close();
-  //_print();
+  _print();
 }
 
 
@@ -36,7 +36,6 @@ Config::Config(Config const &src) {
 Config &Config::operator=(const Config &rhs) {
 	if (this != &rhs){
         _servers = rhs._servers;
-		_locations = rhs._locations;
     }
 
   //std::cout << "Config copy assignment operator called" << std::endl;
@@ -51,6 +50,7 @@ void Config::_parse(std::ifstream &configurationFile)
 {
 	std::string line;
 	std::stringstream serverStream;
+	std::map<std::string, LocationConfig> locations;
 	while (std::getline(configurationFile, line))
 	{
 		trimSpaces(line);
@@ -72,13 +72,13 @@ void Config::_parse(std::ifstream &configurationFile)
 			{
 				std::string path = _extractPath(line, line.find("location"), strlen("location"));
 				std::stringstream elements(_extractElements(line, configurationFile));
-				_locations.insert(std::make_pair(path, LocationConfig(elements)));
+				locations.insert(std::make_pair(path, LocationConfig(elements)));
 			}
 			else if (_foundServer && line.find("}") != std::string::npos)
 			{
-				ServerConfig server(serverStream, _servers.size(), _locations);
+				ServerConfig server(serverStream, _servers.size(), locations);
 				_servers.push_back(server);
-				_locations.clear();
+				locations.clear();
 			}
 			else if (_foundServer)
 				serverStream << line << std::endl;

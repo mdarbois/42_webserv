@@ -39,6 +39,6 @@ class Config
     std::string _extractElements(std::string &line, std::ifstream &configurationFile);
     std::string _extractPath(std::string &line, size_t pos, size_t length);
     std::vector<ServerConfig> _servers;
-    std::map<std::string, LocationConfig> _locations;
+  
 };
 #endif
