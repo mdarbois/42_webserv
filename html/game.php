@@ -127,7 +127,7 @@ $htmlResponse = "<html>
 </div>
 </form>
 
-<a href=\"index.html\">Back to Home</a>
+<a href=\"./index.html\">Back to Home</a>
 </body>
 </html>";
 
