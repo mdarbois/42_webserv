@@ -1,13 +1,18 @@
 <?php
-        $dir = "./uploads/";
+   
+    $dir = "./uploads/";
+    echo "Directory: $dir<br>";
+            $files = scandir($dir);
+            echo "Files: " . implode(", ", $files) . "<br>";
         
-        $files = scandir($dir);
-        
-        foreach ($files as $file) {
-            // Exclude current directory (.) and parent directory (..)
-            if ($file != "." && $file != "..") {
-                echo "<li>$file</li>";
+            $htmlResponse = "";
+    
+            // Iterate through the files and add them to the HTML response
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..') {
+                    $htmlResponse .= "<li>$file</li>";
+                }
             }
-        }
-       
+            
+            echo $htmlResponse;
 ?>

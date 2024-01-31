@@ -28,6 +28,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	{
     //CGI cgi(_request);
 		_cgi = CGI(_request);
+		std::cout << "coucou";
 		setResponseLine(HTTP_200, "OK");
 		_body = _cgi.getBody();
 	}
@@ -136,7 +137,6 @@ void	ResponseHTTP::_GET()
 	// Check redirection
 	std::string pathNoRoot = _request.getPath().erase(0,5);
 	pathNoRoot.erase(pathNoRoot.length() - 1);
-	std::cout << "PATH=" << pathNoRoot << std::endl;
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		//std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
@@ -237,6 +237,7 @@ void	ResponseHTTP::_POST()
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
 	setResponseLine(HTTP_200, "OK");
+	setHeader("Access-Control-Allow-Origin", "*");
 }
 
 void	ResponseHTTP::_DELETE()

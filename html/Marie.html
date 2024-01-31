@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome Marie!</title>
+    <title>Welcome You!</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,17 +12,19 @@
             padding: 50px;
         }
         h1 {
-            color: #4CAF50;
+            color: violet;
         }
-        p {
-            color: #333;
+        h2 {
+            color: darkblue;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome, Marie!</h1>
-    <p>This is a colorful and fancy HTML response just for you!</p>
-    <p> FORM with user input so it displays his/her name ?</p>
+    <h1>Wilkommen</h1>
+    <form method="post" action="./marie.php">
+        Enter your name: <input type="text" name="name"><br>
+        <input type="submit" value="Submit">
+    </form>
     <a href="./index.html">Back to Home</a>
 </body>
 </html>
