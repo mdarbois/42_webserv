@@ -28,6 +28,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	{
     //CGI cgi(_request);
 		_cgi = CGI(_request);
+		std::cout << "coucou";
 		setResponseLine(HTTP_200, "OK");
 		_body = _cgi.getBody();
 	}
@@ -237,6 +238,7 @@ void	ResponseHTTP::_POST()
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
 	setResponseLine(HTTP_200, "OK");
+	setHeader("Access-Control-Allow-Origin", "*");
 }
 
 void	ResponseHTTP::_DELETE()
