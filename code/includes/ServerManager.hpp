@@ -26,7 +26,7 @@
 #include "ServerConfig.hpp"
 #include "utils.hpp"
 #include "ParserHTTP.hpp"
-
+#include <csignal>
 
 //For Testing - later set up by config
 # define MAX_GET_SIZE 8192
