@@ -8,3 +8,6 @@
 - How do we send a response as chunked data?
 - How to handle uploaded Data
 - Where to check Client Body siyze and what should we return
+- if there is no index in the location, dont return auto off, but an empty string
+- The back home on the error page does not work
+- Hard coded host in POST has to be dynamically
