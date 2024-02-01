@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/30 14:21:30 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/01 09:06:56 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,20 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_request = request;
 
 	//Very basic. A lot of cheecks have to be performed
-	if (_request.isCGI())
-	{
-    //CGI cgi(_request);
-		_cgi = CGI(_request);
-		std::cout << "coucou";
-		setResponseLine(HTTP_200, "OK");
-		_body = _cgi.getBody();
-	}
-	else if (request.getMethod() == GET)
+
+	if (request.getMethod() == GET)
+
 		_GET();
 	else if (request.getMethod() == POST)
 		_POST();
 	else if (request.getMethod() == DELETE)
 		_DELETE();
+}
+
+ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
+{
+	if (!config.getHost().empty())
+		_body = cgi.getBody();
 }
 /* ResponseHTTP::ResponseHTTP()
 {
@@ -140,8 +140,7 @@ void	ResponseHTTP::_GET()
 	//std::cout << "PATH=" << pathNoRoot << std::endl;
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		//std::cout << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
-        //std::cout << std::endl;
+
 		if(it->first == pathNoRoot && !(it->second.getRedirection().empty()))
 		{
 			std::string statusCode = (it->second).getRedirection().substr(0,3);
@@ -164,7 +163,10 @@ void	ResponseHTTP::_GET()
 	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
-	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
+
+	
+	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
+
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
 	if (requestedResource == PT_ERROR)
@@ -188,8 +190,7 @@ void	ResponseHTTP::_GET()
 			if (!_config.getLocations()[_request.getPath()].getIndex().empty())
 			{
 				//override the path/
-				//std::cout << "My location:" << std::endl;
-				//std::cout << _config.getLocations()[_request.getPath()] << std::endl;
+
 				if (!_readFile())
 					throw std::runtime_error("GET: Could not open file");
 				else

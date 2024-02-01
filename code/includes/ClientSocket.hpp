@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/30 14:05:34 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/31 16:15:40 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include "ServerSocket.hpp"
 # include "ParserHTTP.hpp"
 # include "ResponseHTTP.hpp"
+# include "CGI.hpp"
 
 # define CLIENT_RECEIVE_BUFFER_SIZE 1024
 # define CLIENT_TIMEOUT_RECEIVE 5
@@ -65,20 +66,26 @@ class ClientSocket: public Socket
 		bool				hasCommunicationTimeOut();
 		Request				getRequest() const;
 		bool				requestedCGI() const;
-		int					getPipeToParentFd() const;
-		int					getCGIToPipeFd() const;
+		struct pollfd		getPipeToParentFd() const;
+		struct pollfd		getCGIToPipeFd() const;
+		void				setCGIToPipeFd(int fd);
+		void				setPipeToParentFd(int fd);
+		CGI&				getCGI();
 
 	private:
+		CGI					_cgi;
+		bool				_isCGI;
 		int					_connectingServerFD;
 		Request				_request;
 		time_t				_startTimeCommunication;
-		int					_pipeToParentFd;
-		int					_CGIToPipeFd;
-
+		struct pollfd		_pipeToParentFd;
+		struct pollfd		_CGIToPipeFd;
+		ParserHTTP			_parser;
 		ResponseData		_responseData;
 
 		void				_resetRequest();
 		bool				_checkContentLength();
+		bool				_doneReceiving();
 
 };
 

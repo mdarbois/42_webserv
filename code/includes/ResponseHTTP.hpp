@@ -36,6 +36,7 @@ class ResponseHTTP
 {
 	public:
 		ResponseHTTP(ParserHTTP	request, ServerConfig config);
+		ResponseHTTP(const CGI& cgi, ServerConfig config);
 		~ResponseHTTP();
 		ResponseHTTP &		operator=( ResponseHTTP const & rhs );
 		ResponseHTTP();
@@ -52,7 +53,6 @@ class ResponseHTTP
 
 	private:
 		ServerConfig						_config;
-		CGI									_cgi;
 		ResponseLine						_responseLine;
 		std::string							_body;
 		std::map<std::string, std::string>	_header;
