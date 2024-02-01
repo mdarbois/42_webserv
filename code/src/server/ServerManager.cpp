@@ -204,6 +204,7 @@ bool	ServerManager::_checkPollErrors(SocketType socketType, int socketIdx, short
 	return (true);
 }
 
+
 /* 
 	PollFd array conatins socket fds and pipe fds, so the index of the _sockets[] and 
 	the pollFD[] does not match. In the main loop we iterate over the pollfd and need
@@ -229,6 +230,7 @@ SocketType	ServerManager::_getSocketTypeForPollFdIdx(int idx, int *socketIndex) 
 	The server sockets accept and create new client sockets.
 	The client sockets handle request receiving and response sending.
  */
+
 void	ServerManager::run()
 {
 	int	pollResult;

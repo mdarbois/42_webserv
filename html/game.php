@@ -7,7 +7,7 @@ $answer3 = getenv('answer3');
 $answer4 = getenv('answer4');
 
 $color1 = $color2 = $color3 = $color4 = "red";
- if ($answer1 == 'Leberknoedel')
+if ($answer1 == 'Leberknoedel')
     $color1 = "green";
 if ($answer2 == 'Semmelknoedel')
     $color2 = "green";

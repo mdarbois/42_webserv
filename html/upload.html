@@ -6,9 +6,13 @@
     <title>File Upload Form</title>
 </head>
 <body>
+    <h1>File List</h1>
+    <button id="listButton" onclick="listFiles()">List Files</button>
+    <div id="fileList"></div>
+
     <h1>File Upload Form</h1>
     
-    <form id="uploadForm">
+    <form id="uploadForm" action="/" method="post">
         <label for="file">Select a file:</label>
         <input type="file" name="file" id="file" required>
         <br>
@@ -16,6 +20,28 @@
     </form>
 
     <script>
+        var isListDisplayed = false;
+        function listFiles() {
+            if (isListDisplayed) {
+                // If list is displayed, hide it and update the button text
+                document.getElementById("fileList").innerHTML = "";
+                document.getElementById("listButton").innerText = "List Files";
+                isListDisplayed = false;
+            } else {
+            // Make an AJAX request to fetch the file history from the server
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    // Display the file history in the result div
+                    document.getElementById("fileList").innerHTML = xhr.responseText;
+                    document.getElementById("listButton").innerText = "Hide List";
+                    isListDisplayed = true;
+                }
+            };
+            xhr.open("GET", "list_files.php", true);
+            xhr.send();
+        }
+        }
         function uploadFile() {
             // Get the file input element
             var fileInput = document.getElementById('file');
@@ -34,7 +60,6 @@
                 // Set the Content-Type header with the boundary string
                 var contentType = 'multipart/form-data; boundary=' + boundary;
                 xhr.setRequestHeader('Content-Type', contentType);
-                
                 // Define a callback function to handle the response
                 xhr.onload = function() {
                     if (xhr.status === 200) {
@@ -51,7 +76,7 @@
                 formData.append('file', fileInput.files[0]);
 
                 // Append the boundary string as a field in the FormData object
-                formData.append('boundary', '--' + boundary + '\r\n');
+               // formData.append('boundary', '--' + boundary + '\r\n');
                 
                 // Send the FormData object containing the file
                 xhr.send(formData);

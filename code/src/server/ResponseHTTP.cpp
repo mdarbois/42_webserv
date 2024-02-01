@@ -24,7 +24,9 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_request = request;
 
 	//Very basic. A lot of cheecks have to be performed
+
 	if (request.getMethod() == GET)
+
 		_GET();
 	else if (request.getMethod() == POST)
 		_POST();
@@ -130,12 +132,15 @@ PathType	getPathType(std::string path)
 
 void	ResponseHTTP::_GET()
 {
-	//Check if the requested Resource is existing
+	
+	
+	// Check redirection
 	std::string pathNoRoot = _request.getPath().erase(0,5);
 	pathNoRoot.erase(pathNoRoot.length() - 1);
-	std::cout << "PATH=" << pathNoRoot << std::endl;
+	//std::cout << "PATH=" << pathNoRoot << std::endl;
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+
 		if(it->first == pathNoRoot && !(it->second.getRedirection().empty()))
 		{
 			std::string statusCode = (it->second).getRedirection().substr(0,3);
@@ -155,10 +160,13 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	}
+	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
+
 	
 	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
+
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
 	if (requestedResource == PT_ERROR)
@@ -182,6 +190,7 @@ void	ResponseHTTP::_GET()
 			if (!_config.getLocations()[_request.getPath()].getIndex().empty())
 			{
 				//override the path/
+
 				if (!_readFile())
 					throw std::runtime_error("GET: Could not open file");
 				else
@@ -230,6 +239,7 @@ void	ResponseHTTP::_POST()
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
 	setResponseLine(HTTP_200, "OK");
+	setHeader("Access-Control-Allow-Origin", "*");
 }
 
 void	ResponseHTTP::_DELETE()

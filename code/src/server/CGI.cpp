@@ -4,6 +4,7 @@ CGI::CGI(){}
 
 CGI::CGI(ParserHTTP &parsedRequest) : _php(""), _length (0),  _timeOut (false), _body ("")
 {
+
 	//Set up the CGI
 	_parsedRequest = parsedRequest;
 	_addEnv(parsedRequest);
@@ -141,11 +142,13 @@ void CGI::_addEnv(ParserHTTP &parsing)
 	std::map<std::string, std::string> cgiParams = parsing.getCGIParamMap();
 		std::map<std::string, std::string>::iterator it;
 		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
+
 			std::cout << "\t-" << it->first << ": " << it->second << std::endl;
 			std::string envVar = pairToString(it->first, it->second);
 			std::cout << envVar << "\n";
 			_env.push_back(envVar);
 			//putenv(const_cast<char*>(envVar.c_str()));
+
 		}
 	/* std::map<std::string, std::string>::iterator iter;
 	std::cout << parsing << std::endl;
