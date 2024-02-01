@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/30 14:06:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/31 16:17:39 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,20 @@
 
 ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 {
+	_isCGI = false;
+	
 	_startTimeCommunication = time(0);
 	_responseData.bytesSent = 0;
 	_responseData.sendInProgress = false;
-	_pipeToParentFd = -1;
-	_CGIToPipeFd = -1;
+
+	_pipeToParentFd.fd = 0;
+	_pipeToParentFd.revents = 0;
+	_pipeToParentFd.events = POLLIN;
+
+	_CGIToPipeFd.fd = 0;
+	_CGIToPipeFd.revents = 0;
+	_CGIToPipeFd.events = POLLOUT;
+	
 	_type = CLIENT;
 	_config = config;
 	_connectingServerFD = connectingServerFD;
@@ -133,10 +142,20 @@ bool	ClientSocket::_checkContentLength()
 	return (false);
 }
 
+bool	ClientSocket::_doneReceiving()
+{
+	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.endType == SINGLE)
+		return (true);
+	else if (_request.endType == CONTENT_LENGTH && _checkContentLength())
+		return (true);
+	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.endType == CHUNKED_ENCODING)
+		return (true);
+	return (false);
+}
+
 CommunicationStatus	ClientSocket::receiveRequest()
 {
-	std::cout << "Client -> receive" << std::endl;
-	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE]; //SIZE NEEDS TO BE RETHOUGHT
+	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE]; //TODO: SIZE NEEDS TO BE RETHOUGHT
 	size_t	bytesRead;
 	
 	if ((bytesRead = recv(_pollFD.fd, &buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
@@ -167,17 +186,20 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	else
 		_request.endType = SINGLE; //DELETE OR GET
 	
-	if (_request.buffer.find("\r\n\r\n") != std::string::npos && _request.endType == SINGLE)
-		return (COM_DONE);
-	else if (_request.endType == CONTENT_LENGTH && _checkContentLength())
+	if (_doneReceiving())
 	{
-		std::cout << "BODY" << std::endl;
-		std::cout << _request.buffer << std::endl;
-		std::cout << "---------------------" << std::endl;
+		//Parse the request string
+		_parser = ParserHTTP (_request.buffer);
+		if (_parser.isCGI())
+		{
+			_cgi = CGI(_parser); //Set up the CGI with the pipes and environment
+			_isCGI = true;
+			setCGIToPipeFd(_cgi.output_pipe[1]);
+			setPipeToParentFd(_cgi.output_pipe[0]);
+			return (CGI_PENDING);
+		}
 		return (COM_DONE);
 	}
-	else if (_request.buffer.find("0\r\n\r\n") != std::string::npos && _request.endType == CHUNKED_ENCODING)
-		return (COM_DONE);
 	else
 		return (COM_IN_PROGRESS);
 }
@@ -188,14 +210,14 @@ CommunicationStatus	ClientSocket::sendResponse()
 	{
 		//TBD: Timer!
 		_startTimeCommunication = time(0);
-		
-		//Parse the request string
-		ParserHTTP parser(_request.buffer);
 
 		//Make a HTTP-Response
 		try
 		{
-			_responseData.response = ResponseHTTP(parser, _config);
+			if (_isCGI)
+				_responseData.response = ResponseHTTP(_cgi, _config);
+			else
+				_responseData.response = ResponseHTTP(_parser, _config);
 			_responseData.sendInProgress = true;
 		}
 		catch(const std::exception& e)
@@ -223,6 +245,36 @@ CommunicationStatus	ClientSocket::sendResponse()
 Request	ClientSocket::getRequest() const
 {
 	return (_request);
+}
+
+bool	ClientSocket::requestedCGI() const
+{
+	return (_isCGI);
+}
+
+struct pollfd	ClientSocket::getPipeToParentFd() const
+{
+	return (_pipeToParentFd);
+}
+
+struct pollfd	ClientSocket::getCGIToPipeFd() const
+{
+	return (_CGIToPipeFd);
+}
+
+CGI&	ClientSocket::getCGI()
+{
+	return (_cgi);
+}
+
+void	ClientSocket::setCGIToPipeFd(int fd)
+{
+	_CGIToPipeFd.fd = fd;
+}
+
+void	ClientSocket::setPipeToParentFd(int fd)
+{
+	_pipeToParentFd.fd = fd;
 }
 
 /* ************************************************************************** */

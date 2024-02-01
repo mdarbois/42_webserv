@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:13 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/24 16:58:30 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/01/31 09:04:10 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	Socket::setPollFD(int fd, short events, short revents)
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
-t_socketType	Socket::getType() const
+SocketType	Socket::getType() const
 {
 	return (_type);
 }
