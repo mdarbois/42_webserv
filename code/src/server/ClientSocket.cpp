@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/31 16:17:39 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:07:06 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,10 @@ CommunicationStatus	ClientSocket::receiveRequest()
 		return (COM_DONE);
 	}
 	else
+	{
+		std::cout << "Still receiving..." << std::endl;
 		return (COM_IN_PROGRESS);
+	}
 }
 
 CommunicationStatus	ClientSocket::sendResponse()

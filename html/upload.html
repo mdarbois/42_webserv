@@ -1,90 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload Form</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>File Upload Form</title>
 </head>
 <body>
-    <h1>File List</h1>
-    <button id="listButton" onclick="listFiles()">List Files</button>
-    <div id="fileList"></div>
+	<h1>File List</h1>
+	<button id="listButton" onclick="listFiles()">List Files</button>
+	<div id="fileList"></div>
 
-    <h1>File Upload Form</h1>
-    
-    <form id="uploadForm" action="/" method="post">
-        <label for="file">Select a file:</label>
-        <input type="file" name="file" id="file" required>
-        <br>
-        <input type="button" value="Upload" onclick="uploadFile()">
-    </form>
+	<h1>File Upload Form</h1>
+	
+	<form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+		<label for="file">Select a file:</label>
+		<input type="file" name="file" id="file" required>
+		<br>
+		<input type="button" value="Upload" onclick="uploadFile()">
+	</form>
 
-    <script>
-        var isListDisplayed = false;
-        function listFiles() {
-            if (isListDisplayed) {
-                // If list is displayed, hide it and update the button text
-                document.getElementById("fileList").innerHTML = "";
-                document.getElementById("listButton").innerText = "List Files";
-                isListDisplayed = false;
-            } else {
-            // Make an AJAX request to fetch the file history from the server
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    // Display the file history in the result div
-                    document.getElementById("fileList").innerHTML = xhr.responseText;
-                    document.getElementById("listButton").innerText = "Hide List";
-                    isListDisplayed = true;
-                }
-            };
-            xhr.open("GET", "list_files.php", true);
-            xhr.send();
-        }
-        }
-        function uploadFile() {
-            // Get the file input element
-            var fileInput = document.getElementById('file');
-            
-            // Check if a file is selected
-            if (fileInput.files.length > 0) {
-                // Generate a boundary string
-                var boundary = '---------------------------' + Date.now().toString(16);
-                
-                // Create a new XMLHttpRequest object
-                var xhr = new XMLHttpRequest();
-                
-                // Configure it for a POST request to 127.0.0.1:18000
-                xhr.open('POST', 'http://127.0.0.1:18000', true);
-                
-                // Set the Content-Type header with the boundary string
-                var contentType = 'multipart/form-data; boundary=' + boundary;
-                xhr.setRequestHeader('Content-Type', contentType);
-                // Define a callback function to handle the response
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        alert('File uploaded successfully!');
-                    } else {
-                        alert('Error uploading file. Status: ' + xhr.status);
-                    }
-                };
+	<script>
+		var isListDisplayed = false;
+		function listFiles() {
+			if (isListDisplayed) {
+				// If list is displayed, hide it and update the button text
+				document.getElementById("fileList").innerHTML = "";
+				document.getElementById("listButton").innerText = "List Files";
+				isListDisplayed = false;
+			} else {
+			// Make an AJAX request to fetch the file history from the server
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+					// Display the file history in the result div
+					document.getElementById("fileList").innerHTML = xhr.responseText;
+					document.getElementById("listButton").innerText = "Hide List";
+					isListDisplayed = true;
+				}
+			};
+			xhr.open("GET", "list_files.php", true);
+			xhr.send();
+		}
+		}
+		function uploadFile() {
+			// Get the file input element
+			var fileInput = document.getElementById('file');
+			
+			// Check if a file is selected
+			if (fileInput.files.length > 0) {
+				// Create a new XMLHttpRequest object
+				var xhr = new XMLHttpRequest();
+				
+				// Configure it for a POST request to 127.0.0.1:18000
+				xhr.open('POST', 'http://127.0.0.1:18000', true);
 
-                // Create a FormData object
-                var formData = new FormData();
-                
-                // Append the file to the FormData object
-                formData.append('file', fileInput.files[0]);
+				// Define a callback function to handle the response
+				xhr.onload = function() {
+					if (xhr.status === 200) {
+						alert('File uploaded successfully!');
+					} else {
+						alert('Error uploading file. Status: ' + xhr.status);
+					}
+				};
 
-                // Append the boundary string as a field in the FormData object
-               // formData.append('boundary', '--' + boundary + '\r\n');
-                
-                // Send the FormData object containing the file
-                xhr.send(formData);
-            } else {
-                alert('Please select a file before uploading.');
-            }
-        }
-    </script>
-    <a href="./index.html">Back to Home</a>
+				// Create a FormData object
+				var formData = new FormData();
+				
+				// Append the file to the FormData object
+				formData.append('file', fileInput.files[0]);
+
+				// Send the FormData object containing the file
+				xhr.send(formData);
+			} else {
+				alert('Please select a file before uploading.');
+			}
+		}
+	</script>
+	<a href="./index.html">Back to Home</a>
 </body>
 </html>

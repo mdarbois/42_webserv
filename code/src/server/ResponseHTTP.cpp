@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/01 11:59:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/01 14:31:27 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,7 @@ void	ResponseHTTP::_GET()
 		}
 	} */
 	//Check if the requested Resource is existing
+	std::cout << getFullRequestedPath() << std::endl;
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
 
