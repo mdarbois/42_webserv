@@ -15,7 +15,7 @@ server {
 		uploads usr/bin/php;
 	}
 
-	location /restricted {
+	location /Marie {
 		methods GET;
 		index my_awesome_index.html;
 		uploads usr/bin/php;
@@ -26,7 +26,7 @@ server {
 	}
 	
 
-	location /red {
+	location /red/ {
 		methods GET;
 		redirection 	301 https://www.ecosia.org/;
 	}
