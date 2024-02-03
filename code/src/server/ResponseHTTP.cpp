@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/03 11:52:51 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/03 13:10:38 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		_POST();
 	else if (request.getMethod() == DELETE)
 		_DELETE();
+	else
+		_createErrorResponse("/html/403.html", HTTP_403); //TODO Paths are still weird
 }
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
