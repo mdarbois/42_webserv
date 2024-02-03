@@ -7,6 +7,9 @@
 - if there is no index in the location, dont return auto off, but an empty string
 - The back home on the error page does not work
 - In the fileupload branch now its not wrkong if only the / is requested. The index is shown but then i cant go to the other pages.
+
+- xhr.open('POST', 'http://' + host + ':' + port, true); should go t oxhr.open('POST', 'http://' + host + ':' + port + '/uploads/', true); becuase / is POST not allowed!!!
+
 - The host shouldnt be empty in the request
 - How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed
 - Post files with the content in the body without multipart --> Yann?

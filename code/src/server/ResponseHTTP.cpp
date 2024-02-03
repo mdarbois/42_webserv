@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/03 13:10:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/03 13:19:17 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,6 +226,8 @@ void	ResponseHTTP::_POST()
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
 		return setResponseLine(HTTP_400, "Bad Request");
+
+	std::cout << _request << std::endl;
 
 	//check if the folder is accessible and the rights to post a file 
 	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)

@@ -1,0 +1,5 @@
+curl -X POST -F "fieldname=@/path/to/file" http://example.com/upload
+
+curl -X DELETE http://example.com/api/resource/123
+
+curl -X GET http://example.com/api/resource

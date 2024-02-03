@@ -55,7 +55,7 @@
 				// Configure it for a POST request to the dynamic host and port
 				var host = window.location.hostname; // Get the current hostname dynamically
 				var port = window.location.port; // Get the current port dynamically
-				xhr.open('POST', 'http://' + host + ':' + port, true);
+				xhr.open('POST', 'http://' + host + ':' + port + '/uploads/', true);
 				console.log(host, port);
 				// Define a callback function to handle the response
 				xhr.onload = function() {
