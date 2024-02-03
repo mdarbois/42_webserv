@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/01 14:31:27 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/03 11:52:51 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_config = config;
 	_request = request;
 
+	if (request.getBody().size() > config.getClientMaxBodySize())
+	{
+		_createErrorResponse("/html/413.html", HTTP_413); //TODO Paths are still weird
+		return;
+	}
 	//Very basic. A lot of cheecks have to be performed
 	if (request.getMethod() == GET)
 		_GET();
@@ -87,7 +92,7 @@ void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus stat
 {
 	_request.overidePath(errPagePath);
 	_readFile();
-	setResponseLine(status, "Retreive later from a lookup");
+	setResponseLine(status, "Retreive later from a lookup"); //TODO
 }
 
 bool	ResponseHTTP::_readFile()
@@ -156,7 +161,6 @@ void	ResponseHTTP::_GET()
 		}
 	} */
 	//Check if the requested Resource is existing
-	std::cout << getFullRequestedPath() << std::endl;
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
 
@@ -234,8 +238,12 @@ void	ResponseHTTP::_POST()
 	std::ofstream	newFile(uploadFilePath.c_str());
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
-	setResponseLine(HTTP_200, "OK");
+	setResponseLine(HTTP_201, "Created");
 	setHeader("Access-Control-Allow-Origin", "*");
+	size_t endHeader = _request.getBody().find("\r\n\r\n") + 4;
+	size_t endFormData = _request.getBody().find(_request.getEndBoundary());
+	newFile << _request.getBody().substr(endHeader, endFormData - endHeader - 2);
+	newFile.close();
 }
 
 void	ResponseHTTP::_DELETE()

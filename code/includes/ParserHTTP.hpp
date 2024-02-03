@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 09:24:12 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/27 15:05:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/02 19:29:08 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 # include <sstream>
 # include <map>
 # include <cstring>
-# include <string>
+#include <iostream>
+#include <fstream>
 
 typedef enum e_httpMethod
 {

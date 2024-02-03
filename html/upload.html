@@ -28,19 +28,19 @@
 				document.getElementById("listButton").innerText = "List Files";
 				isListDisplayed = false;
 			} else {
-			// Make an AJAX request to fetch the file history from the server
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = function () {
-				if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-					// Display the file history in the result div
-					document.getElementById("fileList").innerHTML = xhr.responseText;
-					document.getElementById("listButton").innerText = "Hide List";
-					isListDisplayed = true;
-				}
-			};
-			xhr.open("GET", "list_files.php", true);
-			xhr.send();
-		}
+				// Make an AJAX request to fetch the file history from the server
+				var xhr = new XMLHttpRequest();
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+						// Display the file history in the result div
+						document.getElementById("fileList").innerHTML = xhr.responseText;
+						document.getElementById("listButton").innerText = "Hide List";
+						isListDisplayed = true;
+					}
+				};
+				xhr.open("GET", "list_files.php", true);
+				xhr.send();
+			}
 		}
 		function uploadFile() {
 			// Get the file input element
@@ -50,16 +50,22 @@
 			if (fileInput.files.length > 0) {
 				// Create a new XMLHttpRequest object
 				var xhr = new XMLHttpRequest();
+				//xhr.setRequestHeader('Content-Type', 'undefined');
 				
-				// Configure it for a POST request to 127.0.0.1:18000
-				xhr.open('POST', 'http://127.0.0.1:18000', true);
-
+				// Configure it for a POST request to the dynamic host and port
+				var host = window.location.hostname; // Get the current hostname dynamically
+				var port = window.location.port; // Get the current port dynamically
+				xhr.open('POST', 'http://' + host + ':' + port, true);
+				console.log(host, port);
 				// Define a callback function to handle the response
 				xhr.onload = function() {
-					if (xhr.status === 200) {
+					if (xhr.status === 201) {
 						alert('File uploaded successfully!');
 					} else {
-						alert('Error uploading file. Status: ' + xhr.status);
+						// Display the HTML response from the server in the current window
+						document.open(); // Open a new document
+						document.write(xhr.responseText); // Write the HTML response to the document
+						document.close(); // Close the document
 					}
 				};
 
