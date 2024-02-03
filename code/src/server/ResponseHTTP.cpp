@@ -22,7 +22,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
-
+  _path = _config.getLocationPath(_request.getPath());
+  _checkRed();
 	//Very basic. A lot of cheecks have to be performed
 	if (request.getMethod() == GET)
 		_GET();
@@ -127,6 +128,31 @@ PathType	getPathType(std::string path)
 	return (PT_ERROR);
 }
 
+void ResponseHTTP::_checkRed()
+{
+
+  std::map<std::string, LocationConfig> locations(_config.getLocations());
+  for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
+  if(it->first == _path && !(it->second.getRedirection().empty()))
+  {
+      std::string statusCode = (it->second).getRedirection().substr(0,3);
+			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+			std::string link = (it->second).getRedirection().erase(0,3);
+			trimSpaces(link);
+			std::string htmlContent =
+				"<html>"
+				"<head>"
+				"<title>Redirecting...</title>"
+				"</head>"
+				"<body>"
+				"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+				"</body>"
+				"</html>";
+			setBody(htmlContent);
+      return;
+  }
+
+}
 
 void	ResponseHTTP::_GET()
 {
@@ -159,7 +185,7 @@ void	ResponseHTTP::_GET()
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
 
-	
+
 	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
 
 	//Check if file or directory is requested
@@ -209,7 +235,7 @@ void	ResponseHTTP::_GET()
 					//return the auto index html with all the subfolders and
 				}
 			}
-			
+
 		}
 	}
 }
@@ -220,7 +246,7 @@ void	ResponseHTTP::_POST()
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
 		return setResponseLine(HTTP_400, "Bad Request");
 
-	//check if the folder is accessible and the rights to post a file 
+	//check if the folder is accessible and the rights to post a file
 	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
 		return setResponseLine(HTTP_404, "Not Found");
 

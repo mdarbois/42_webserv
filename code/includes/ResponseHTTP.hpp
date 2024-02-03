@@ -55,6 +55,7 @@ class ResponseHTTP
 		ServerConfig						_config;
 		ResponseLine						_responseLine;
 		std::string							_body;
+    std::string             _path;
 		std::map<std::string, std::string>	_header;
 		ParserHTTP							_request;
 		int									_bodyLength;
@@ -63,6 +64,7 @@ class ResponseHTTP
 		void								_GET();
 		void								_POST();
 		void								_DELETE();
+    void                _checkRed();
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );

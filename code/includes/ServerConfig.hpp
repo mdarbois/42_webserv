@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-class LocationConfig; 
+class LocationConfig;
 
 class ServerConfig {
 	public:
@@ -35,6 +35,7 @@ class ServerConfig {
 		std::string getHost(void) const;
 		std::string getRoot(void) const;
 		std::string getServerName(void) const;
+    std::string getLocationPath(std::string requestPath);
 		unsigned int getClientMaxBodySize(void) const;
 		unsigned int getIp(void) const;
 		std::map<unsigned int, std::string> getErrorPages(void) const;
