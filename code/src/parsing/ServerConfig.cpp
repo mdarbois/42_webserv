@@ -148,7 +148,7 @@ void ServerConfig::_setDefaultLocations()
         //rootLocation.setMethods(methods);
         _locations.insert(std::make_pair("/", rootLocation));
     }
-    it = _locations.find("/uploads");
+    it = _locations.find("/uploads/");
     if (it == _locations.end())
     {
         LocationConfig           uploadsLocation;
@@ -158,7 +158,7 @@ void ServerConfig::_setDefaultLocations()
         methods.push_back("POST");
         methods.push_back("DELETE");
         //newLocation.setMethods(methods);
-        _locations.insert(std::make_pair("/uploads", uploadsLocation));
+        _locations.insert(std::make_pair("/uploads/", uploadsLocation));
     }
 }
 void ServerConfig::_setDefaultErrorPages()
@@ -259,22 +259,22 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
         }
   }
   //directory
-  else
-  {
+ 
     std::string dir = requestPath;
     while (!dir.empty())
     {
         size_t slash = dir.find_last_of('/');
-        dir = dir.substr(0, slash);
+        dir = dir.substr(0, slash + 1);
 
         for (std::map<std::string, LocationConfig>::const_iterator it = _locations.begin();
             it != _locations.end(); ++it)
         {
+          std::cout << it->first << std::endl;
             if (it->first == dir)
                 return (it->first);
         }
     }
-  }
+  
   return ("");
 
 }
