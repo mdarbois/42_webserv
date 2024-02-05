@@ -281,11 +281,13 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
 std::string ServerConfig::getLocationRoot(std::string path, std::string requestPath)
 {
   std::string pathRoot;
+  std::string root;
 
-  if (_locations[path].getRoot().empty())
-    _locations[path].getRoot() = _root;
+  root = _locations[path].getRoot();
+  if (root.empty())
+    root = _root;
   if (!_locations[path].getUploads().empty())
-    return(_root + requestPath);
+    return(root + requestPath);
   pathRoot = requestPath.substr(path.length(), requestPath.length());
 
 
@@ -293,12 +295,12 @@ std::string ServerConfig::getLocationRoot(std::string path, std::string requestP
             _locations[path].getAutoindex() == true)
     {
 		if (pathRoot[pathRoot.size() - 1 == '/'])
-            return (_root + pathRoot);
+            return (root + pathRoot);
         else
-            return (_root + pathRoot + "/");
+            return (root + pathRoot + "/");
     }
-    // check if Uri already specified a file, if not add based on "index"
-  /*   if (pathRoot.empty() || pathRoot == "/")
+   //check if Uri already specified a file, if not add based on "index"
+    /* if (pathRoot.empty() || pathRoot == "/")
     {
         fileName = _locations[path].getIndex();
         if (fileName.empty())

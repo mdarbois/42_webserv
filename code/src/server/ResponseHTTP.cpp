@@ -22,12 +22,14 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
+
   	_path = _config.getLocationPath(_request.getPath());
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
-	/* 
-	std::cout << "request path=" << _request.getPath() << std::endl;
-	std::cout << "PATH=" << _path << std::endl;
-	std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
+	
+	/* std::cout << "request path = " << _request.getPath() << std::endl;
+	std::cout << "root path=" << _pathRoot << std::endl;
+	std::cout << "PATH=" << _path << std::endl; */
+	/* std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
 	std::map<std::string, LocationConfig>::const_iterator it;
     for (it = locationCopy.begin(); it != locationCopy.end(); ++it) {
 			std::cout << "it->first : " << it->first << std::endl;
@@ -60,8 +62,10 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
-	_path = _config.getLocationPath(_request.getPath());
-	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
+	if (_path.empty())
+		_path = _config.getLocationPath(_request.getPath());
+	if (_pathRoot.empty())
+		_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
 }
@@ -96,6 +100,8 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 		_body = rhs._body;
 		_header = rhs._header;
 		_bodyLength = rhs._bodyLength;
+		_path = rhs._path;
+		_pathRoot = rhs._pathRoot;
 	}
 	return *this;
 }
@@ -253,7 +259,8 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	} */
-	 if (_pathRoot[_pathRoot.length() - 1] == '/')
+	std::map<std::string, LocationConfig> locations(_config.getLocations());
+	if (_pathRoot[_pathRoot.length() - 1] == '/' && locations[_request.getPath()].getAutoindex() == true)
 	{
 		std::cout << "AUTOINDEX" << std::endl;
 	} 

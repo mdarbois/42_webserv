@@ -15,9 +15,11 @@ server {
 		root ./html;
 		uploads usr/bin/php;
 	}
+	
 
 	location /Marie {
 		methods GET;
+		root ./html;
 		uploads usr/bin/php;
 	}
 	
@@ -27,10 +29,6 @@ server {
 	location /red/ {
 		methods GET;
 		redirection 	301 https://www.ecosia.org/;
-	}
-
-	location  {
-
 	}
 
 	location /red/home/ {
