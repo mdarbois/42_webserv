@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/05 15:30:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/05 15:36:16 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void ResponseHTTP::_checkRed()
   if(it->first == _path && !(it->second.getRedirection().empty()))
   {
       std::string statusCode = (it->second).getRedirection().substr(0,3);
-			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())));
 			std::string link = (it->second).getRedirection().erase(0,3);
 			trimSpaces(link);
 			std::string htmlContent =
