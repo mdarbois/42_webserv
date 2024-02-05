@@ -130,9 +130,54 @@ PathType	getPathType(std::string path)
 
 void	ResponseHTTP::_GET()
 {
+	//check redirection
+		//fetch the redirection folders from serverconfig
+		std::string pathNoRoot = _request.getPath().erase(0,5);
+		//pathNoRoot.erase(pathNoRoot.length() - 1);
+		//char lastChar = pathNoRoot[pathNoRoot.length() - 1];
+		/* if (lastChar == '/')
+		{ */
+			std::vector<std::string> tokens = splitString(pathNoRoot, '/');
+			prependCharacter(tokens, '/');
+			for (size_t i = 0; i < tokens.size(); ++i)
+			{
+				std::cout << "token = " << tokens[i] << std::endl;
+				std::map<std::string, LocationConfig> locations(_config.getLocations());
+				for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+				std::cout << "locations = " << it->first << std::endl;
+				if(it->first == tokens[i] && !(it->second.getRedirection().empty()))
+				{
+					std::string statusCode = (it->second).getRedirection().substr(0,3);
+					setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+					std::string link = (it->second).getRedirection().erase(0,3);
+					trimSpaces(link);
+					std::string htmlContent =
+						"<html>"
+						"<head>"
+						"<title>Redirecting...</title>"
+						"</head>"
+						"<body>"
+						"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+						"</body>"
+						"</html>";
+					setBody(htmlContent);
+					return ;
+				}
+				}
+			}
+		//}
+		std::cout << "path=" <<  pathNoRoot << std::endl;
+		//_config.getLocations()[]
+
+
+	// check if _request.getPath() ends with /
+	// if so, directory: check if index, check if autoindex
+	// if not, file: check access
+
+
+
 	// Check redirection
-	/* std::string pathNoRoot = _request.getPath().erase(0,5);
-	pathNoRoot.erase(pathNoRoot.length() - 1);
+	/* 
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 
@@ -161,7 +206,7 @@ void	ResponseHTTP::_GET()
 
 	
 	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
-
+	
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
 	if (requestedResource == PT_ERROR)

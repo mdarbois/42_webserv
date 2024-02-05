@@ -114,3 +114,26 @@ std::string pairToString(const std::string& key, const std::string& value) {
     return ss.str();
 }
 
+std::vector<std::string> splitString(const std::string& s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string::size_type start = 0;
+    std::string::size_type end = s.find(delimiter);
+
+    while (end != std::string::npos) {
+        tokens.push_back(s.substr(start, end - start + 1));
+        start = end + 1;
+        end = s.find(delimiter, start);
+    }
+
+    // Push the last token (or the only token if no delimiter is found)
+    tokens.push_back(s.substr(start));
+
+    return tokens;
+}
+
+// Function to prepend a character to each string in a vector
+void prependCharacter(std::vector<std::string>& vec, char ch) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        vec[i] = ch + vec[i]; // Prepend the character to each string
+    }
+}
