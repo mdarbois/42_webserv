@@ -52,7 +52,7 @@ void ServerConfig::_parseServer(std::stringstream &serverStream)
 {
    std::string line;
 
-    while (std::getline(serverStream, line, ';')) 
+    while (std::getline(serverStream, line, ';'))
     {
         trimSpaces(line);
         if (line.empty())
@@ -77,7 +77,7 @@ void ServerConfig::_parseServer(std::stringstream &serverStream)
     }
 }
 
-void ServerConfig::_extractPorts(std::string &line, size_t pos, size_t length) 
+void ServerConfig::_extractPorts(std::string &line, size_t pos, size_t length)
 {
   if (pos != std::string::npos)
 		line.erase(pos, length);
@@ -107,7 +107,7 @@ unsigned int ServerConfig::_ipConvert(const std::string host)
   std::string                 part;
   unsigned int                ip;
   int                         count = 0;
-  while (std::getline(ipStream, part, '.')) 
+  while (std::getline(ipStream, part, '.'))
     {
         count++;
         unsigned int num = static_cast<unsigned int>(atoi(part.c_str()));
@@ -136,7 +136,7 @@ void ServerConfig::_setDefault(int index)
 void ServerConfig::_setDefaultLocations()
 {
   std::map<std::string, LocationConfig>::const_iterator   it;
-    
+
     it = _locations.find("/");
     if (it == _locations.end())
     {
@@ -234,7 +234,7 @@ std::map<unsigned int, std::string>  ServerConfig::getErrorPages(void) const
             it != copyErrorPages.end(); ++it)
     {
         it->second = _root + it->second;
-    } 
+    }
     return (copyErrorPages);
 }
 
@@ -243,12 +243,49 @@ std::map<std::string,LocationConfig> ServerConfig::getLocations(void) const
     return (_locations);
 }
 
+std::string ServerConfig::getLocationPath(std::string requestPath)
+{
+  size_t dot = requestPath.find_last_of('.');
+  std::string file;
+  //file
+  if (dot != std::string::npos)
+  {
+    file = requestPath.substr(dot);
+    for (std::map<std::string, LocationConfig>::const_iterator it = _locations.begin();
+            it != _locations.end(); ++it)
+        {
+            if (it->first == file)
+                return (file);
+        }
+  }
+  //directory
+  else
+  {
+    std::string dir = requestPath;
+    while (!dir.empty())
+    {
+        size_t slash = dir.find_last_of('/');
+        dir = dir.substr(0, slash);
+
+        for (std::map<std::string, LocationConfig>::const_iterator it = _locations.begin();
+            it != _locations.end(); ++it)
+        {
+            if (it->first == dir)
+                return (it->first);
+        }
+    }
+  }
+  return ("");
+
+}
+
+
 void	ServerConfig::setPort(const int &p)
 {
 	_port = p;
 }
 
-std::ostream& operator<<(std::ostream& os, const ServerConfig& serverConfig) 
+std::ostream& operator<<(std::ostream& os, const ServerConfig& serverConfig)
 {
   os << "\033[34m---------- ServerConfig:-----------\033[0m\n";
     os << "Port(s):                 ";
@@ -264,13 +301,13 @@ std::ostream& operator<<(std::ostream& os, const ServerConfig& serverConfig)
     os << "Error Pages:\n";
     std::map<unsigned int, std::string>   errorPageCopy(serverConfig.getErrorPages());
     for (std::map<unsigned int, std::string>::const_iterator it = errorPageCopy.begin();
-            it != errorPageCopy.end(); ++it) 
+            it != errorPageCopy.end(); ++it)
     {
         os << " " << it->first << ": " << it->second << "\n";
     }
     os << "\n";
     std::map<std::string, LocationConfig> locationCopy(serverConfig.getLocations());
-    for (std::map<std::string, LocationConfig>::const_iterator it = locationCopy.begin(); 
+    for (std::map<std::string, LocationConfig>::const_iterator it = locationCopy.begin();
             it != locationCopy.end(); ++it) {
         os << "\033[92m---------- Location: " << it->first << " -----------\033[0m\n";
         os << it->second;
