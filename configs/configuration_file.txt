@@ -29,6 +29,10 @@ server {
 		redirection 	301 https://www.ecosia.org/;
 	}
 
+	location  {
+
+	}
+
 	location /red/home/ {
 		methods GET;
 		index /html/index.html;
