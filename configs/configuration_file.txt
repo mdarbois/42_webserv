@@ -47,10 +47,9 @@ server {
 		uploads usr/bin/php;
 	}
 
-	location /upload {
+	location /uploads/ {
 		methods GET POST DELETE;
-		
-		root ./html;
+
 	}
 
 	
