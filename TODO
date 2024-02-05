@@ -1,4 +1,3 @@
-- EMPTY locations should be handled
 - Can we use this: if (std::system(command.c_str()) == 0) ???
 - Which part of a path should be taken to validate the allowed methods in a location
 - We should remove the ENV for the CGI afterwards?
@@ -7,3 +6,10 @@
 - How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed
 - Post files with the content in the body without multipart --> Yann?
 - At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible
+- Error: 403 on uploads/ than go back to home, go to file manager again. The path gets /html/html/..
+
+Response branch
+- change everything that all is rooted at html
+- rework method workflow
+- deleting folders shouldnt be possible
+- Deleting files is possible although it shouldnt

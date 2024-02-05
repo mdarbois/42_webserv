@@ -21,7 +21,7 @@ Config::Config(std::string path) {
 
   _parse(configurationFile);
   configurationFile.close();
-  //_print();
+	//_print();
 }
 
 
@@ -73,6 +73,7 @@ void Config::_parse(std::ifstream &configurationFile)
 				std::string path = _extractPath(line, line.find("location"), strlen("location"));
 				std::stringstream elements(_extractElements(line, configurationFile));
 				locations.insert(std::make_pair(path, LocationConfig(elements)));
+				
 			}
 			else if (_foundServer && line.find("}") != std::string::npos)
 			{
