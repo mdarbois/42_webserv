@@ -42,14 +42,15 @@ std::string extractString(std::string &line, size_t pos, size_t length)
 
 unsigned int extractInt(std::string &line, size_t pos, size_t length)
 {
-   if (pos != std::string::npos)
+	if (pos != std::string::npos)
 		line.erase(pos, length);
 	trimSpaces(line);
-  line.erase(line.find(";"), 1);
-  std::istringstream  lineStream(line);
-  int intNumber;
-  lineStream >> intNumber;
-  return intNumber;
+	if (line.find(";") != std::string::npos)
+		line.erase(line.find(";"), 1);
+	std::istringstream  lineStream(line);
+	int intNumber;
+	lineStream >> intNumber;
+	return intNumber;
 }
 
 bool checkSemiColon(const std::string& line) {

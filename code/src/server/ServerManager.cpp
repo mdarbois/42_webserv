@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/01 09:43:00 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:03:31 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,6 @@ void	ServerManager::run()
 			std::cerr << "error: poll() failed";
 			std::exit(EXIT_FAILURE);
 		}
-		
 		//Check every server if a new connection has been requested
 			//POLLIN - ready to read/recv from the fd non-blocking
 			//POLLOUT - ready to write/send to the fd non-blocking
@@ -291,7 +290,10 @@ void	ServerManager::run()
 
 			//Check if the client has a timeout
 			if ( _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT && dynamic_cast<ClientSocket *>(_sockets[socketIdx])->hasCommunicationTimeOut())
+			{
+				std::cerr << "Client has timed out" << std::endl;
 				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_408); // If cleients timed out, do we have to send a response to it?
+			}
 		}
 	}
 	// Close the server socket

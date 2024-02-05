@@ -48,7 +48,7 @@ class ResponseHTTP
 		int									getResponseLength() const;
 		std::string							getFullRequestedPath() const;
 		void								setBody(std::string body);
-		void								setResponseLine(HttpStatus status, std::string reasonPhrase);
+		void								setResponseLine(HttpStatus status);
 		void								setHeader(std::string key, std::string value);
 
 	private:
@@ -62,6 +62,7 @@ class ResponseHTTP
 		int									_bodyLength;
 		bool								_readFile();
 		void								_createErrorResponse(std::string errPagePath, HttpStatus status);
+		std::string							_getResponsePhrase(HttpStatus status) const;
 		void								_GET();
 		void								_POST();
 		void								_DELETE();

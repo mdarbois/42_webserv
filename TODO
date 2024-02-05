@@ -1,13 +1,9 @@
-- there can be a null byte in the middle of the request, but then we shouldnt stop reading! --> DONE via content length
-- what if location "EMPTY" { ??
-- upload a file where the name already exists
+- EMPTY locations should be handled
 - Can we use this: if (std::system(command.c_str()) == 0) ???
 - Which part of a path should be taken to validate the allowed methods in a location
 - We should remove the ENV for the CGI afterwards?
 - When there is a request with multipart/data or chunked we need a function to reassemble the body
-- How do we send a response as chunked data?
-- How to handle uploaded Data
-- Where to check Client Body siyze and what should we return
-- if there is no index in the location, dont return auto off, but an empty string
-- The back home on the error page does not work
-- Hard coded host in POST has to be dynamically
+- The host shouldnt be empty in the request
+- How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed
+- Post files with the content in the body without multipart --> Yann?
+- At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible

@@ -1,14 +1,15 @@
 server {
 	listen 18000;
+	listen 18001;
 	listen 18007;
-	#listen 65535;
 	host 127.0.0.1;
 	root ./html;
+	#client_max_body_size 10000;
 	error_page: 404 /error_pages/405.html;
 	server_name coucou;
 	
 	location / {
-		methods GET POST;
+		methods GET;
 		autoindex off;
 		index /html/index.html;
 		root ./html;
@@ -23,7 +24,6 @@ server {
 	location /game.html {
 		methods GET ;
 	}
-	
 	location /red/ {
 		methods GET;
 		redirection 	301 https://www.ecosia.org/;
@@ -31,6 +31,7 @@ server {
 
 	location /red/home/ {
 		methods GET;
+		index /html/index.html;
 		redirection 	301 https://www.ecosia.org/;
 	}
 

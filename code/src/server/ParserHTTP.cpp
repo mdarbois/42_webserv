@@ -13,7 +13,6 @@ ParserHTTP::ParserHTTP(std::string requestString)
 	_isCGI = false;
 	_isUpload = false;
 	parseRequest();
-	std::cout << *this;
 }
 
 ParserHTTP::ParserHTTP()
@@ -141,7 +140,6 @@ void	ParserHTTP::parseRequest()
 		_method = DELETE;
 	else
 		_method = NONE;
-
 	trimChars(_path, "\n\r ");
 	trimChars(_httpProtocol, "\n\r ");
 	while (std::getline(requestStream, line) && line != "\r") {
@@ -162,9 +160,12 @@ void	ParserHTTP::parseRequest()
 			}
 		}
 	}
-	std::getline(requestStream, _body, '\0');
+	//Read the rest of the request string into the _body, also \0 \n and \r
+	char ch;
+	while (requestStream.get(ch)) {
+		_body += ch;
+	}
 	trimChars(_body, "\n\r ");
-
 	//check the path
 	std::istringstream queryStream;
 	if (_path.find("?") != std::string::npos && _method == GET)
@@ -246,7 +247,7 @@ std::string	ParserHTTP::getStartBoundary() const
 
 std::string	ParserHTTP::getEndBoundary() const
 {
-	return (_endBoundary);
+	return ( "--" + _startBoundary + "--");
 }
 
 std::string	ParserHTTP::getUploadFilename() const
