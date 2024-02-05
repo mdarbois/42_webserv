@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/03 13:19:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/05 15:18:50 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,9 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 
 void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus status)
 {
-	_request.overidePath(errPagePath);
+	_request.overidePath(errPagePath); //TODO This has to be merged with your PATH matching @MArie
 	_readFile();
-	setResponseLine(status, "Retreive later from a lookup"); //TODO
+	setResponseLine(status);
 }
 
 bool	ResponseHTTP::_readFile()
@@ -179,7 +179,7 @@ void	ResponseHTTP::_GET()
 		if (!_readFile())
 			throw std::runtime_error("GET: Could not open file");
 		else
-			setResponseLine(HTTP_200, "OK");
+			setResponseLine(HTTP_200);
 	}
 	else if (requestedResource == PT_DIR)
 	{
@@ -196,7 +196,7 @@ void	ResponseHTTP::_GET()
 				if (!_readFile())
 					throw std::runtime_error("GET: Could not open file");
 				else
-					setResponseLine(HTTP_200, "OK");
+					setResponseLine(HTTP_200);
 			}
 			else
 			{
@@ -205,11 +205,7 @@ void	ResponseHTTP::_GET()
 					//No index and no auto index
 					//return the error page of this location or the default error page
 					//Error 403
-					_request.overidePath("/html/403.html"); //make it dynamically later
-					if (!_readFile())
-						throw std::runtime_error("GET: Could not open file");
-					else
-						setResponseLine(HTTP_403, "Forbidden");
+					_createErrorResponse("html/403.html", HTTP_403);
 				}
 				else
 				{
@@ -225,24 +221,24 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		return setResponseLine(HTTP_400, "Bad Request");
+		return _createErrorResponse("/html/400.html", HTTP_400); //TODO PATH
 
 	std::cout << _request << std::endl;
 
 	//check if the folder is accessible and the rights to post a file 
 	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
-		return setResponseLine(HTTP_404, "Not Found");
+		return _createErrorResponse("/html/404.html", HTTP_404); //TODO PATH
 
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
-		return setResponseLine(HTTP_403, "Forbidden");
+		return _createErrorResponse("/html/403.html", HTTP_403); //TODO PATH
 
 	//create a new file
 	std::string	uploadFilePath = std::string("./uploads/") + _request.getUploadFilename();
 	std::ofstream	newFile(uploadFilePath.c_str());
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
-	setResponseLine(HTTP_201, "Created");
+	setResponseLine(HTTP_201);
 	setHeader("Access-Control-Allow-Origin", "*");
 	size_t endHeader = _request.getBody().find("\r\n\r\n") + 4;
 	size_t endFormData = _request.getBody().find(_request.getEndBoundary());
@@ -266,11 +262,11 @@ void	ResponseHTTP::_DELETE()
 	{
 		//check if the file has write rights
 		if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-			return setResponseLine(HTTP_403, "Forbidden");
+			return _createErrorResponse("/html/403.hmtl", HTTP_403);
 		else
 		{
 			if (std::remove(getFullRequestedPath().c_str()) == 0)
-				return (setResponseLine(HTTP_200, "OK"));
+				return (setResponseLine(HTTP_200));
 			else
 				throw std::runtime_error("DELETE: Could not delete file");
 		}
@@ -285,12 +281,12 @@ void	ResponseHTTP::_DELETE()
 		{
 			//check if the folder has write rights
 			if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-				return setResponseLine(HTTP_403, "Forbidden");
+				return _createErrorResponse("/html/403.hmtl", HTTP_403);
 			else
 			{
 				std::string command = "rm -rf " + getFullRequestedPath();
-				if (std::system(command.c_str()) == 0)
-					return (setResponseLine(HTTP_200, "OK"));
+				if (std::system(command.c_str()) == 0) //TODO should we delete folders???
+					return (setResponseLine(HTTP_200));
 				else
 					throw std::runtime_error("DELETE: Could not delete dir");
 			}
@@ -298,9 +294,57 @@ void	ResponseHTTP::_DELETE()
 	}
 }
 
+std::string ResponseHTTP::_getResponsePhrase(HttpStatus status) const
+{
+	switch (status)
+	{
+	case 200:
+		return "OK";
+		break;
+	case 201:
+		return "Created";
+		break;
+	case 301:
+		return "Moved Permanently";
+		break;
+	case 400:
+		return "Bad Request";
+		break;
+	case 403:
+		return "Forbidden";
+		break;
+	case 404:
+		return "Not Found";
+		break;
+	case 405:
+		return "Method Not Allowed";
+		break;
+	case 408:
+		return "Request Timeout";
+		break;
+	case 409:
+		return "Conflict";
+		break;
+	case 413:
+		return "Payload too large";
+		break;
+	case 500:
+		return "Internal server error";
+		break;
+	case 505:
+		return "HTTP Version not supported";
+		break;
+	default:
+		return "HTTP Error";
+		break;
+	}
+}
+
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
+
+
 std::string	ResponseHTTP::getFullResponseString() const
 {
 	std::string responseStr = ALLOWED_HTTP_PROTOCOL;
@@ -338,7 +382,7 @@ int	ResponseHTTP::getResponseLength() const
 
 std::string	ResponseHTTP::getFullRequestedPath() const
 {
-	return ( "." + _request.getPath()); //TESTING!!! Change later. Depends where the root is mounted
+	return ( "." + _request.getPath()); //TODO TESTING!!! Change later. Depends where the root is mounted
 }
 
 void	ResponseHTTP::setBody(std::string body)
@@ -346,11 +390,11 @@ void	ResponseHTTP::setBody(std::string body)
 	_body = body;
 }
 
-void	ResponseHTTP::setResponseLine(HttpStatus status, std::string reasonPhrase)
+void	ResponseHTTP::setResponseLine(HttpStatus status)
 {
 	_responseLine.allowedHttpProtocol = ALLOWED_HTTP_PROTOCOL;
 	_responseLine.httpStatusCode = status;
-	_responseLine.reasonPhrase = reasonPhrase;
+	_responseLine.reasonPhrase = _getResponsePhrase(status);
 }
 
 void	ResponseHTTP::setHeader(std::string key, std::string value)

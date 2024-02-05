@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/03 11:53:08 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/05 14:29:28 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ CommunicationStatus	ClientSocket::sendResponse()
 		catch(const std::exception& e)
 		{
 			std::cerr << e.what() << '\n';
-			_responseData.response.setResponseLine(HTTP_500, "Internal Server Error");
+			_responseData.response.setResponseLine(HTTP_500);
 		}
 	}
 	const std::string& fullResponse = _responseData.response.getFullResponseString();

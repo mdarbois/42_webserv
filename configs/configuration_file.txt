@@ -9,15 +9,7 @@ server {
 	server_name coucou;
 	
 	location / {
-		methods GET POST;
-		autoindex off;
-		index /html/index.html;
-		root ./html;
-		uploads usr/bin/php;
-	}
-
-	location{
-		methods GET POST;
+		methods GET;
 		autoindex off;
 		index /html/index.html;
 		root ./html;
@@ -60,10 +52,9 @@ server {
 	#	uploads usr/bin/php;
 	#}
 
-	#location /uploads {
-	#	root ./cgi-bin/uploads;
-	#	methods GET POST DELETE;
-	#}
+	location /uploads/ {
+		methods GET POST DELETE;
+	}
 
 	#location /cgi-bin/uploads {
 	#	root ./cgi-bin/uploads;

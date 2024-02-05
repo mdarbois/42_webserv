@@ -59,10 +59,11 @@
 				console.log(host, port);
 				// Define a callback function to handle the response
 				xhr.onload = function() {
-					if (xhr.status === 201) {
+					if (xhr.status === 201 || xhr.status == 200) {
 						alert('File uploaded successfully!');
 					} else {
 						// Display the HTML response from the server in the current window
+						console.log(xhr.responseText);
 						document.open(); // Open a new document
 						document.write(xhr.responseText); // Write the HTML response to the document
 						document.close(); // Close the document
