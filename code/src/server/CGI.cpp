@@ -18,7 +18,7 @@ CGI::CGI(ParserHTTP &parsedRequest) : _php(""), _length (0),  _timeOut (false), 
 	//Build the response in the child and write it to the pipe
 	//In order to use poll, this must be executed in the next poll cycle
 	//therefore put in another function
-	/* 
+	/*
 	time_t	startTime = time(0);
 	int pid = fork();
 	_print(*this);
@@ -159,7 +159,7 @@ void CGI::_addEnv(ParserHTTP &parsing)
 		//std::cout << envVar << "\n";
 		//putenv(const_cast<char*>(envVar.c_str()));
 	} */
-} 
+}
 
 void CGI::_childProcess(int *output_pipe)
 {
@@ -198,12 +198,12 @@ void CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startT
 	close(output_pipe[1]);
 	//std::string body = parsing.getBody();
 	//if ( !write(input_pipefd[1], body.c_str(), body.length()) && !write(input_pipefd[1], "coucou", 7 ))
-		//throw std::runtime_error("CGI error: write body"); 
+		//throw std::runtime_error("CGI error: write body");
 	//close(input_pipefd[1]);
-	while (pidWait == 0 && time(0) - startTime <= 6) 
+	while (pidWait == 0 && time(0) - startTime <= 6)
 		pidWait = waitpid(pid, NULL, WNOHANG);
 	if (pidWait == 0) {
-		kill(1, SIGKILL);
+		//kill(1, SIGKILL);
 		_timeOut = true;
 	}
 	if (pidWait == -1)	{

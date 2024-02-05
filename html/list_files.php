@@ -1,6 +1,6 @@
 <?php
    
-    $dir = "./uploads/";
+    $dir = "../uploads/";
     echo "Directory: $dir<br>";
             $files = scandir($dir);
             echo "Files: " . implode(", ", $files) . "<br>";

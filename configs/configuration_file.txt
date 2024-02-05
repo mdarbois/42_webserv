@@ -16,48 +16,42 @@ server {
 		uploads usr/bin/php;
 	}
 
-	location /restricted {
+	location /Marie {
 		methods GET;
-		index my_awesome_index.html;
 		uploads usr/bin/php;
 	}
 	
 	location /game.html {
 		methods GET ;
 	}
+	location /red/ {
+		methods GET;
+		redirection 	301 https://www.ecosia.org/;
+	}
 
-	location /red {
+	location /red/home/ {
 		methods GET;
 		index /html/index.html;
 		redirection 	301 https://www.ecosia.org/;
 	}
 
-	location /autoindex {
+	location /autoindex/ {
 		methods GET;
 		root ./html;
 		autoindex on;
 	}
 
-	#location .php {
-	#	methods GET POST;
-	#	root ./cgi-bin;
-	#	autoindex off;
-	#	uploads usr/bin/php;
-	#}
-
-	#location .py {
-	#	methods GET POST;
-	#	root ./cgi-bin;
-	#	autoindex off;
-	#	uploads usr/bin/php;
-	#}
-
-	location /uploads/ {
-		methods GET POST DELETE;
+	location .php {
+		methods GET POST;
+		autoindex off;
+		uploads usr/bin/php;
 	}
 
-	#location /cgi-bin/uploads {
-	#	root ./cgi-bin/uploads;
-	#	methods GET POST DELETE;
-	#}
+	location /upload {
+		methods GET POST DELETE;
+		
+		root ./html;
+	}
+
+	
 }

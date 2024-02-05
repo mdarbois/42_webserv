@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/05 15:18:50 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/05 15:30:09 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,26 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
-
+  	_path = _config.getLocationPath(_request.getPath());
+	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
+	/* 
+	std::cout << "request path=" << _request.getPath() << std::endl;
+	std::cout << "PATH=" << _path << std::endl;
+	std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
+	std::map<std::string, LocationConfig>::const_iterator it;
+    for (it = locationCopy.begin(); it != locationCopy.end(); ++it) {
+			std::cout << "it->first : " << it->first << std::endl;
+        if (it->first == _path) {
+            break; // Key found, exit loop
+        }
+    }
+    // Check if key was found
+    if (it != locationCopy.end() && (it->second).getAutoindex() == true && endsWithSlash(_request.getPath()))
+	{
+		//std::cout << "it->second : " << it->second << std::endl;
+		std::cout << "AUTOINDEX" << std::endl;
+	} */
+ 	 _checkRed();
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
 		_createErrorResponse("/html/413.html", HTTP_413); //TODO Paths are still weird
@@ -41,6 +60,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
+	_path = _config.getLocationPath(_request.getPath());
+	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
 }
@@ -134,12 +155,82 @@ PathType	getPathType(std::string path)
 	return (PT_ERROR);
 }
 
+void ResponseHTTP::_checkRed()
+{
+
+  std::map<std::string, LocationConfig> locations(_config.getLocations());
+  for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
+  if(it->first == _path && !(it->second.getRedirection().empty()))
+  {
+      std::string statusCode = (it->second).getRedirection().substr(0,3);
+			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+			std::string link = (it->second).getRedirection().erase(0,3);
+			trimSpaces(link);
+			std::string htmlContent =
+				"<html>"
+				"<head>"
+				"<title>Redirecting...</title>"
+				"</head>"
+				"<body>"
+				"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+				"</body>"
+				"</html>";
+			setBody(htmlContent);
+      return;
+  }
+
+}
 
 void	ResponseHTTP::_GET()
 {
+	//check redirection
+		//fetch the redirection folders from serverconfig
+	/* 	std::string pathNoRoot = _request.getPath().erase(0,5);
+		//pathNoRoot.erase(pathNoRoot.length() - 1);
+		//char lastChar = pathNoRoot[pathNoRoot.length() - 1];
+		 if (lastChar == '/')
+		{ 
+			std::vector<std::string> tokens = splitString(pathNoRoot, '/');
+			prependCharacter(tokens, '/');
+			for (size_t i = 0; i < tokens.size(); ++i)
+			{
+				std::cout << "token = " << tokens[i] << std::endl;
+				std::map<std::string, LocationConfig> locations(_config.getLocations());
+				for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+				std::cout << "locations = " << it->first << std::endl;
+				if(it->first == tokens[i] && !(it->second.getRedirection().empty()))
+				{
+					std::string statusCode = (it->second).getRedirection().substr(0,3);
+					setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
+					std::string link = (it->second).getRedirection().erase(0,3);
+					trimSpaces(link);
+					std::string htmlContent =
+						"<html>"
+						"<head>"
+						"<title>Redirecting...</title>"
+						"</head>"
+						"<body>"
+						"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+						"</body>"
+						"</html>";
+					setBody(htmlContent);
+					return ;
+				}
+				}
+			}
+		//}
+		std::cout << "path=" <<  pathNoRoot << std::endl; */
+		//_config.getLocations()[]
+
+
+	// check if _request.getPath() ends with /
+	// if so, directory: check if index, check if autoindex
+	// if not, file: check access
+
+
+
 	// Check redirection
-	/* std::string pathNoRoot = _request.getPath().erase(0,5);
-	pathNoRoot.erase(pathNoRoot.length() - 1);
+	/* 
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 
@@ -162,13 +253,17 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	} */
+	 if (_pathRoot[_pathRoot.length() - 1] == '/')
+	{
+		std::cout << "AUTOINDEX" << std::endl;
+	} 
 	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));
 
-	
-	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
 
+	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
+	
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
 	if (requestedResource == PT_ERROR)
@@ -212,7 +307,7 @@ void	ResponseHTTP::_GET()
 					//return the auto index html with all the subfolders and
 				}
 			}
-			
+
 		}
 	}
 }
@@ -225,7 +320,7 @@ void	ResponseHTTP::_POST()
 
 	std::cout << _request << std::endl;
 
-	//check if the folder is accessible and the rights to post a file 
+	//check if the folder is accessible and the rights to post a file
 	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
 		return _createErrorResponse("/html/404.html", HTTP_404); //TODO PATH
 
