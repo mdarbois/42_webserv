@@ -17,7 +17,6 @@ server {
 
 	location /Marie {
 		methods GET;
-		index my_awesome_index.html;
 		uploads usr/bin/php;
 	}
 	
@@ -35,8 +34,9 @@ server {
 		redirection 	301 https://www.ecosia.org/;
 	}
 
-	location /autoindex {
+	location /autoindex/ {
 		methods GET;
+		root ./html;
 		autoindex on;
 	}
 
@@ -46,15 +46,10 @@ server {
 		uploads usr/bin/php;
 	}
 
-	#location .py {
-	#	methods GET POST;
-	#	root ./cgi-bin;
-	#	autoindex off;
-	#	uploads usr/bin/php;
-	#}
-
-	location /uploads {
+	location /upload {
 		methods GET POST DELETE;
+		
+		root ./html;
 	}
 
 	

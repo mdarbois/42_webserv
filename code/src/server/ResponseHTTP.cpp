@@ -22,8 +22,26 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
-  _path = _config.getLocationPath(_request.getPath());
-  _checkRed();
+  	_path = _config.getLocationPath(_request.getPath());
+	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
+	/* 
+	std::cout << "request path=" << _request.getPath() << std::endl;
+	std::cout << "PATH=" << _path << std::endl;
+	std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
+	std::map<std::string, LocationConfig>::const_iterator it;
+    for (it = locationCopy.begin(); it != locationCopy.end(); ++it) {
+			std::cout << "it->first : " << it->first << std::endl;
+        if (it->first == _path) {
+            break; // Key found, exit loop
+        }
+    }
+    // Check if key was found
+    if (it != locationCopy.end() && (it->second).getAutoindex() == true && endsWithSlash(_request.getPath()))
+	{
+		//std::cout << "it->second : " << it->second << std::endl;
+		std::cout << "AUTOINDEX" << std::endl;
+	} */
+ 	 _checkRed();
 	//Very basic. A lot of cheecks have to be performed
 	if (request.getMethod() == GET)
 		_GET();
@@ -35,6 +53,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
+	_path = _config.getLocationPath(_request.getPath());
+	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
 }
@@ -158,11 +178,11 @@ void	ResponseHTTP::_GET()
 {
 	//check redirection
 		//fetch the redirection folders from serverconfig
-		std::string pathNoRoot = _request.getPath().erase(0,5);
+	/* 	std::string pathNoRoot = _request.getPath().erase(0,5);
 		//pathNoRoot.erase(pathNoRoot.length() - 1);
 		//char lastChar = pathNoRoot[pathNoRoot.length() - 1];
-		/* if (lastChar == '/')
-		{ */
+		 if (lastChar == '/')
+		{ 
 			std::vector<std::string> tokens = splitString(pathNoRoot, '/');
 			prependCharacter(tokens, '/');
 			for (size_t i = 0; i < tokens.size(); ++i)
@@ -192,7 +212,7 @@ void	ResponseHTTP::_GET()
 				}
 			}
 		//}
-		std::cout << "path=" <<  pathNoRoot << std::endl;
+		std::cout << "path=" <<  pathNoRoot << std::endl; */
 		//_config.getLocations()[]
 
 
@@ -226,6 +246,10 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	} */
+	 if (_pathRoot[_pathRoot.length() - 1] == '/')
+	{
+		std::cout << "AUTOINDEX" << std::endl;
+	} 
 	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 		return (_createErrorResponse("/html/404.html", HTTP_404));

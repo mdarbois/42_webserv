@@ -56,6 +56,7 @@ class ResponseHTTP
 		ResponseLine						_responseLine;
 		std::string							_body;
     std::string             _path;
+	std::string				_pathRoot;
 		std::map<std::string, std::string>	_header;
 		ParserHTTP							_request;
 		int									_bodyLength;
