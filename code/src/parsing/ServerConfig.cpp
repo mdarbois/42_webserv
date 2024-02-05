@@ -278,6 +278,38 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
   return ("");
 
 }
+std::string ServerConfig::getLocationRoot(std::string path, std::string requestPath)
+{
+  std::string pathRoot;
+
+  if (_locations[path].getRoot().empty())
+    _locations[path].getRoot() = _root;
+  if (!_locations[path].getUploads().empty())
+    return(_root + requestPath);
+  pathRoot = requestPath.substr(path.length(), requestPath.length());
+
+
+    if (requestPath[requestPath.length() - 1 ] == '/' &&
+            _locations[path].getAutoindex() == true)
+    {
+		if (pathRoot[pathRoot.size() - 1 == '/'])
+            return (_root + pathRoot);
+        else
+            return (_root + pathRoot + "/");
+    }
+    // check if Uri already specified a file, if not add based on "index"
+  /*   if (pathRoot.empty() || pathRoot == "/")
+    {
+        fileName = _locations[path].getIndex();
+        if (fileName.empty())
+            fileName =  "/" + _index;
+    } */
+
+    if (pathRoot[0] != '/')
+        pathRoot = "/" + pathRoot;
+    return (_root + pathRoot); // + fileName
+}
+
 
 
 void	ServerConfig::setPort(const int &p)

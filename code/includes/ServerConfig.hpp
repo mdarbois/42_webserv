@@ -42,6 +42,7 @@ class ServerConfig {
 		std::map<std::string,LocationConfig> getLocations(void) const;
 		void _validation(void) const;
 		void	setPort(const int &p);
+		std::string getLocationRoot(std::string path, std::string requestPath);
 
  /*    class ServerConfigException : public std::exception {
 				public:

@@ -137,3 +137,11 @@ void prependCharacter(std::vector<std::string>& vec, char ch) {
         vec[i] = ch + vec[i]; // Prepend the character to each string
     }
 }
+
+bool endsWithSlash(const std::string& str) {
+    if (!str.empty()) {
+        // Check if the last character is '/'
+        return str[str.length() - 1] == '/';
+    }
+    return false; // Return false for an empty string
+}
