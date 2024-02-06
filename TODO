@@ -1,20 +1,25 @@
-- Can we use this: if (std::system(command.c_str()) == 0) ???
-- We should remove the ENV for the CGI afterwards?
-- When there is a request with multipart/data or chunked we need a function to reassemble the body
-- The host shouldnt be empty in the request
-- How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed
+- Can we use this: if (std::system(command.c_str()) == 0) ??? --> ALEX
+
+- When there is a request with multipart/data or chunked we need a function to reassemble the body -- ALEX
+- How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed -- ALEX
 - Post files with the content in the body without multipart --> Yann?
-- At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible
-- Error: 403 on uploads/ than go back to home, go to file manager again. The path gets /html/html/..
-- error redirceting directory
-- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a locatio)
-- if I try to acces http://localhost:18001/uploads/forbiddenFile, 403 page is correctly shown, but Back to home is not wroking, because appends index.html to /uploads/
-- Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
-- redirection URI directory: endless loop to handle
-- CHECK all HTTP response Codes at the end!
+
+- The host shouldnt be empty in the request -- ALEX
+
+- At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible -- ALEX
+- Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted! -- ALEX
+
+- update _deleteClient or add closeConnection function for client which sends response -- ALEX
+
+- "http://localhost:18000/uploads" doesnt show the response -- ALEX
+
+- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a location is not known / found) -- MARIE
+- redirection URI directory: endless loop to handle -- MARIE
+
+- List/Delete files in the file manager -- MARIE
+
+- CGI Timeout example -- MARIE
+
 - Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
-- update _deleteClient or add closeConnection function for client which sends response
-- CGI Timout example
-- List/Delete files in the file manager
-- Autoindex should be set to be off when not listed
-- Autoindex is not set correctly by the parser for other locations than /
+
+- CHECK all HTTP response Codes at the end!
