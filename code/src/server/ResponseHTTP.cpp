@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/05 20:08:36 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 13:05:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,34 +22,23 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
-  	_path = _config.getLocationPath(_request.getPath());
+	_path = _config.getLocationPath(_request.getPath());
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
-	std::cout << "PATHROOT: " << _pathRoot << std::endl;
-	/* 
-	std::cout << "request path=" << _request.getPath() << std::endl;
-	std::cout << "PATH=" << _path << std::endl;
-	std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
-	std::map<std::string, LocationConfig>::const_iterator it;
-    for (it = locationCopy.begin(); it != locationCopy.end(); ++it) {
-			std::cout << "it->first : " << it->first << std::endl;
-        if (it->first == _path) {
-            break; // Key found, exit loop
-        }
-    }
-    // Check if key was found
-    if (it != locationCopy.end() && (it->second).getAutoindex() == true && endsWithSlash(_request.getPath()))
+
+	//Check if the requested Resource is existing. For File and Directory
+	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 	{
-		//std::cout << "it->second : " << it->second << std::endl;
-		std::cout << "AUTOINDEX" << std::endl;
-	} */
- 	if (_checkRed())
+		_createErrorResponse("/404.html", HTTP_404);
+		return ;
+	}
+	if (_checkRed())
 		return;
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
 		_createErrorResponse("/413.html", HTTP_413); //TODO Paths are still weird
 		return;
 	}
-	//Very basic. A lot of cheecks have to be performed
+
 	if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
@@ -123,7 +112,6 @@ void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus stat
 bool	ResponseHTTP::_readFile()
 {
 	std::ifstream	htmlFile(getFullRequestedPath().c_str());
-	std::cout << getFullRequestedPath().c_str() << std::endl;
 	if (!htmlFile.is_open())
 		return (false);
 
@@ -146,195 +134,91 @@ bool	ResponseHTTP::_readFile()
 	return (true);
 }
 
-PathType	getPathType(std::string path)
-{
-	struct stat pathStat;
-	if (stat(path.c_str(), &pathStat) != 0)
-		return (PT_ERROR);
-	if (S_ISREG(pathStat.st_mode))
-		return (PT_FILE);
-	else if (S_ISDIR(pathStat.st_mode))
-		return (PT_DIR);
-	return (PT_ERROR);
-}
-
 bool ResponseHTTP::_checkRed()
 {
-
-  std::map<std::string, LocationConfig> locations(_config.getLocations());
-  for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
-  if(it->first == _path && !(it->second.getRedirection().empty()))
-  {
-      std::string statusCode = (it->second).getRedirection().substr(0,3);
-			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())));
-			std::string link = (it->second).getRedirection().erase(0,3);
-			trimSpaces(link);
-			std::string htmlContent =
-				"<html>"
-				"<head>"
-				"<title>Redirecting...</title>"
-				"</head>"
-				"<body>"
-				"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
-				"</body>"
-				"</html>";
-			setBody(htmlContent);
-      return true;
-  }
-  return false;
-
+	std::map<std::string, LocationConfig> locations(_config.getLocations());
+	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
+	if(it->first == _path && !(it->second.getRedirection().empty()))
+	{
+		std::string statusCode = (it->second).getRedirection().substr(0,3);
+		setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())));
+		std::string link = (it->second).getRedirection().erase(0,3);
+		trimSpaces(link);
+		std::string htmlContent =
+			"<html>"
+			"<head>"
+			"<title>Redirecting...</title>"
+			"</head>"
+			"<body>"
+			"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
+			"</body>"
+			"</html>";
+		setBody(htmlContent);
+		return true;
+	}
+	return false;
 }
 
 void	ResponseHTTP::_GET()
 {
-	//check redirection
-		//fetch the redirection folders from serverconfig
-	/* 	std::string pathNoRoot = _request.getPath().erase(0,5);
-		//pathNoRoot.erase(pathNoRoot.length() - 1);
-		//char lastChar = pathNoRoot[pathNoRoot.length() - 1];
-		 if (lastChar == '/')
-		{ 
-			std::vector<std::string> tokens = splitString(pathNoRoot, '/');
-			prependCharacter(tokens, '/');
-			for (size_t i = 0; i < tokens.size(); ++i)
-			{
-				std::cout << "token = " << tokens[i] << std::endl;
-				std::map<std::string, LocationConfig> locations(_config.getLocations());
-				for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-				std::cout << "locations = " << it->first << std::endl;
-				if(it->first == tokens[i] && !(it->second.getRedirection().empty()))
-				{
-					std::string statusCode = (it->second).getRedirection().substr(0,3);
-					setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
-					std::string link = (it->second).getRedirection().erase(0,3);
-					trimSpaces(link);
-					std::string htmlContent =
-						"<html>"
-						"<head>"
-						"<title>Redirecting...</title>"
-						"</head>"
-						"<body>"
-						"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
-						"</body>"
-						"</html>";
-					setBody(htmlContent);
-					return ;
-				}
-				}
-			}
-		//}
-		std::cout << "path=" <<  pathNoRoot << std::endl; */
-		//_config.getLocations()[]
-
-
-	// check if _request.getPath() ends with /
-	// if so, directory: check if index, check if autoindex
-	// if not, file: check access
-
-
-
-	// Check redirection
-	/* 
-	std::map<std::string, LocationConfig> locations(_config.getLocations());
-	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-
-		if(it->first == pathNoRoot && !(it->second.getRedirection().empty()))
-		{
-			std::string statusCode = (it->second).getRedirection().substr(0,3);
-			setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())), "Moved Permanently");
-			std::string link = (it->second).getRedirection().erase(0,3);
-			trimSpaces(link);
-			std::string htmlContent =
-				"<html>"
-				"<head>"
-				"<title>Redirecting...</title>"
-				"</head>"
-				"<body>"
-				"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
-				"</body>"
-				"</html>";
-			setBody(htmlContent);
-			return ;
-		}
-	} */
-	std::cout << "_______" << std::endl;
-	std::cout << _request.getPath() << std::endl;
-	std::cout << _pathRoot << std::endl;
-	std::cout << _path << std::endl;
-	std::cout << "_______" << std::endl;
-	 if (_pathRoot[_pathRoot.length() - 1] == '/')
-	{
-		std::cout << "AUTOINDEX" << std::endl;
-	} 
-	//Check if the requested Resource is existing
-	//if (access(getFullRequestedPath().c_str(), F_OK) != 0)
-		//return (_createErrorResponse("/404.html", HTTP_404));
-
-
-	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
-	std::cout << _config.getLocations()[_path] << std::endl;
+	//Check if GET is allowed for the requested location
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "GET"))
 		return (_createErrorResponse("/403.html", HTTP_403));
-	//Check if file or directory is requested
-	PathType requestedResource = getPathType(getFullRequestedPath());
-	if (requestedResource == PT_ERROR)
-		throw std::runtime_error("GET: Could not determine file or dir type");
-	else if (requestedResource == PT_FILE)
+
+	//chck read rights
+	if (access(getFullRequestedPath().c_str(), R_OK) != 0)
+		return (_createErrorResponse("/403.html", HTTP_403));
+
+	//Check if the path ends on a slash -> Directory is requested
+	if (_request.getPath()[_request.getPath().length() - 1] == '/')
 	{
+		//check if there is an index file for that location
+		if (!_config.getLocations()[_path].getIndex().empty())
+		{
+			//override the path
+			std::cout << "PATH:" << _pathRoot + _config.getLocations()[_path].getIndex() << std::endl;
+			std::cout << _config.getLocations()[_path] <<std::endl;
+			_request.overidePath( "/" + _config.getLocations()[_path].getIndex());
+			if (!_readFile())
+				throw std::runtime_error("GET: Could not open file");
+			else
+				setResponseLine(HTTP_200);
+		}
+		//check if there is auto index, when there is no index file
+		else if (!_config.getLocations()[_path].getAutoindex())
+		{
+			//No index and no auto index --> return the error page of this location or the default error page
+			_createErrorResponse("/403.html", HTTP_403);
+		}
+		else
+		{
+			//TODO: Create the autoindex html file
+			//return the auto index html with all the subfolders and
+			std::cout << "AUTOINDEX :)" << std::endl;
+		}
+	}
+	//Else A file is requested
+	else
+	{
+		//Check access to file
+		//Create response
 		//Reads the requested file to the body
 		if (!_readFile())
 			throw std::runtime_error("GET: Could not open file");
 		else
 			setResponseLine(HTTP_200);
 	}
-	else if (requestedResource == PT_DIR)
-	{
-		if (getFullRequestedPath()[getFullRequestedPath().length() - 1] != '/')
-		{
-			std::cout << "What should we do here? :)" << std::endl;
-		}
-		else
-		{
-			if (!_config.getLocations()[_path].getIndex().empty())
-			{
-				//override the path/
-				_request.overidePath(_config.getLocations()[_request.getPath()].getIndex());
-				std::cout << _config.getRoot() << std::endl;
-				std::cout << _request.getPath() << std::endl;
-				if (!_readFile())
-					throw std::runtime_error("GET: Could not open file");
-				else
-					setResponseLine(HTTP_200);
-			}
-			else
-			{
-				if (!_config.getLocations()[_request.getPath()].getAutoindex())
-				{
-					//No index and no auto index
-					//return the error page of this location or the default error page
-					//Error 403
-					_createErrorResponse("/403.html", HTTP_403);
-				}
-				else
-				{
-					//return the auto index html with all the subfolders and
-				}
-			}
-
-		}
-	}
 }
 
 void	ResponseHTTP::_POST()
 {
-	
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
 		return _createErrorResponse("/400.html", HTTP_400); //TODO PATH
 
-	//check if the folder is accessible and the rights to post a file
-	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
-		return _createErrorResponse("/404.html", HTTP_404); //TODO PATH
+	//check write rights
+	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
+		return (_createErrorResponse("/403.html", HTTP_403));
 		
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
@@ -355,20 +239,16 @@ void	ResponseHTTP::_POST()
 
 void	ResponseHTTP::_DELETE()
 {
-	//Check if the requested Resource is existing
-	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
-		return (_createErrorResponse("/404.html", HTTP_404));
+	//chck read and write rights for deletion
+	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
+		return (_createErrorResponse("/403.html", HTTP_403));
 
 	//check if the location supports POST
-	std::cout << _pathRoot << std::endl;
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
 		return _createErrorResponse("/403.html", HTTP_403); //TODO PATH
 
-	//Check if file or directory is requested to delete
-	PathType requestedResource = getPathType(getFullRequestedPath());
-	if (requestedResource == PT_ERROR)
-		throw std::runtime_error("DELETE: Could not determine file or dir type");
-	else if (requestedResource == PT_FILE)
+	//Check if file is requested to delete
+	if (_request.getPath()[_request.getPath().length() - 1] != '/')
 	{
 		//check if the file has write rights
 		if (access(getFullRequestedPath().c_str(), W_OK) != 0)
@@ -381,26 +261,14 @@ void	ResponseHTTP::_DELETE()
 				throw std::runtime_error("DELETE: Could not delete file");
 		}
 	}
-	else if (requestedResource == PT_DIR)
+	//else directory is requested to delete
+	else
 	{
-		if (getFullRequestedPath()[getFullRequestedPath().length() - 1] != '/')
-		{
-			std::cout << "What should we do here? :)" << std::endl;
-		}
+		std::string command = "rm -rf " + getFullRequestedPath();
+		if (std::system(command.c_str()) == 0) //TODO should we delete folders???
+			return (setResponseLine(HTTP_200));
 		else
-		{
-			//check if the folder has write rights
-			if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-				return _createErrorResponse("/403.hmtl", HTTP_403);
-			else
-			{
-				std::string command = "rm -rf " + getFullRequestedPath();
-				if (std::system(command.c_str()) == 0) //TODO should we delete folders???
-					return (setResponseLine(HTTP_200));
-				else
-					throw std::runtime_error("DELETE: Could not delete dir");
-			}
-		}
+			throw std::runtime_error("DELETE: Could not delete dir");
 	}
 }
 

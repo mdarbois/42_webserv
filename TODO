@@ -7,6 +7,12 @@
 - Post files with the content in the body without multipart --> Yann?
 - At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible
 - Error: 403 on uploads/ than go back to home, go to file manager again. The path gets /html/html/..
+- error redirceting directory
+- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes)
+- if I try to acces http://localhost:18001/uploads/forbiddenFile, 403 page is correctly shown, but Back to home is not wroking, because appends index.html to /uploads/
+- index file of no index should be "" and not auto off
+- Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
+- CHECK all HTTP response Codes at the end!
 
 Response branch
 - change everything that all is rooted at html
