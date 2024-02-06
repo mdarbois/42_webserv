@@ -7,7 +7,7 @@
 - At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible
 - Error: 403 on uploads/ than go back to home, go to file manager again. The path gets /html/html/..
 - error redirceting directory
-- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes)
+- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a locatio)
 - if I try to acces http://localhost:18001/uploads/forbiddenFile, 403 page is correctly shown, but Back to home is not wroking, because appends index.html to /uploads/
 - Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
 -redirection URI directory: endless loop to handle
@@ -16,3 +16,5 @@
 - update _deleteClient or add closeConnection function for client which sends response
 - CGI Timout example
 - List/Delete files in the file manager
+- Autoindex should be set to be off when not listed
+- Autoindex is not set correctly by the parser for other locations than /

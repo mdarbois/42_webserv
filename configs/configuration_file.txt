@@ -50,5 +50,6 @@ server {
 
 	location /uploads/ {
 		methods GET POST DELETE;
+		autoindex off;
 	}
 }

@@ -269,7 +269,6 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
         for (std::map<std::string, LocationConfig>::const_iterator it = _locations.begin();
             it != _locations.end(); ++it)
         {
-          std::cout << it->first << std::endl;
             if (it->first == dir)
                 return (it->first);
         }
