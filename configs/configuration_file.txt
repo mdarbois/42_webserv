@@ -15,9 +15,11 @@ server {
 		root ./html;
 		uploads usr/bin/php;
 	}
+	
 
 	location /Marie {
 		methods GET;
+		root ./html;
 		uploads usr/bin/php;
 	}
 	
