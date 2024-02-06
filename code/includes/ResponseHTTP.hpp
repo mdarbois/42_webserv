@@ -58,7 +58,7 @@ class ResponseHTTP
 		void								_GET();
 		void								_POST();
 		void								_DELETE();
-    bool                _checkRed();
+    bool                _checkRedirection();
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );

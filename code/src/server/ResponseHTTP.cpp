@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 14:10:52 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 14:29:27 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,15 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_path = _config.getLocationPath(_request.getPath());
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 
+	if (_checkRedirection())
+		return;
+
 	//Check if the requested Resource is existing. For File and Directory
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 	{
 		_createErrorResponse("/404.html", HTTP_404);
 		return ;
 	}
-	if (_checkRed())
-		return;
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
 		_createErrorResponse("/413.html", HTTP_413); //TODO Paths are still weird
@@ -138,7 +139,7 @@ bool	ResponseHTTP::_readFile()
 	return (true);
 }
 
-bool ResponseHTTP::_checkRed()
+bool ResponseHTTP::_checkRedirection()
 {
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
