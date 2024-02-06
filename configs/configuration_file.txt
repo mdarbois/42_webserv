@@ -11,8 +11,6 @@ server {
 	location / {
 		methods GET;
 		autoindex off;
-		index /index.html;
-		root ./html;
 		uploads usr/bin/php;
 	}
 	

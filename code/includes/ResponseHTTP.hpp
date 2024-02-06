@@ -24,14 +24,6 @@ typedef struct s_ResponseLine
 	std::string	reasonPhrase;
 }ResponseLine;
 
-typedef enum e_PathType
-{
-	PT_ERROR,
-	PT_FILE,
-	PT_DIR
-}PathType;
-
-
 class ResponseHTTP
 {
 	public:
