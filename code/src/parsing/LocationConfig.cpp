@@ -30,6 +30,8 @@ LocationConfig::LocationConfig(std::stringstream &elements)
 		{
 			if (extractString(line, line.find("autoindex"), strlen("autoindex")) == "on")
 				_autoindex = true;
+			else
+				_autoindex = false;
 		}
 		else if (line.find("index") != std::string::npos)
 			_index = extractString(line, line.find("index"), strlen("index"));

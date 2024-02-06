@@ -23,6 +23,7 @@ server {
 	
 	location /game.html {
 		methods GET ;
+		autoindex on;
 	}
 
 	location /red/ {
@@ -34,17 +35,16 @@ server {
 		methods GET;
 		index /html/index.html;
 		redirection 	301 https://www.42berlin.de/;
+		autoindex on;
 	}
 
 	location /autoindex/ {
 		methods GET;
 		root ./html;
-		autoindex on;
 	}
 
 	location .php {
 		methods GET POST;
-		autoindex off;
 		uploads usr/bin/php;
 	}
 

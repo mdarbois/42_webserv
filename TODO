@@ -10,7 +10,7 @@
 - http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a locatio)
 - if I try to acces http://localhost:18001/uploads/forbiddenFile, 403 page is correctly shown, but Back to home is not wroking, because appends index.html to /uploads/
 - Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
--redirection URI directory: endless loop to handle
+- redirection URI directory: endless loop to handle
 - CHECK all HTTP response Codes at the end!
 - Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
 - update _deleteClient or add closeConnection function for client which sends response
