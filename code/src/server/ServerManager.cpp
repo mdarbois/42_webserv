@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/01 15:03:31 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 15:04:54 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,6 @@ void	ServerManager::_sendResponse(ClientSocket *client)
 	_updatePollFDArray();
 }
 
-//TODO - closeConnection function for client
 void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 {
 	if (code < 0)
@@ -174,7 +173,7 @@ bool	ServerManager::_checkPollErrors(SocketType socketType, int socketIdx, short
 	{
 		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
 		{
-			std::cout << "POLL error server" << std::endl;
+			std::cerr << "POLL error server" << std::endl;
 			dynamic_cast<ServerSocket *>(_sockets[socketIdx])->restartServerSocket();
 			return (true);
 		}
@@ -184,7 +183,7 @@ bool	ServerManager::_checkPollErrors(SocketType socketType, int socketIdx, short
 	{
 		if (revent & POLLNVAL || revent & POLLHUP || revent & POLLERR)
 		{
-			std::cout << "POLL error client" << std::endl;
+			std::cerr << "POLL error client" << std::endl;
 			_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_500);
 			return (true);
 		}
@@ -192,11 +191,10 @@ bool	ServerManager::_checkPollErrors(SocketType socketType, int socketIdx, short
 	}
 	else if (socketType == NO_SOCKET)
 	{
-		//TODO: What should we do here?
 		if (revent & POLLNVAL || revent & POLLERR)
 		{
-			std::cout << "POLL error Pipe FD" << std::endl;
-			//_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_500);
+			std::cerr << "POLL error Pipe FD" << std::endl;
+			_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_500);
 			return (true);
 		}
 		return (false);

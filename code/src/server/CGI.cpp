@@ -60,7 +60,6 @@ void	CGI::writeCGIToPipe()
 	}
 }
 
-//TODO: What happens if timeout?
 void	CGI::readBodyFromPipe()
 {
 	if (!_timeOut)
@@ -117,7 +116,6 @@ void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
 	_args.push_back(phpScript + parsing.getPath());
-	std::cout << _args[1] << std::endl;
 }
 
 void CGI::_addEnv(ParserHTTP &parsing)
@@ -144,23 +142,9 @@ void CGI::_addEnv(ParserHTTP &parsing)
 		std::map<std::string, std::string>::iterator it;
 		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
 
-			std::cout << "\t-" << it->first << ": " << it->second << std::endl;
 			std::string envVar = pairToString(it->first, it->second);
-			std::cout << "envar=" << envVar << "\n"; 
 			_env.push_back(envVar);
-			
-			//putenv(const_cast<char*>(envVar.c_str()));
-
 		}
-	/* std::map<std::string, std::string>::iterator iter;
-	std::cout << parsing << std::endl;
-	for (iter = parsing.getCGIParamMap().begin(); iter != parsing.getCGIParamMap().end(); ++iter) {
-		std::cout << "first=" << iter->first;
-		std::cout << "second=" << iter->second << "\n";
-		//std::string envVar = pairToString(iter->first, iter->second);
-		//std::cout << envVar << "\n";
-		//putenv(const_cast<char*>(envVar.c_str()));
-	} */
 }
 
 void CGI::_childProcess(int *output_pipe)

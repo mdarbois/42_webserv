@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 14:29:27 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 15:04:06 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	}
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
-		_createErrorResponse("/413.html", HTTP_413); //TODO Paths are still weird
+		_createErrorResponse("/413.html", HTTP_413);
 		return;
 	}
 
@@ -47,7 +47,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	else if (request.getMethod() == DELETE)
 		_DELETE();
 	else
-		_createErrorResponse("/403.html", HTTP_403); //TODO Paths are still weird
+		_createErrorResponse("/403.html", HTTP_403);
 }
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
@@ -109,7 +109,7 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 
 void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus status)
 {
-	_request.overidePath(errPagePath); //TODO This has to be merged with your PATH matching @MArie
+	_request.overidePath(errPagePath);
 	_readFile();
 	setResponseLine(status);
 }
@@ -178,8 +178,6 @@ void	ResponseHTTP::_GET()
 	if (_request.getPath()[_request.getPath().length() - 1] == '/')
 	{
 		//override the path
-		std::cout << "PATH:" << _pathRoot + _config.getLocations()[_path].getIndex() << std::endl;
-		std::cout << _config.getLocations()[_path] <<std::endl;
 		//check if there is an index file for that location
 		if (!_config.getLocations()[_path].getIndex().empty())
 		{
@@ -197,7 +195,6 @@ void	ResponseHTTP::_GET()
 		}
 		else
 		{
-			//TODO: Create the autoindex html file
 			//return the auto index html with all the subfolders and
 			_request.overidePath( "/autoindex.html");
 			if (!_readFile())
@@ -223,7 +220,7 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		return _createErrorResponse("/400.html", HTTP_400); //TODO PATH
+		return _createErrorResponse("/400.html", HTTP_400);
 
 	//check write rights
 	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
@@ -231,7 +228,7 @@ void	ResponseHTTP::_POST()
 		
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
-		return _createErrorResponse("/403.html", HTTP_403); //TODO PATH
+		return _createErrorResponse("/403.html", HTTP_403);
 
 	//create a new file
 	std::string	uploadFilePath = std::string(_config.getRoot() + _request.getPath()) + _request.getUploadFilename();
@@ -254,7 +251,7 @@ void	ResponseHTTP::_DELETE()
 
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
-		return _createErrorResponse("/403.html", HTTP_403); //TODO PATH
+		return _createErrorResponse("/403.html", HTTP_403);
 
 	//Check if file is requested to delete
 	if (_request.getPath()[_request.getPath().length() - 1] != '/')
@@ -274,7 +271,7 @@ void	ResponseHTTP::_DELETE()
 	else
 	{
 		std::string command = "rm -rf " + getFullRequestedPath();
-		if (std::system(command.c_str()) == 0) //TODO should we delete folders???
+		if (std::system(command.c_str()) == 0)
 			return (setResponseLine(HTTP_200));
 		else
 			throw std::runtime_error("DELETE: Could not delete dir");
@@ -368,7 +365,7 @@ int	ResponseHTTP::getResponseLength() const
 
 std::string	ResponseHTTP::getFullRequestedPath() const
 {
-	return ( _config.getRoot() + _request.getPath()); //TODO TESTING!!! Change later. Depends where the root is mounted
+	return ( _config.getRoot() + _request.getPath());
 }
 
 void	ResponseHTTP::setBody(std::string body)

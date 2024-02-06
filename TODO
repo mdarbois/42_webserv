@@ -1,5 +1,4 @@
 - Can we use this: if (std::system(command.c_str()) == 0) ???
-- Which part of a path should be taken to validate the allowed methods in a location
 - We should remove the ENV for the CGI afterwards?
 - When there is a request with multipart/data or chunked we need a function to reassemble the body
 - The host shouldnt be empty in the request
@@ -10,16 +9,10 @@
 - error redirceting directory
 - http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes)
 - if I try to acces http://localhost:18001/uploads/forbiddenFile, 403 page is correctly shown, but Back to home is not wroking, because appends index.html to /uploads/
-- index file of no index should be "" and not auto off
 - Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
-- CHECK all HTTP response Codes at the end!
-
-Response branch
-- change everything that all is rooted at html
-- rework method workflow
-- deleting folders shouldnt be possible
-- Deleting files is possible although it shouldnt
-
-
-
 -redirection URI directory: endless loop to handle
+- CHECK all HTTP response Codes at the end!
+- Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
+- update _deleteClient or add closeConnection function for client which sends response
+- CGI Timout example
+- List/Delete files in the file manager
