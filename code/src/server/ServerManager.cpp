@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 15:04:54 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 21:26:14 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ ServerManager::ServerManager(Config const &config)
 	{
 		std::vector<unsigned int> portsList = (*it).getPorts();
 		std::vector<unsigned int>::iterator portIT = portsList.begin();
-		for (; portIT != portsList.end(); ++portIT){
-			
+		for (; portIT != portsList.end(); ++portIT)
+		{
 			_sockets.push_back(new ServerSocket(static_cast<int>(*portIT), (*it).getIp(), *it));
 		}
 	}

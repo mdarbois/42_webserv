@@ -23,3 +23,6 @@
 - Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
 
 - CHECK all HTTP response Codes at the end!
+- if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
+	Put REUSPORT back in, just commented out, because it does not work on mac
+- while (line[i] && !line.empty()) -> needed for working on macos, should we put this into the project?
