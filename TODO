@@ -13,3 +13,7 @@ Response branch
 - rework method workflow
 - deleting folders shouldnt be possible
 - Deleting files is possible although it shouldnt
+
+
+
+-redirection URI directory: endless loop to handle
