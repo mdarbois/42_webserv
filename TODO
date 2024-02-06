@@ -13,6 +13,7 @@
 - index file of no index should be "" and not auto off
 - Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted!
 - CHECK all HTTP response Codes at the end!
+- Redirection button not working
 
 Response branch
 - change everything that all is rooted at html
