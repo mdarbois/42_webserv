@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 13:05:52 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 13:54:38 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,10 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
-	_path = _config.getLocationPath(_request.getPath());
-	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
+	if (_path.empty())
+		_path = _config.getLocationPath(_request.getPath());
+	if (_pathRoot.empty())
+		_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
 }
@@ -87,6 +89,8 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 		_body = rhs._body;
 		_header = rhs._header;
 		_bodyLength = rhs._bodyLength;
+		_path = rhs._path;
+		_pathRoot = rhs._pathRoot;
 	}
 	return *this;
 }

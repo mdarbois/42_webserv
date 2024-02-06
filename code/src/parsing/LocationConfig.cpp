@@ -26,13 +26,13 @@ LocationConfig::LocationConfig(std::stringstream &elements)
 			_redirection = extractString(line, line.find("redirection"), strlen("redirection"));
 		else if (line.find("root") != std::string::npos)
 			_root = extractString(line, line.find("root"), strlen("root"));
-		else if (line.find("index") != std::string::npos)
-			_index = extractString(line, line.find("index"), strlen("index"));
 		else if (line.find("autoindex") != std::string::npos)
 		{
 			if (extractString(line, line.find("autoindex"), strlen("autoindex")) == "on")
 				_autoindex = true;
 		}
+		else if (line.find("index") != std::string::npos)
+			_index = extractString(line, line.find("index"), strlen("index"));
 		else if (line.find("uploads") != std::string::npos)
 			_uploads = extractString(line, line.find("uploads"), strlen("uploads"));
 		else

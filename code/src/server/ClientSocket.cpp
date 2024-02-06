@@ -192,7 +192,7 @@ CommunicationStatus	ClientSocket::receiveRequest()
 		_parser = ParserHTTP (_request.buffer);
 		if (_parser.isCGI())
 		{
-			_cgi = CGI(_parser); //Set up the CGI with the pipes and environment
+			_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
 			_isCGI = true;
 			setCGIToPipeFd(_cgi.output_pipe[1]);
 			setPipeToParentFd(_cgi.output_pipe[0]);

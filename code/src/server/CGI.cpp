@@ -2,13 +2,13 @@
 
 CGI::CGI(){}
 
-CGI::CGI(ParserHTTP &parsedRequest) : _php(""), _length (0),  _timeOut (false), _body ("")
+CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0),  _timeOut (false), _body ("")
 {
 
 	//Set up the CGI
 	_parsedRequest = parsedRequest;
 	_addEnv(parsedRequest);
-	_addArgs(parsedRequest);
+	_addArgs(parsedRequest, config);
 	//if (pipe(input_pipefd) == -1)
 	//	throw std::runtime_error("CGI error: input pipe failed");
 	if (pipe(output_pipe) == -1)
@@ -111,12 +111,13 @@ bool	CGI::timeOut() const
 }
 
 
-void CGI::_addArgs(ParserHTTP &parsing)
+void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 {
 	_php = "/usr/bin/php";
 	_args.push_back(_php);
-	std::string phpScript = ".";
+	std::string phpScript = config.getRoot();
 	_args.push_back(phpScript + parsing.getPath());
+	std::cout << _args[1] << std::endl;
 }
 
 void CGI::_addEnv(ParserHTTP &parsing)
@@ -145,8 +146,9 @@ void CGI::_addEnv(ParserHTTP &parsing)
 
 			std::cout << "\t-" << it->first << ": " << it->second << std::endl;
 			std::string envVar = pairToString(it->first, it->second);
-			std::cout << envVar << "\n";
+			std::cout << "envar=" << envVar << "\n"; 
 			_env.push_back(envVar);
+			
 			//putenv(const_cast<char*>(envVar.c_str()));
 
 		}

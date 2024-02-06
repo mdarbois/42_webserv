@@ -71,6 +71,8 @@ void Config::_parse(std::ifstream &configurationFile)
 			if(line.find("location") != std::string::npos)
 			{
 				std::string path = _extractPath(line, line.find("location"), strlen("location"));
+				if (path.empty())
+					throw std::runtime_error("Config: Location path can't be empty");
 				std::stringstream elements(_extractElements(line, configurationFile));
 				locations.insert(std::make_pair(path, LocationConfig(elements)));
 				
