@@ -10,7 +10,7 @@ server {
 	
 	location / {
 		methods GET;
-		autoindex off;
+		autoindex on;
 		uploads usr/bin/php;
 	}
 	

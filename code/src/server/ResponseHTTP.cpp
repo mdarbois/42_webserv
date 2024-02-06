@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 13:54:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/06 14:10:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,12 +176,12 @@ void	ResponseHTTP::_GET()
 	//Check if the path ends on a slash -> Directory is requested
 	if (_request.getPath()[_request.getPath().length() - 1] == '/')
 	{
+		//override the path
+		std::cout << "PATH:" << _pathRoot + _config.getLocations()[_path].getIndex() << std::endl;
+		std::cout << _config.getLocations()[_path] <<std::endl;
 		//check if there is an index file for that location
 		if (!_config.getLocations()[_path].getIndex().empty())
 		{
-			//override the path
-			std::cout << "PATH:" << _pathRoot + _config.getLocations()[_path].getIndex() << std::endl;
-			std::cout << _config.getLocations()[_path] <<std::endl;
 			_request.overidePath( "/" + _config.getLocations()[_path].getIndex());
 			if (!_readFile())
 				throw std::runtime_error("GET: Could not open file");
@@ -198,7 +198,11 @@ void	ResponseHTTP::_GET()
 		{
 			//TODO: Create the autoindex html file
 			//return the auto index html with all the subfolders and
-			std::cout << "AUTOINDEX :)" << std::endl;
+			_request.overidePath( "/autoindex.html");
+			if (!_readFile())
+				throw std::runtime_error("GET: Could not open file");
+			else
+				setResponseLine(HTTP_200);
 		}
 	}
 	//Else A file is requested
