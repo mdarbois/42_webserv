@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/05 15:36:16 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/05 20:08:36 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,14 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
   	_path = _config.getLocationPath(_request.getPath());
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
-	
-	/* std::cout << "request path = " << _request.getPath() << std::endl;
-	std::cout << "root path=" << _pathRoot << std::endl;
-	std::cout << "PATH=" << _path << std::endl; */
-	/* std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
+
+	std::cout << "PATHROOT: " << _pathRoot << std::endl;
+	/* 
+	std::cout << "request path=" << _request.getPath() << std::endl;
+	std::cout << "PATH=" << _path << std::endl;
+	std::map<std::string, LocationConfig> locationCopy (_config.getLocations());
+
+
 	std::map<std::string, LocationConfig>::const_iterator it;
     for (it = locationCopy.begin(); it != locationCopy.end(); ++it) {
 			std::cout << "it->first : " << it->first << std::endl;
@@ -43,10 +46,11 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		//std::cout << "it->second : " << it->second << std::endl;
 		std::cout << "AUTOINDEX" << std::endl;
 	} */
- 	 _checkRed();
+ 	if (_checkRed())
+		return;
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
-		_createErrorResponse("/html/413.html", HTTP_413); //TODO Paths are still weird
+		_createErrorResponse("/413.html", HTTP_413); //TODO Paths are still weird
 		return;
 	}
 	//Very basic. A lot of cheecks have to be performed
@@ -57,7 +61,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	else if (request.getMethod() == DELETE)
 		_DELETE();
 	else
-		_createErrorResponse("/html/403.html", HTTP_403); //TODO Paths are still weird
+		_createErrorResponse("/403.html", HTTP_403); //TODO Paths are still weird
 }
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
@@ -127,6 +131,7 @@ void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus stat
 bool	ResponseHTTP::_readFile()
 {
 	std::ifstream	htmlFile(getFullRequestedPath().c_str());
+	std::cout << getFullRequestedPath().c_str() << std::endl;
 	if (!htmlFile.is_open())
 		return (false);
 
@@ -161,7 +166,7 @@ PathType	getPathType(std::string path)
 	return (PT_ERROR);
 }
 
-void ResponseHTTP::_checkRed()
+bool ResponseHTTP::_checkRed()
 {
 
   std::map<std::string, LocationConfig> locations(_config.getLocations());
@@ -182,8 +187,9 @@ void ResponseHTTP::_checkRed()
 				"</body>"
 				"</html>";
 			setBody(htmlContent);
-      return;
+      return true;
   }
+  return false;
 
 }
 
@@ -259,18 +265,25 @@ void	ResponseHTTP::_GET()
 			return ;
 		}
 	} */
-	std::map<std::string, LocationConfig> locations(_config.getLocations());
-	if (_pathRoot[_pathRoot.length() - 1] == '/' && locations[_request.getPath()].getAutoindex() == true)
+
+	std::cout << "_______" << std::endl;
+	std::cout << _request.getPath() << std::endl;
+	std::cout << _pathRoot << std::endl;
+	std::cout << _path << std::endl;
+	std::cout << "_______" << std::endl;
+	 if (_pathRoot[_pathRoot.length() - 1] == '/') // && locations[_request.getPath()].getAutoindex() == true)
 	{
 		std::cout << "AUTOINDEX" << std::endl;
 	} 
 	//Check if the requested Resource is existing
-	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
-		return (_createErrorResponse("/html/404.html", HTTP_404));
+	//if (access(getFullRequestedPath().c_str(), F_OK) != 0)
+		//return (_createErrorResponse("/404.html", HTTP_404));
 
 
 	//TODO: HOW TO CHECK THE ALLOWED METHODS HERE?
-	
+	std::cout << _config.getLocations()[_path] << std::endl;
+	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "GET"))
+		return (_createErrorResponse("/403.html", HTTP_403));
 	//Check if file or directory is requested
 	PathType requestedResource = getPathType(getFullRequestedPath());
 	if (requestedResource == PT_ERROR)
@@ -291,10 +304,12 @@ void	ResponseHTTP::_GET()
 		}
 		else
 		{
-			if (!_config.getLocations()[_request.getPath()].getIndex().empty())
+			if (!_config.getLocations()[_path].getIndex().empty())
 			{
 				//override the path/
 				_request.overidePath(_config.getLocations()[_request.getPath()].getIndex());
+				std::cout << _config.getRoot() << std::endl;
+				std::cout << _request.getPath() << std::endl;
 				if (!_readFile())
 					throw std::runtime_error("GET: Could not open file");
 				else
@@ -307,7 +322,7 @@ void	ResponseHTTP::_GET()
 					//No index and no auto index
 					//return the error page of this location or the default error page
 					//Error 403
-					_createErrorResponse("html/403.html", HTTP_403);
+					_createErrorResponse("/403.html", HTTP_403);
 				}
 				else
 				{
@@ -321,22 +336,21 @@ void	ResponseHTTP::_GET()
 
 void	ResponseHTTP::_POST()
 {
+	
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		return _createErrorResponse("/html/400.html", HTTP_400); //TODO PATH
-
-	std::cout << _request << std::endl;
+		return _createErrorResponse("/400.html", HTTP_400); //TODO PATH
 
 	//check if the folder is accessible and the rights to post a file
 	if (access(getFullRequestedPath().c_str(), F_OK | W_OK) != 0)
-		return _createErrorResponse("/html/404.html", HTTP_404); //TODO PATH
-
+		return _createErrorResponse("/404.html", HTTP_404); //TODO PATH
+		
 	//check if the location supports POST
-	if (!containsValue<std::string>(_config.getLocations()[_request.getPath()].getMethods(), "POST"))
-		return _createErrorResponse("/html/403.html", HTTP_403); //TODO PATH
+	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
+		return _createErrorResponse("/403.html", HTTP_403); //TODO PATH
 
 	//create a new file
-	std::string	uploadFilePath = std::string("./uploads/") + _request.getUploadFilename();
+	std::string	uploadFilePath = std::string(_config.getRoot() + _request.getPath()) + _request.getUploadFilename();
 	std::ofstream	newFile(uploadFilePath.c_str());
 	if (!newFile.is_open())
 		throw std::runtime_error("Could not create posted file");
@@ -352,9 +366,12 @@ void	ResponseHTTP::_DELETE()
 {
 	//Check if the requested Resource is existing
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
-		_createErrorResponse("/html/404.html", HTTP_404);
+		return (_createErrorResponse("/404.html", HTTP_404));
 
-	//TBD: HOW TO CHECK THE ALLOWED METHODS HERE?
+	//check if the location supports POST
+	std::cout << _pathRoot << std::endl;
+	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
+		return _createErrorResponse("/403.html", HTTP_403); //TODO PATH
 
 	//Check if file or directory is requested to delete
 	PathType requestedResource = getPathType(getFullRequestedPath());
@@ -364,7 +381,7 @@ void	ResponseHTTP::_DELETE()
 	{
 		//check if the file has write rights
 		if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-			return _createErrorResponse("/html/403.hmtl", HTTP_403);
+			return _createErrorResponse("/403.hmtl", HTTP_403);
 		else
 		{
 			if (std::remove(getFullRequestedPath().c_str()) == 0)
@@ -383,7 +400,7 @@ void	ResponseHTTP::_DELETE()
 		{
 			//check if the folder has write rights
 			if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-				return _createErrorResponse("/html/403.hmtl", HTTP_403);
+				return _createErrorResponse("/403.hmtl", HTTP_403);
 			else
 			{
 				std::string command = "rm -rf " + getFullRequestedPath();
@@ -446,7 +463,6 @@ std::string ResponseHTTP::_getResponsePhrase(HttpStatus status) const
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
-
 std::string	ResponseHTTP::getFullResponseString() const
 {
 	std::string responseStr = ALLOWED_HTTP_PROTOCOL;
@@ -484,7 +500,7 @@ int	ResponseHTTP::getResponseLength() const
 
 std::string	ResponseHTTP::getFullRequestedPath() const
 {
-	return ( "." + _request.getPath()); //TODO TESTING!!! Change later. Depends where the root is mounted
+	return ( _config.getRoot() + _request.getPath()); //TODO TESTING!!! Change later. Depends where the root is mounted
 }
 
 void	ResponseHTTP::setBody(std::string body)

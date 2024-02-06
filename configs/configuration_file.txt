@@ -11,7 +11,7 @@ server {
 	location / {
 		methods GET;
 		autoindex off;
-		index /html/index.html;
+		index /index.html;
 		root ./html;
 		uploads usr/bin/php;
 	}
@@ -26,6 +26,7 @@ server {
 	location /game.html {
 		methods GET ;
 	}
+
 	location /red/ {
 		methods GET;
 		redirection 	301 https://www.ecosia.org/;
@@ -34,7 +35,7 @@ server {
 	location /red/home/ {
 		methods GET;
 		index /html/index.html;
-		redirection 	301 https://www.ecosia.org/;
+		redirection 	301 https://www.42berlin.de/;
 	}
 
 	location /autoindex/ {
@@ -51,8 +52,5 @@ server {
 
 	location /uploads/ {
 		methods GET POST DELETE;
-
 	}
-
-	
 }

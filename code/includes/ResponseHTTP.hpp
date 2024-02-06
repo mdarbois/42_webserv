@@ -66,7 +66,7 @@ class ResponseHTTP
 		void								_GET();
 		void								_POST();
 		void								_DELETE();
-    void                _checkRed();
+    bool                _checkRed();
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );

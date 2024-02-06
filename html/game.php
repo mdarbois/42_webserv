@@ -87,28 +87,28 @@ $htmlResponse = "<html>
 <div class=\"grid-container\">
 <!-- First grid item -->
 <div class=\"grid-item\">
-    <img src=\"1024px-Leberknoedelsuppe.jpg\" alt=\"Image 1\">
+    <img src=\"../1024px-Leberknoedelsuppe.jpg\" alt=\"Image 1\">
     <label for=\"answer1\"></label>
     <input style=\"background-color:$color1\" type=\"text\" name=\"answer1\" placeholder=\"$answer1\" required>
 </div>
 
 <!-- Second grid item -->
 <div class=\"grid-item\">
-    <img src=\"Semmelknoedel.jpg\" alt=\"Image 2\">
+    <img src=\"../Semmelknoedel.jpg\" alt=\"Image 2\">
     <label for=\"answer2\"></label>
     <input style=\"background-color:$color2\" type=\"text\" name=\"answer2\" placeholder=\"$answer2\" required>
 </div>
 
 <!-- Third grid item -->
 <div class=\"grid-item\">
-    <img src=\"Germknoedel.jpg\" alt=\"Image 3\">
+    <img src=\"../Germknoedel.jpg\" alt=\"Image 3\">
     <label for=\"answer3\"></label>
     <input style=\"background-color:$color3\" type=\"text\" name=\"answer3\" placeholder=\"$answer3\" required>
 </div>
 
 <!-- Fourth grid item -->
 <div class=\"grid-item\">
-    <img src=\"Kloesse.jpg\" alt=\"Image 4\">
+    <img src=\"../Kloesse.jpg\" alt=\"Image 4\">
     <label for=\"answer4\"></label>
     <input style=\"background-color:$color4\" type=\"text\" name=\"answer4\" placeholder=\"$answer4\" required>
 </div>
@@ -118,7 +118,7 @@ $htmlResponse = "<html>
 </div>
 </form>
 
-<a href=\"./index.html\">Back to Home</a>
+<a href=\"/\">Back to Home</a>
 </body>
 </html>";
 echo $htmlResponse;

@@ -21,7 +21,7 @@ Config::Config(std::string path) {
 
   _parse(configurationFile);
   configurationFile.close();
-  //_print();
+	//_print();
 }
 
 
@@ -75,6 +75,7 @@ void Config::_parse(std::ifstream &configurationFile)
 					throw std::runtime_error("Config: Location path can't be empty");
 				std::stringstream elements(_extractElements(line, configurationFile));
 				locations.insert(std::make_pair(path, LocationConfig(elements)));
+				
 			}
 			else if (_foundServer && line.find("}") != std::string::npos)
 			{
