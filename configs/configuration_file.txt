@@ -44,7 +44,7 @@ server {
 	}
 
 	location .php {
-		methods GET POST;
+		methods GET POST DELETE;
 		uploads usr/bin/php;
 	}
 

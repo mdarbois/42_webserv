@@ -31,4 +31,7 @@ bool	containsValue(const std::vector<T>& vec, const T& value) {
 std::vector<std::string> splitString(const std::string& s, char delimiter);
 void prependCharacter(std::vector<std::string>& vec, char ch);
 bool endsWithSlash(const std::string& str);
+bool isSlashAfterDot(const std::string& str);
+bool isSlashAtEnd(const std::string& str);
+
 #endif

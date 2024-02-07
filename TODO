@@ -13,9 +13,6 @@
 
 - "http://localhost:18000/uploads" doesnt show the response -- ALEX
 
-- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a location is not known / found) -- MARIE
-- redirection URI directory: endless loop to handle -- MARIE
-
 - List/Delete files in the file manager -- MARIE
 
 - CGI Timeout example -- MARIE

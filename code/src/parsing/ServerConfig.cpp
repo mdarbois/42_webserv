@@ -245,6 +245,7 @@ std::map<std::string,LocationConfig> ServerConfig::getLocations(void) const
 
 std::string ServerConfig::getLocationPath(std::string requestPath)
 {
+ 
   size_t dot = requestPath.find_last_of('.');
   std::string file;
   //file
@@ -263,15 +264,19 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
     std::string dir = requestPath;
     while (!dir.empty())
     {
+      
         size_t slash = dir.find_last_of('/');
         dir = dir.substr(0, slash + 1);
-
-        for (std::map<std::string, LocationConfig>::const_iterator it = _locations.begin();
-            it != _locations.end(); ++it)
+        std::cout << "slash = " << slash << std::endl;
+        std::cout << "dir = " << dir << std::endl;
+        std::map<std::string, LocationConfig>::const_iterator it ;
+        for (it = _locations.begin(); it != _locations.end(); ++it)
         {
             if (it->first == dir)
                 return (it->first);
         }
+        if (it == _locations.end() && isSlashAtEnd(dir) && !dir.empty())
+          dir.erase(dir.end() - 1);
     }
   
   return ("");

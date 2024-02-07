@@ -4,7 +4,6 @@ CGI::CGI(){}
 
 CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0),  _timeOut (false), _body ("")
 {
-
 	//Set up the CGI
 	_parsedRequest = parsedRequest;
 	_addEnv(parsedRequest);

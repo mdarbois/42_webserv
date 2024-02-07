@@ -146,3 +146,22 @@ bool endsWithSlash(const std::string& str) {
     }
     return false; // Return false for an empty string
 }
+
+bool isSlashAfterDot(const std::string& str) {
+    size_t dotPos = str.find('.');
+    if (dotPos != std::string::npos) {
+        size_t slashPos = str.find('/', dotPos);
+        if (slashPos != std::string::npos) {
+            return true; // Slash found after dot
+        }
+    }
+    return false;
+}
+
+bool isSlashAtEnd(const std::string& str) {
+    if (!str.empty()) {
+        char lastChar = str[str.length() - 1];
+        return lastChar == '/';
+    }
+    return false; // String is empty
+}

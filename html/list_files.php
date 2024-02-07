@@ -1,18 +1,11 @@
 <?php
-   
-    $dir = "../uploads/";
-    echo "Directory: $dir<br>";
-            $files = scandir($dir);
-            echo "Files: " . implode(", ", $files) . "<br>";
-        
-            $htmlResponse = "";
-    
-            // Iterate through the files and add them to the HTML response
-            foreach ($files as $file) {
-                if ($file != '.' && $file != '..') {
-                    $htmlResponse .= "<li>$file</li>";
-                }
-            }
-            
-            echo $htmlResponse;
+$folderPath = '/uploads';
+
+$files = scandir($folderPath);
+
+// Remove '.' and '..' from the list
+$files = array_diff($files, array('.', '..'));
+
+// Convert to a simple array and encode to JSON
+echo json_encode(array_values($files));
 ?>

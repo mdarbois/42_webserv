@@ -22,7 +22,14 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
+	// check if there is a slash after a dot // throwing 404 but might not be the right one
+  	if (isSlashAfterDot(_request.getPath()))
+	{
+		_createErrorResponse("/404.html", HTTP_404);
+		return ;
+	}
 	_path = _config.getLocationPath(_request.getPath());
+	std::cout << _path << std::endl;
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 
 	if (_checkRedirection())
@@ -177,6 +184,7 @@ void	ResponseHTTP::_GET()
 	//Check if the path ends on a slash -> Directory is requested
 	if (_request.getPath()[_request.getPath().length() - 1] == '/')
 	{
+		std::cout << "coucou";
 		//override the path
 		//check if there is an index file for that location
 		if (!_config.getLocations()[_path].getIndex().empty())

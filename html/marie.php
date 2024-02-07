@@ -7,7 +7,7 @@ $htmlResponse = "<html>
 <body>
     <h1>Welcome $name</h1>
     <h2>Happy to C you</h2>
-    <a href=\"/\">Back to Home</a>
+    <a href=\"/index.html\">Back to Home</a>
 </body>
 </html>";
 
