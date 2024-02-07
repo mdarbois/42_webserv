@@ -267,8 +267,6 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
       
         size_t slash = dir.find_last_of('/');
         dir = dir.substr(0, slash + 1);
-        std::cout << "slash = " << slash << std::endl;
-        std::cout << "dir = " << dir << std::endl;
         std::map<std::string, LocationConfig>::const_iterator it ;
         for (it = _locations.begin(); it != _locations.end(); ++it)
         {
