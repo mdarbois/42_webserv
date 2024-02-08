@@ -26,7 +26,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	// check if there is a slash after a dot // throwing 404 but might not be the right one
   	if (isSlashAfterDot(_request.getPath()))
 	{
-		_createErrorResponse("/404.html", HTTP_404);
+		_createErrorResponse(HTTP_404);
 		return ;
 	}
 	_path = _config.getLocationPath(_request.getPath());

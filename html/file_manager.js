@@ -1,4 +1,6 @@
 function uploadFile() {
+    // Display the "Uploading file..." message
+    document.getElementById("message").style.display = "block";
     // Get the file input element
     var fileInput = document.getElementById('file');
     
@@ -15,6 +17,8 @@ function uploadFile() {
         console.log(host, port);
         // Define a callback function to handle the response
         xhr.onload = function() {
+            // Hide the "Uploading file..." message
+            document.getElementById("message").style.display = "none";
             if (xhr.status === 201 || xhr.status == 200) {
                 alert('File uploaded successfully!');
             } else {
@@ -35,6 +39,8 @@ function uploadFile() {
         // Send the FormData object containing the file
         xhr.send(formData);
     } else {
+         // Hide the "Uploading file..." message if no file is selected
+         document.getElementById("message").style.display = "none";
         alert('Please select a file before uploading.');
     }
 }
@@ -77,11 +83,13 @@ const sendDeleteRequest = (fileName) => {
 	});
 };
 function listFiles() {
-    const fileList = document.getElementById("fileList");
+    //const fileList = document.getElementById("fileList");
     if (fileList.style.display === "none") {
+        
                     fetch('/list_files.php')
                     .then(response => response.json())
                     .then(files => {
+                        console.log(files);
                         const fileList = document.getElementById('fileList');
                         // Clear existing list
                         //fileList.innerHTML = "";

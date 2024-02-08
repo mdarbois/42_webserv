@@ -4,7 +4,6 @@ $directory = './html/uploads';
 
 // Initialize an array to store file names
 $files = array();
-echo "coucou";
 // Open the directory
 if ($handle = opendir($directory)) {
     // Loop through the directory
