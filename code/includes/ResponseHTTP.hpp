@@ -9,6 +9,8 @@
 # include <cstdio>
 # include <cstdlib>
 # include <algorithm>
+# include <cstring>
+# include <dirent.h>
 # include <sys/stat.h> // to check if file or dir
 # include "utils.hpp"
 # include "ParserHTTP.hpp"
@@ -63,6 +65,7 @@ class ResponseHTTP
 		bool								_checkRedirection();
 		void								_createErrorPageLookUp();
 		std::string							_getErrorPage(HttpStatus status);
+		void								_generateAutoIndexHTML();
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );

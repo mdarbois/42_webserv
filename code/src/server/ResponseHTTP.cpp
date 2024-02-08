@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/08 13:24:58 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/08 23:17:54 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,6 +209,37 @@ bool	isDirectory(const std::string& path)
 	return S_ISDIR(path_stat.st_mode);
 }
 
+void	ResponseHTTP::_generateAutoIndexHTML()
+{
+	std::stringstream output;
+	DIR* dir = opendir(getFullRequestedPath().c_str());
+	if (dir == nullptr) {
+		std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
+		return;
+	}
+	output << "<html><head><title>Autoindex</title></head><body><h1>Autoindex</h1><ul>";
+	dirent* entry;
+	while ((entry = readdir(dir)) != nullptr) {
+		std::string name = entry->d_name;
+		if (name != "." && name != "..") {
+			output << "<li>";
+			// Check if entry is a directory
+			if (entry->d_type == DT_DIR) {
+				// For directories, create a link to browse its contents
+				output << "<a href=\"" << name << "/\">" << name << " (directory)</a>";
+			} else {
+				// For files, create a link to download the file
+				output << "<a href=\"" << name << "\">" << name << "</a>";
+			}
+			output << "</li>";
+		}
+	}
+	output << "</ul></body></html>";
+	closedir(dir);
+	_body = output.str();
+	setResponseLine(HTTP_200);
+}
+
 void	ResponseHTTP::_GET()
 {
 	//Check if GET is allowed for the requested location
@@ -222,7 +253,6 @@ void	ResponseHTTP::_GET()
 	//Check if the path ends on a slash -> Directory is requested
 	if (_request.getPath()[_request.getPath().length() - 1] == '/')
 	{
-		std::cout << "coucou";
 		//override the path
 		//check if there is an index file for that location
 		if (!_config.getLocations()[_path].getIndex().empty())
@@ -233,21 +263,11 @@ void	ResponseHTTP::_GET()
 			else
 				setResponseLine(HTTP_200);
 		}
-		//check if there is auto index, when there is no index file
+		//No index and no auto index --> return the error page of this location or the default error page
 		else if (!_config.getLocations()[_path].getAutoindex())
-		{
-			//No index and no auto index --> return the error page of this location or the default error page
 			_createErrorResponse(HTTP_403);
-		}
 		else
-		{
-			//return the auto index html with all the subfolders and
-			_request.overidePath( "/autoindex.html");
-			if (!_readFile())
-				throw std::runtime_error("GET: Could not open file");
-			else
-				setResponseLine(HTTP_200);
-		}
+			_generateAutoIndexHTML();
 	}
 	//Else A file is requested
 	else
