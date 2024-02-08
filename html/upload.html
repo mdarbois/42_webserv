@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>File Upload Form</title>
-	<script src="file_manager.js"></script>
+	
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Upload Form</title>
@@ -55,10 +55,7 @@
     <!-- Non-interactive message element -->
     <div class="message" id="message">Uploading file...</div>
 
-    <h1>File List</h1>
-    <button id="listButton" onclick="listFiles()">List Files</button>
-    <ul id="fileList"></ul>
-
+    
     <h1>File Upload Form</h1>
     
     <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
@@ -67,8 +64,12 @@
         <br>
         <input type="button" value="Upload" onclick="uploadFile()">
     </form>
-
-	<script>
+    
+    <h1>File List</h1>
+  <!--   <button id="listButton">List Files</button> -->
+    <ul id="fileList"></ul>
+    
+	<script src="file_manager.js">
 		/*var isListDisplayed = false;
 		function listFiles() {
 			if (isListDisplayed) {
