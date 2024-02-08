@@ -4,16 +4,43 @@ CGI::CGI(){}
 
 CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0),  _timeOut (false), _body ("")
 {
-
 	//Set up the CGI
 	_parsedRequest = parsedRequest;
 	_addEnv(parsedRequest);
 	_addArgs(parsedRequest, config);
+
 	
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
 	//std::cout << "Pipe set up write end: " << output_pipe[1] << std::endl;
 	//std::cout << "Pipe set up read end: " << output_pipe[0] << std::endl;
+	std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
+	std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
+	//Build the response in the child and write it to the pipe
+	//In order to use poll, this must be executed in the next poll cycle
+	//therefore put in another function
+	/*
+	time_t	startTime = time(0);
+	int pid = fork();
+	_argsArray = vectorToCharArray(_args);
+	_envArray = vectorToCharArray(_env);
+	_print(*this);
+	if (pid == 0)
+		_childProcess(input_pipefd, output_pipe);
+	else if (pid > 0)
+		_parentProcess(parsing, pid, input_pipefd, output_pipe, 0, startTime);
+	else
+	{
+		deleteArray(_argsArray);
+		deleteArray(_envArray);
+		throw std::runtime_error("CGI error: fork failed");
+	} */
+
+	//Read the response from the pipe
+	/* if (!_timeOut)
+		_body = _readOutput(output_pipe);
+	deleteArray(_argsArray);
+	deleteArray(_envArray); */
 }
 
 void	CGI::writeCGIToPipe()
@@ -116,12 +143,15 @@ void CGI::_addEnv(ParserHTTP &parsing)
 	_env.push_back("METHOD = " + method);
 	_env.push_back("UPLOAD_PATH = ." + parsing.getPath());
 	std::map<std::string, std::string> cgiParams = parsing.getCGIParamMap();
+	if (!cgiParams.empty())
+	{
 		std::map<std::string, std::string>::iterator it;
 		for (it = cgiParams.begin(); it != cgiParams.end(); ++it) {
 
 			std::string envVar = pairToString(it->first, it->second);
 			_env.push_back(envVar);
 		}
+	}
 }
 
 void CGI::_childProcess(int *output_pipe)
@@ -134,6 +164,8 @@ void CGI::_childProcess(int *output_pipe)
 		throw std::runtime_error("CGI error: dup2 output pipe in child process failed");
 	}
 	close(output_pipe[1]);
+	//std::cout << "args " << _argsArray << std::endl;
+	//std::cout << "env " << _envArray << std::endl;
 	if (execve(_php, _argsArray, _envArray) == -1)
 	{
 		deleteArray(_argsArray);
@@ -145,11 +177,12 @@ void CGI::_childProcess(int *output_pipe)
 }
 void CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime)
 {
+	//std::cout << "PARENT" << std::endl;
 	close(output_pipe[1]);
 	while (pidWait == 0 && time(0) - startTime <= 6)
 		pidWait = waitpid(pid, NULL, WNOHANG);
 	if (pidWait == 0) {
-		//kill(1, SIGKILL);
+		kill(1, SIGKILL);
 		_timeOut = true;
 	}
 	if (pidWait == -1)	{

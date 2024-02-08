@@ -5,9 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timeout Example</title>
 </head>
+
 <body>
-    <h1>Timeout Example</h1>
-    <p>Processing request...</p>
-    <?php include("timeout_script.php"); ?>
+    <h1>Timeout Handling Example</h1>
+    <button onclick="TimeOut()">TimeOut</button>
+    <div id="response"></div>
+<!--     <p>Status: <span id="status">Waiting for task to complete...</span></p>
+ -->    <script>
+        function TimeOut() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'timeout_script.php', true);
+            // Set up a timer to simulate a timeout
+            var timeout = setTimeout(function() {
+                // Abort the request if it hasn't completed within the timeout duration
+                console.log("coucou");
+                xhr.abort();
+                document.getElementById("response").innerText ='Timeout occurred: Request took too long to complete!';
+            }, 3000); // Timeout duration: 3 seconds (adjust as needed)
+
+            // Set up event listener for when the request completes
+            xhr.onreadystatechange = function() {
+                console.log("Ready state changed:", xhr.readyState);
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    clearTimeout(timeout); // Cancel the timeout timer since the request completed
+                    if (xhr.status === 200) {
+                        // Request succeeded, process the response
+                        document.getElementById("response").innerText = xhr.responseText;                   
+                    } else {
+                            // Request failed
+                        console.error('Error: ' + xhr.status);
+                    }
+                }
+            };
+    // Send the request
+    xhr.send();
+        };
+    </script>
 </body>
 </html>

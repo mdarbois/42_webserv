@@ -2,6 +2,15 @@
 - Do we need to send chunked responses? How does sending big files as response work?
 - How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed -- ALEX
 - Post files with the content in the body without multipart --> Yann?
+
+- The host shouldnt be empty in the request -- ALEX
+
+- At the moment it is possibel to curl -i -X DELETE localhost:18000/uploads/ the whole directory, which should not be possible -- ALEX
+- Set all permissions corectly so the client can not delete files in our html folder when they shouldnt be deleted! -- ALEX
+
+- update _deleteClient or add closeConnection function for client which sends response -- ALEX
+
+- "http://localhost:18000/uploads" doesnt show the response -- ALEX
 .
 - http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a location is not known / found) -- MARIE
 - redirection URI directory: endless loop to handle -- MARIE

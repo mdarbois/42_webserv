@@ -1,18 +1,30 @@
 <?php
-   
-    $dir = "../uploads/";
-    echo "Directory: $dir<br>";
-            $files = scandir($dir);
-            echo "Files: " . implode(", ", $files) . "<br>";
-        
-            $htmlResponse = "";
-    
-            // Iterate through the files and add them to the HTML response
-            foreach ($files as $file) {
-                if ($file != '.' && $file != '..') {
-                    $htmlResponse .= "<li>$file</li>";
-                }
-            }
-            
-            echo $htmlResponse;
+// Directory path
+$directory = './html/uploads';
+
+// Initialize an array to store file names
+$files = array();
+echo "coucou";
+// Open the directory
+if ($handle = opendir($directory)) {
+    // Loop through the directory
+    while (false !== ($file = readdir($handle))) {
+        // Exclude current directory (.) and parent directory (..)
+        if ($file != "." && $file != "..") {
+            // Add the file to the array
+            $files[] = $file;
+        }
+    }
+    // Close the directory handle
+    closedir($handle);
+}
+
+// Convert the array to JSON
+$json = json_encode($files);
+
+// Set the response header to indicate JSON content
+//header('Content-Type: application/json');
+
+// Output the JSON
+echo $json;
 ?>

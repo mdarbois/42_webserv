@@ -167,6 +167,9 @@ void	ParserHTTP::parseRequest()
 	}
 	trimChars(_body, "\n\r ");
 	//check the path
+		//std::cout << "path" << _path << std::endl;
+	if (endsWith(_path, ".php"))
+		_isCGI = true;
 	std::istringstream queryStream;
 	if (_path.find("?") != std::string::npos && _method == GET)
 	{
