@@ -1,11 +1,30 @@
 <?php
-$folderPath = '/uploads';
+// Directory path
+$directory = './html/uploads';
 
-$files = scandir($folderPath);
+// Initialize an array to store file names
+$files = array();
+echo "coucou";
+// Open the directory
+if ($handle = opendir($directory)) {
+    // Loop through the directory
+    while (false !== ($file = readdir($handle))) {
+        // Exclude current directory (.) and parent directory (..)
+        if ($file != "." && $file != "..") {
+            // Add the file to the array
+            $files[] = $file;
+        }
+    }
+    // Close the directory handle
+    closedir($handle);
+}
 
-// Remove '.' and '..' from the list
-$files = array_diff($files, array('.', '..'));
+// Convert the array to JSON
+$json = json_encode($files);
 
-// Convert to a simple array and encode to JSON
-echo json_encode(array_values($files));
+// Set the response header to indicate JSON content
+//header('Content-Type: application/json');
+
+// Output the JSON
+echo $json;
 ?>

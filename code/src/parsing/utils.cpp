@@ -165,3 +165,9 @@ bool isSlashAtEnd(const std::string& str) {
     }
     return false; // String is empty
 }
+
+bool endsWith(const std::string& str, const std::string& suffix) {
+    if (str.length() < suffix.length())
+        return false;
+    return str.substr(str.length() - suffix.length()) == suffix;
+}

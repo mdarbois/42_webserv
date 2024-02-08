@@ -29,7 +29,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		return ;
 	}
 	_path = _config.getLocationPath(_request.getPath());
-	std::cout << _path << std::endl;
+	//std::cout << _path << std::endl;
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 
 	if (_checkRedirection())

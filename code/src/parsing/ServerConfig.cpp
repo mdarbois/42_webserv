@@ -260,7 +260,6 @@ std::string ServerConfig::getLocationPath(std::string requestPath)
         }
   }
   //directory
- 
     std::string dir = requestPath;
     while (!dir.empty())
     {

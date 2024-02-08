@@ -33,5 +33,5 @@ void prependCharacter(std::vector<std::string>& vec, char ch);
 bool endsWithSlash(const std::string& str);
 bool isSlashAfterDot(const std::string& str);
 bool isSlashAtEnd(const std::string& str);
-
+bool endsWith(const std::string& str, const std::string& suffix);
 #endif

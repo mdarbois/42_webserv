@@ -38,6 +38,22 @@ function uploadFile() {
         alert('Please select a file before uploading.');
     }
 }
+const sendGetRequest = (fileName) => {
+	fetch(`/uploads/${fileName}`, {
+		method: 'GET',
+	})
+	.then(response => response.blob())
+	.then(blob => {
+		// Create a link element and trigger the download
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(blob);
+		link.download = fileName;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	})
+	.catch(error => console.error('Error downloading file:', error));
+};
 
 const sendDeleteRequest = (fileName) => {
 
@@ -63,17 +79,20 @@ const sendDeleteRequest = (fileName) => {
 function listFiles() {
     const fileList = document.getElementById("fileList");
     if (fileList.style.display === "none") {
-        fileList.innerHTML = "coucou";
-                    fetch('list_files.php')
+                    fetch('/list_files.php')
                     .then(response => response.json())
                     .then(files => {
-                        //const fileList = document.getElementById("fileList");
+                        const fileList = document.getElementById('fileList');
                         // Clear existing list
                         //fileList.innerHTML = "";
                         // Populate the list with fetched files
                         files.forEach(file => {
-                            const listItem = document.createElement("li");
+                            const listItem = document.createElement('li');
                             listItem.textContent = file;
+                            const getButton = document.createElement('button');
+                            getButton.textContent = 'GET';
+                            getButton.addEventListener('click', () => sendGetRequest(item));
+
                             const deleteButton = document.createElement('button');
                             deleteButton.textContent = 'DELETE';
                             deleteButton.addEventListener('click', () => {
@@ -81,6 +100,7 @@ function listFiles() {
                                                 .then(() => location.reload())
                                                 .catch(error => console.error('Error deleting file:', error));
                                             });
+                                            listItem.appendChild(getButton);
                                             fileList.appendChild(deleteButton);
                                             fileList.appendChild(listItem);
                                         });

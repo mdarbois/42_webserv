@@ -190,6 +190,7 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	{
 		//Parse the request string
 		_parser = ParserHTTP (_request.buffer);
+		//std::cout << "parser = " << _parser << std::endl;
 		if (_parser.isCGI())
 		{
 			_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
