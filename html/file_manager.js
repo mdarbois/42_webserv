@@ -21,6 +21,7 @@ function uploadFile() {
             document.getElementById("message").style.display = "none";
             if (xhr.status === 201 || xhr.status == 200) {
                 alert('File uploaded successfully!');
+                window.location.reload();
             } else {
                 // Display the HTML response from the server in the current window
                 console.log(xhr.responseText);
@@ -64,7 +65,7 @@ const sendGetRequest = (fileName) => {
 const sendDeleteRequest = (fileName) => {
 
 	return new Promise((resolve, reject) => {
-		fetch(`/html/uploads/${fileName}`, {
+		fetch(`/uploads/${fileName}`, {
 			method: 'DELETE',
 		})
 		.then(response => {
@@ -82,24 +83,62 @@ const sendDeleteRequest = (fileName) => {
 		});
 	});
 };
+
+
+fetch('/list.php')
+.then(response => response.json())
+.then(files => {
+                
+                const fileList = document.getElementById('fileList');
+                // Clear existing list
+                fileList.innerHTML = "";
+                // Populate the list with fetched files
+                files.forEach(file => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = file;
+                    const getButton = document.createElement('button');
+                    getButton.textContent = 'GET';
+                    getButton.addEventListener('click', () => sendGetRequest(file));
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'DELETE';
+                    deleteButton.addEventListener('click', () => {
+                        sendDeleteRequest(file)
+                                        .then(() => location.reload())
+                                        .catch(error => console.error('Error deleting file:', error));
+                                    });
+                                    listItem.appendChild(getButton);
+                                    fileList.appendChild(deleteButton);
+                                    fileList.appendChild(listItem);
+                                });
+                                
+                            })
+            .catch(error => console.error('Error fetching file list:', error));
+
+
+
+
+
+
 function listFiles() {
-    //const fileList = document.getElementById("fileList");
+    const fileList = document.getElementById("fileList");
     if (fileList.style.display === "none") {
         
-                    fetch('/list_files.php')
-                    .then(response => response.json())
-                    .then(files => {
-                        console.log(files);
-                        const fileList = document.getElementById('fileList');
+        fetch('/list.php')
+        .then(response => response.json())
+        .then(files => {
+                        document.getElementById("listButton").innerText = "Hide Files";
+                        
+                        //const fileList = document.getElementById('fileList');
                         // Clear existing list
-                        //fileList.innerHTML = "";
+                        fileList.innerHTML = "";
                         // Populate the list with fetched files
                         files.forEach(file => {
                             const listItem = document.createElement('li');
                             listItem.textContent = file;
                             const getButton = document.createElement('button');
                             getButton.textContent = 'GET';
-                            getButton.addEventListener('click', () => sendGetRequest(item));
+                            getButton.addEventListener('click', () => sendGetRequest(file));
 
                             const deleteButton = document.createElement('button');
                             deleteButton.textContent = 'DELETE';
@@ -115,13 +154,12 @@ function listFiles() {
                                         
                                     })
                     .catch(error => console.error('Error fetching file list:', error));
-        document.getElementById("listButton").innerText = "Hide Files";
         fileList.style.display = "block";
     } else {
                 // If list is displayed, hide it and update the button text
                 document.getElementById("fileList").innerHTML = "";
                 document.getElementById("listButton").innerText = "List Files";
-                fileList.style.display = "none"
+                fileList.style.display = "none";
 
     } 
 }
