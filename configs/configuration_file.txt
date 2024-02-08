@@ -11,7 +11,6 @@ server {
 	location / {
 		methods GET;
 		autoindex on;
-		index index.html;
 		uploads usr/bin/php;
 	}
 	
@@ -51,6 +50,6 @@ server {
 
 	location /uploads/ {
 		methods GET POST DELETE;
-		autoindex off;
+		autoindex on;
 	}
 }

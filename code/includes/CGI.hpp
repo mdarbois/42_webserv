@@ -8,6 +8,7 @@
 #include "./ParserHTTP.hpp"
 #include "./ServerConfig.hpp"
 #include "utils.hpp"
+#include <signal.h>
 
 class CGI {
 	public:

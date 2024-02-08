@@ -12,35 +12,8 @@ CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0
 	
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
-	//std::cout << "Pipe set up write end: " << output_pipe[1] << std::endl;
-	//std::cout << "Pipe set up read end: " << output_pipe[0] << std::endl;
 	std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
 	std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
-	//Build the response in the child and write it to the pipe
-	//In order to use poll, this must be executed in the next poll cycle
-	//therefore put in another function
-	/*
-	time_t	startTime = time(0);
-	int pid = fork();
-	_argsArray = vectorToCharArray(_args);
-	_envArray = vectorToCharArray(_env);
-	_print(*this);
-	if (pid == 0)
-		_childProcess(input_pipefd, output_pipe);
-	else if (pid > 0)
-		_parentProcess(parsing, pid, input_pipefd, output_pipe, 0, startTime);
-	else
-	{
-		deleteArray(_argsArray);
-		deleteArray(_envArray);
-		throw std::runtime_error("CGI error: fork failed");
-	} */
-
-	//Read the response from the pipe
-	/* if (!_timeOut)
-		_body = _readOutput(output_pipe);
-	deleteArray(_argsArray);
-	deleteArray(_envArray); */
 }
 
 void	CGI::writeCGIToPipe()
