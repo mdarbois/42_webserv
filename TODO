@@ -1,6 +1,5 @@
-- Can we use this: if (std::system(command.c_str()) == 0) ??? --> ALEX
-
-- When there is a request with multipart/data or chunked we need a function to reassemble the body -- ALEX
+- When there is a chunked request we need a function to reassemble the body -- ALEX
+- Do we need to send chunked responses? How does sending big files as response work?
 - How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed -- ALEX
 - Post files with the content in the body without multipart --> Yann?
 
@@ -12,6 +11,9 @@
 - update _deleteClient or add closeConnection function for client which sends response -- ALEX
 
 - "http://localhost:18000/uploads" doesnt show the response -- ALEX
+.
+- http://localhost:18001//sdfsdf leads to infinite loop (two or more slashes) (basically when a location is not known / found) -- MARIE
+- redirection URI directory: endless loop to handle -- MARIE
 
 - List/Delete files in the file manager -- MARIE
 
@@ -20,3 +22,10 @@
 - Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
 
 - CHECK all HTTP response Codes at the end!
+- if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
+	Put REUSPORT back in, just commented out, because it does not work on mac
+- while (line[i] && !line.empty()) -> needed for working on macos, should we put this into the project?
+- End the server with ctrl c? Are every socekts freed correctly --> valgrind
+- .php CGI not working on MACOS
+- changed _php to location on my mac to _php = "/usr/local/bin/php";
+- default error page?

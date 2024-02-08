@@ -9,10 +9,11 @@ CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0
 	_addEnv(parsedRequest);
 	_addArgs(parsedRequest, config);
 
-	//if (pipe(input_pipefd) == -1)
-	//	throw std::runtime_error("CGI error: input pipe failed");
+	
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
+	//std::cout << "Pipe set up write end: " << output_pipe[1] << std::endl;
+	//std::cout << "Pipe set up read end: " << output_pipe[0] << std::endl;
 	std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
 	std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
 	//Build the response in the child and write it to the pipe
@@ -88,8 +89,6 @@ CGI &CGI::operator=(const CGI &rhs) {
 		this->_timeOut = rhs._timeOut;
 		this->_length = rhs._length;
 		this->_body = rhs._body;
-		//this->input_pipefd[0] = rhs.input_pipefd[0];
-		//this->input_pipefd[1] = rhs.input_pipefd[1];
 		this->output_pipe[0] = rhs.output_pipe[0];
 		this->output_pipe[1] = rhs.output_pipe[1];
 	}
@@ -112,7 +111,12 @@ bool	CGI::timeOut() const
 
 void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 {
+	//MacOS
+	//_php = "/usr/local/bin/php";
+
+	//Linux
 	_php = "/usr/bin/php";
+	
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
 	_args.push_back(phpScript + parsing.getPath());
@@ -152,15 +156,7 @@ void CGI::_addEnv(ParserHTTP &parsing)
 
 void CGI::_childProcess(int *output_pipe)
 {
-	//close(input_pipefd[1]);
 	close(output_pipe[0]);
-	/* if (dup2(input_pipefd[0], 0) == -1)
-	{
-		deleteArray(_argsArray);
-		deleteArray(_envArray);
-		throw std::runtime_error("CGI error: dup2 input pipe in child process failed");
-	}
-	close(input_pipefd[0]); */
 	if (dup2(output_pipe[1], 1) == -1)
 	{
 		deleteArray(_argsArray);
@@ -168,7 +164,6 @@ void CGI::_childProcess(int *output_pipe)
 		throw std::runtime_error("CGI error: dup2 output pipe in child process failed");
 	}
 	close(output_pipe[1]);
-	std::cerr << "Execute child" << std::endl;
 	//std::cout << "args " << _argsArray << std::endl;
 	//std::cout << "env " << _envArray << std::endl;
 	if (execve(_php, _argsArray, _envArray) == -1)
@@ -178,24 +173,16 @@ void CGI::_childProcess(int *output_pipe)
 		throw std::runtime_error("Error: execve failed");
 	}
 	else
-	{
-		//close(input_pipefd[0]);
 		close(output_pipe[1]);
-	}
 }
 void CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime)
 {
 	//std::cout << "PARENT" << std::endl;
-	//close(input_pipefd[0]);
 	close(output_pipe[1]);
-	//std::string body = parsing.getBody();
-	//if ( !write(input_pipefd[1], body.c_str(), body.length()) && !write(input_pipefd[1], "coucou", 7 ))
-		//throw std::runtime_error("CGI error: write body");
-	//close(input_pipefd[1]);
 	while (pidWait == 0 && time(0) - startTime <= 6)
 		pidWait = waitpid(pid, NULL, WNOHANG);
 	if (pidWait == 0) {
-		//kill(1, SIGKILL);
+		kill(1, SIGKILL);
 		_timeOut = true;
 	}
 	if (pidWait == -1)	{

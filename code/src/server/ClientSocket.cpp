@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 15:03:35 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/07 18:41:56 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ CommunicationStatus	ClientSocket::sendResponse()
 {
 	if (!_responseData.sendInProgress)
 	{
-		//TBD: Timer!
+		//TODO: Timer!
 		_startTimeCommunication = time(0);
 
 		//Make a HTTP-Response
@@ -238,6 +238,20 @@ CommunicationStatus	ClientSocket::sendResponse()
 	if (_responseData.bytesSent >= static_cast<int>(fullResponse.size()))
 		return (COM_DONE);
 	return (COM_IN_PROGRESS);
+}
+
+void	ClientSocket::closeClient(HttpStatus status)
+{
+	try
+	{
+		_responseData.response = ResponseHTTP(status, _config);
+		_responseData.sendInProgress = true;
+		sendResponse();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 }
 
 /*

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseHTTP.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/06 15:33:35 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/08 13:24:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ ResponseHTTP::ResponseHTTP() {}
 
 ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 {
+	_createErrorPageLookUp();
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
@@ -32,18 +33,23 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	//std::cout << _path << std::endl;
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 
+	if (_request.getHeaderMap().find("Host") == _request.getHeaderMap().end()
+		|| _request.getHeaderMap()["Host"].empty())
+	{
+		_createErrorResponse(HTTP_400);
+		return ;
+	}
 	if (_checkRedirection())
 		return;
-
 	//Check if the requested Resource is existing. For File and Directory
 	if (access(getFullRequestedPath().c_str(), F_OK) != 0)
 	{
-		_createErrorResponse("/404.html", HTTP_404);
+		_createErrorResponse(HTTP_404);
 		return ;
 	}
 	if (request.getBody().size() > config.getClientMaxBodySize())
 	{
-		_createErrorResponse("/413.html", HTTP_413);
+		_createErrorResponse(HTTP_413);
 		return;
 	}
 
@@ -54,17 +60,25 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	else if (request.getMethod() == DELETE)
 		_DELETE();
 	else
-		_createErrorResponse("/403.html", HTTP_403);
+		_createErrorResponse(HTTP_403);
 }
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
+	_createErrorPageLookUp();
 	if (_path.empty())
 		_path = _config.getLocationPath(_request.getPath());
 	if (_pathRoot.empty())
 		_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
+}
+
+ResponseHTTP::ResponseHTTP(HttpStatus status, ServerConfig config)
+{
+	_config = config;
+	_createErrorPageLookUp();
+	_createErrorResponse(status);
 }
 /* ResponseHTTP::ResponseHTTP()
 {
@@ -113,11 +127,25 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
-
-void	ResponseHTTP::_createErrorResponse(std::string errPagePath, HttpStatus status)
+void	ResponseHTTP::_createErrorPageLookUp()
 {
-	_request.overidePath(errPagePath);
-	_readFile();
+	_errorPageLookUp[HTTP_400] = "/400.html";
+	_errorPageLookUp[HTTP_403] = "/403.html";
+	_errorPageLookUp[HTTP_404] = "/404.html";
+	_errorPageLookUp[HTTP_408] = "/408.html";
+	_errorPageLookUp[HTTP_413] = "/413.html";
+	_errorPageLookUp[HTTP_500] = "/500.html";
+	
+}
+
+void	ResponseHTTP::_createErrorResponse(HttpStatus status)
+{
+	std::string	errPagePath = _getErrorPage(status);
+	if (!errPagePath.empty())
+	{
+		_request.overidePath(errPagePath);
+		_readFile();
+	}
 	setResponseLine(status);
 }
 
@@ -171,15 +199,25 @@ bool ResponseHTTP::_checkRedirection()
 	return false;
 }
 
+bool	isDirectory(const std::string& path)
+{
+	struct stat path_stat;
+	if (stat(path.c_str(), &path_stat) != 0) {
+		// Error occurred while accessing file information
+		return false;
+	}
+	return S_ISDIR(path_stat.st_mode);
+}
+
 void	ResponseHTTP::_GET()
 {
 	//Check if GET is allowed for the requested location
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "GET"))
-		return (_createErrorResponse("/403.html", HTTP_403));
+		return (_createErrorResponse(HTTP_403));
 
 	//chck read rights
 	if (access(getFullRequestedPath().c_str(), R_OK) != 0)
-		return (_createErrorResponse("/403.html", HTTP_403));
+		return (_createErrorResponse(HTTP_403));
 
 	//Check if the path ends on a slash -> Directory is requested
 	if (_request.getPath()[_request.getPath().length() - 1] == '/')
@@ -199,7 +237,7 @@ void	ResponseHTTP::_GET()
 		else if (!_config.getLocations()[_path].getAutoindex())
 		{
 			//No index and no auto index --> return the error page of this location or the default error page
-			_createErrorResponse("/403.html", HTTP_403);
+			_createErrorResponse(HTTP_403);
 		}
 		else
 		{
@@ -217,6 +255,8 @@ void	ResponseHTTP::_GET()
 		//Check access to file
 		//Create response
 		//Reads the requested file to the body
+		if (isDirectory(getFullRequestedPath()))
+			return _createErrorResponse(HTTP_404);
 		if (!_readFile())
 			throw std::runtime_error("GET: Could not open file");
 		else
@@ -228,16 +268,20 @@ void	ResponseHTTP::_POST()
 {
 	//check if the path is a folder, ends with a /
 	if (_request.getPath().empty() || _request.getPath()[_request.getPath().length() - 1] != '/')
-		return _createErrorResponse("/400.html", HTTP_400);
+		return _createErrorResponse(HTTP_400);
 
 	//check write rights
 	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
-		return (_createErrorResponse("/403.html", HTTP_403));
+		return (_createErrorResponse(HTTP_403));
 		
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
-		return _createErrorResponse("/403.html", HTTP_403);
+		return _createErrorResponse(HTTP_403);
 
+	//we only handle cgi and upload as post
+	if (!_request.isCGI() && !_request.isUpload())
+		return _createErrorResponse(HTTP_403);
+	
 	//create a new file
 	std::string	uploadFilePath = std::string(_config.getRoot() + _request.getPath()) + _request.getUploadFilename();
 	std::ofstream	newFile(uploadFilePath.c_str());
@@ -255,18 +299,20 @@ void	ResponseHTTP::_DELETE()
 {
 	//chck read and write rights for deletion
 	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
-		return (_createErrorResponse("/403.html", HTTP_403));
+		return (_createErrorResponse(HTTP_403));
 
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
-		return _createErrorResponse("/403.html", HTTP_403);
+		return _createErrorResponse(HTTP_403);
 
 	//Check if file is requested to delete
 	if (_request.getPath()[_request.getPath().length() - 1] != '/')
 	{
 		//check if the file has write rights
+		if (isDirectory(getFullRequestedPath()))
+			return _createErrorResponse(HTTP_403);
 		if (access(getFullRequestedPath().c_str(), W_OK) != 0)
-			return _createErrorResponse("/403.hmtl", HTTP_403);
+			return _createErrorResponse(HTTP_403);
 		else
 		{
 			if (std::remove(getFullRequestedPath().c_str()) == 0)
@@ -275,15 +321,16 @@ void	ResponseHTTP::_DELETE()
 				throw std::runtime_error("DELETE: Could not delete file");
 		}
 	}
-	//else directory is requested to delete
+	//else directory cant be deleted
 	else
-	{
-		std::string command = "rm -rf " + getFullRequestedPath();
-		if (std::system(command.c_str()) == 0)
-			return (setResponseLine(HTTP_200));
-		else
-			throw std::runtime_error("DELETE: Could not delete dir");
-	}
+		return _createErrorResponse(HTTP_403);
+}
+
+std::string	ResponseHTTP::_getErrorPage(HttpStatus status)
+{
+	if (_errorPageLookUp.find(status) != _errorPageLookUp.end())
+		return (_errorPageLookUp[status]);
+	return ("");
 }
 
 std::string ResponseHTTP::_getResponsePhrase(HttpStatus status) const
