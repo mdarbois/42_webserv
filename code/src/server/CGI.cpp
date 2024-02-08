@@ -85,10 +85,10 @@ bool	CGI::timeOut() const
 void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 {
 	//MacOS
-	_php = "/usr/local/bin/php";
+	//_php = "/usr/local/bin/php";
 
 	//Linux
-	//_php = "/usr/bin/php";
+	_php = "/usr/bin/php";
 	
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
