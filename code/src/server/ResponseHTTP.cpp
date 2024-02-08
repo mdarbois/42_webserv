@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 18:22:18 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/08 13:24:58 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,6 +270,10 @@ void	ResponseHTTP::_POST()
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
 		return _createErrorResponse(HTTP_403);
 
+	//we only handle cgi and upload as post
+	if (!_request.isCGI() && !_request.isUpload())
+		return _createErrorResponse(HTTP_403);
+	
 	//create a new file
 	std::string	uploadFilePath = std::string(_config.getRoot() + _request.getPath()) + _request.getUploadFilename();
 	std::ofstream	newFile(uploadFilePath.c_str());
