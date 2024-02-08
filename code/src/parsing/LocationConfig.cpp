@@ -73,7 +73,7 @@ std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size
 	
 	size_t	i = 0;
 	std::vector<std::string> methods;
-	while (line[i])
+	while (line[i] && !line.empty())
 	{
 		trimSpaces(line);
 		//printf("line=%s\n", line.c_str());

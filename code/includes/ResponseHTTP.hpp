@@ -29,6 +29,7 @@ class ResponseHTTP
 	public:
 		ResponseHTTP(ParserHTTP	request, ServerConfig config);
 		ResponseHTTP(const CGI& cgi, ServerConfig config);
+		ResponseHTTP(HttpStatus status, ServerConfig config);
 		~ResponseHTTP();
 		ResponseHTTP &		operator=( ResponseHTTP const & rhs );
 		ResponseHTTP();
@@ -47,18 +48,21 @@ class ResponseHTTP
 		ServerConfig						_config;
 		ResponseLine						_responseLine;
 		std::string							_body;
-    std::string             _path;
-	std::string				_pathRoot;
+		std::string							_path;
+		std::string							_pathRoot;
 		std::map<std::string, std::string>	_header;
+		std::map<HttpStatus, std::string>	_errorPageLookUp;
 		ParserHTTP							_request;
 		int									_bodyLength;
 		bool								_readFile();
-		void								_createErrorResponse(std::string errPagePath, HttpStatus status);
+		void								_createErrorResponse(HttpStatus status);
 		std::string							_getResponsePhrase(HttpStatus status) const;
 		void								_GET();
 		void								_POST();
 		void								_DELETE();
-    bool                _checkRedirection();
+		bool								_checkRedirection();
+		void								_createErrorPageLookUp();
+		std::string							_getErrorPage(HttpStatus status);
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );

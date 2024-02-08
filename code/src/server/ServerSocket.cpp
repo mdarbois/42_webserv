@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/29 12:15:04 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/08 11:31:03 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,13 +92,22 @@ void	ServerSocket::setUpSocket()
 	}
 
 	// Reusable Port and Socket
+	//Linux
 	int on = 1;
-	if ( setsockopt(_pollFD.fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
+	if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
 	{
-		//perror("setsockop()");
+		perror("setsockop()");
 		std::exit(EXIT_FAILURE);
 	}
 
+	//MacOS
+	/* int on = 1;
+	if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
+	{
+		perror("setsockop()");
+		std::exit(EXIT_FAILURE);
+	} */
+	
 	/*
 		fctnl = file control system call to set options on file descriptor.
 		F_SETFL: Specifies, that we want to set FLAGS on the fd

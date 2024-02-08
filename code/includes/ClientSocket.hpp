@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/03 11:59:12 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/08 09:44:27 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include "ResponseHTTP.hpp"
 # include "CGI.hpp"
 
-# define CLIENT_RECEIVE_BUFFER_SIZE 4096
-# define CLIENT_TIMEOUT_RECEIVE 60
+# define CLIENT_RECEIVE_BUFFER_SIZE 8000
+# define CLIENT_TIMEOUT_RECEIVE 30
 
 typedef enum e_RequestEndType
 {
@@ -71,6 +71,7 @@ class ClientSocket: public Socket
 		void				setCGIToPipeFd(int fd);
 		void				setPipeToParentFd(int fd);
 		CGI&				getCGI();
+		void				closeClient(HttpStatus status);
 
 	private:
 		CGI					_cgi;
