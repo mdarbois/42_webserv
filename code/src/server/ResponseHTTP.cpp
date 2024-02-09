@@ -213,13 +213,13 @@ void	ResponseHTTP::_generateAutoIndexHTML()
 {
 	std::stringstream output;
 	DIR* dir = opendir(getFullRequestedPath().c_str());
-	if (dir == nullptr) {
+	if (dir == NULL) {
 		std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
 		return;
 	}
 	output << "<html><head><title>Autoindex</title></head><body><h1>Autoindex</h1><ul>";
 	dirent* entry;
-	while ((entry = readdir(dir)) != nullptr) {
+	while ((entry = readdir(dir)) != NULL) {
 		std::string name = entry->d_name;
 		if (name != "." && name != "..") {
 			output << "<li>";
