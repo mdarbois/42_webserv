@@ -231,7 +231,7 @@ CommunicationStatus	ClientSocket::sendResponse()
 	int sendReturn = send(
 		_pollFD.fd, fullResponse.c_str() + _responseData.bytesSent,
 		_responseData.response.getResponseLength() - _responseData.bytesSent,
-		0);
+		0); //! Seg fault when send timeout / out of memory
 	if (sendReturn <= 0)
 		return (COM_ERROR);
 	_responseData.bytesSent += sendReturn;
