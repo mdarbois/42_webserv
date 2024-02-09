@@ -1,18 +1,9 @@
 - When there is a chunked request we need a function to reassemble the body -- ALEX
 - Do we need to send chunked responses? How does sending big files as response work?
-- How to handle large file uploads and timeouts. What should happen when the page during a large upload is refrehsed -- ALEX
+
 - Post files with the content in the body without multipart --> Yann?
 
-- CGI Timeout does not properly close the pipe filedescriptors. i am also not sure if the CGI timout is implemented as intended
-	because the timout is not checked by the server, but by the java script in the html.
-- File list only appears if window is referehed
-- I would delete the autoindex button, can be shown via broser link
-
-- List/Delete files in the file manager -- MARIE
-
-- CGI Timeout example -- MARIE
-
-- Extend the basic autoindex.html to work correctly (List all dir/files and put links to follow the dirs or download the files);
+- %20 to delete screenshot --> Marie
 
 - CHECK all HTTP response Codes at the end!
 - End the server with ctrl c? Are every socekts freed correctly --> valgrind

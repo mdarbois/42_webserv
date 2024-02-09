@@ -35,8 +35,7 @@ function uploadFile() {
         var formData = new FormData();
         
         // Append the file to the FormData object
-        formData.append('file', fileInput.files[0]);
-
+        formData.append('file', fileInput.files[0], fileInput.files[0].name.replace(/ /g, "%20"));
         // Send the FormData object containing the file
         xhr.send(formData);
     } else {
@@ -62,18 +61,25 @@ const sendGetRequest = (fileName) => {
 	.catch(error => console.error('Error downloading file:', error));
 };
 
+function addPercentage(fileName)
+{
+    return fileName.replace(/ /g, "%20");
+}
+
 const sendDeleteRequest = (fileName) => {
 
+    const encodedFileName = addPercentage(fileName);
+    console.log(fileName);
 	return new Promise((resolve, reject) => {
-		fetch(`/uploads/${fileName}`, {
+		fetch(`/uploads/${encodedFileName}`, {
 			method: 'DELETE',
 		})
 		.then(response => {
 			if (response.ok) {
-				console.log(`File ${fileName} deleted successfully`);
+				console.log(`File ${encodedFileName} deleted successfully`);
 				resolve();
 			} else {
-				console.error(`Failed to delete file ${fileName}`);
+				console.error(`Failed to delete file ${encodedFileName}`);
 				reject();
 			}
 		})
@@ -83,6 +89,8 @@ const sendDeleteRequest = (fileName) => {
 		});
 	});
 };
+
+
 
 
 fetch('/list.php')
@@ -103,12 +111,13 @@ fetch('/list.php')
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'DELETE';
                     deleteButton.addEventListener('click', () => {
+                        console.log(file);
                         sendDeleteRequest(file)
                                         .then(() => location.reload())
                                         .catch(error => console.error('Error deleting file:', error));
                                     });
                                     listItem.appendChild(getButton);
-                                    fileList.appendChild(deleteButton);
+                                    listItem.appendChild(deleteButton);
                                     fileList.appendChild(listItem);
                                 });
                                 
@@ -117,9 +126,7 @@ fetch('/list.php')
 
 
 
-
-
-
+/* 
 function listFiles() {
     const fileList = document.getElementById("fileList");
     if (fileList.style.display === "none") {
@@ -162,4 +169,4 @@ function listFiles() {
                 fileList.style.display = "none";
 
     } 
-}
+} */
