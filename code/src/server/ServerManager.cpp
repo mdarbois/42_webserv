@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 17:34:29 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/11 13:23:50 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,11 +223,42 @@ SocketType	ServerManager::_getSocketTypeForPollFdIdx(int idx, int *socketIndex) 
 	return (NO_SOCKET);
 }
 
+ClientSocket*	ServerManager::_getClientForPipeFD(int idx) const
+{
+	int	pollFD = _pollFDs[idx].fd;
+	for (size_t i = 0; i < _sockets.size(); i++)
+	{
+		if (_sockets[i]->getType() == CLIENT)
+		{
+			ClientSocket* temp = dynamic_cast<ClientSocket *>(_sockets[i]);
+			if (temp->getCGIToPipeFd().fd == pollFD || temp->getPipeToParentFd().fd == pollFD)
+				return (temp);
+		}
+	}
+	return (NULL);
+}
+
 /* 
 	Server loop loops over all pollFDs (pipes and sockets) and listen for write read events.
 	The server sockets accept and create new client sockets.
 	The client sockets handle request receiving and response sending.
  */
+
+void shufflePollFDs(struct pollfd *_pollFDs, size_t size) {
+	// Seed the random number generator
+	std::srand(std::time(nullptr));
+
+	// Perform Fisher-Yates shuffle
+	for (size_t i = size - 1; i > 0; --i) {
+		// Generate a random index between 0 and i (inclusive)
+		size_t j = std::rand() % (i + 1);
+
+		// Swap _pollFDs[i] and _pollFDs[j]
+		struct pollfd temp = _pollFDs[i];
+		_pollFDs[i] = _pollFDs[j];
+		_pollFDs[j] = temp;
+	}
+}
 
 void	ServerManager::run()
 {
@@ -238,8 +269,11 @@ void	ServerManager::run()
 	while (42)
 	{
 		//Check all monitored fd with poll if an event occured
-		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
+		shufflePollFDs(&_pollFDs[0], _numberPollFDs);
+		if ( (pollResult = poll(&_pollFDs[0], _numberPollFDs, TIMEOUT_POLL)) < 0)
 		{
+			std::cerr << "Error in poll(): " << strerror(errno) << std::endl;
+			std::exit(EXIT_FAILURE);
 			std::cerr << "error: poll() failed";
 			std::exit(EXIT_FAILURE);
 		}
@@ -248,23 +282,22 @@ void	ServerManager::run()
 			//POLLOUT - ready to write/send to the fd non-blocking
 		for (int i = 0; i < _numberPollFDs; i++)
 		{
+			//printFileDescriptors(_pollFDs, _numberPollFDs);
 			//check for poll errors
 			if (_checkPollErrors(_getSocketTypeForPollFdIdx(i, &socketIdx), socketIdx, _pollFDs[i].revents))
 				continue;
 			//Check if there was an in comming POLL IN on the server socket, ask for a new connection
 			if ( _pollFDs[i].revents & POLLIN && _getSocketTypeForPollFdIdx(i, &socketIdx) == SERVER )
 				_acceptNewClient(dynamic_cast<ServerSocket *>(_sockets[socketIdx]));
-
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request
 			else if ( _pollFDs[i].revents & POLLIN && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
 				_receiveRequest(dynamic_cast<ClientSocket *>(_sockets[socketIdx]));//receive the request --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
-			
 			//Must be a file descriptor of a pipe
 			else if (_getSocketTypeForPollFdIdx(i, &socketIdx) == NO_SOCKET)
 			{
-				//socket Idx still the one of the last client which belongs to the current pipe fds
-				ClientSocket *client = dynamic_cast<ClientSocket *>(_sockets[socketIdx]);
+				//since the fds are suffled, get the right client FD for the current pipeFD
+				ClientSocket *client = _getClientForPipeFD(i);
 				//execute the CGI child process and write to the pipe
 				if (_pollFDs[i].revents & POLLOUT && _pollFDs[i].fd == client->getCGIToPipeFd().fd)
 				{

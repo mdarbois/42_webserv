@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 18:41:56 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/10 13:08:33 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	_config = config;
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
-	_pollFD.events = POLLIN; //set tot POLLIN, to listen to the request
+	_pollFD.events = 0;
+	_pollFD.events = _pollFD.events | POLLIN; //set tot POLLIN, to listen to the request
 	setUpSocket();
 	_resetRequest();
 }
