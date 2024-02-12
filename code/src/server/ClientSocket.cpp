@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/12 23:28:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 00:17:11 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,16 +173,11 @@ CommunicationStatus	ClientSocket::receiveRequest()
 {
 	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE];
 	size_t	bytesRead;
-	std::cout << "entered recevieRequest(): ";
-	printTimeStamp();
 	if ((bytesRead = recv(_pollFD.fd, buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
 	{
 		std::cerr << "COM ERROR" << std::endl;
 		return (COM_ERROR);
 	}
-	std::cout << "done reding buffer";
-		printTimeStamp();
-
 	if (bytesRead == 0)
 	{
 		std::cerr << "CONN CLOSED" << std::endl;

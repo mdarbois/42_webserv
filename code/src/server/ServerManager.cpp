@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/12 22:04:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 00:16:59 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ std::ostream &			operator<<( std::ostream & o, ServerManager const & i )
 */
 void printFileDescriptors(const struct pollfd fds[], int num_fds) {
 	for (int i = 0; i < num_fds; ++i) {
-		std::cout << "File Descriptor " << i + 1 << ": " << fds[i].fd << std::endl;
+		std::cout << "File Descriptor " << i << ": " << fds[i].fd;
 	}
 }
 
@@ -73,7 +73,6 @@ void printFileDescriptors(const struct pollfd fds[], int num_fds) {
 */
 void	ServerManager::_updatePollFDArray()
 {
-	std::cout << "Called updatePollFDArray()" << std::endl;
 	_numberPollFDs = 0;
 	int j = 0;
 	for (size_t i = 0; i < _sockets.size(); i++)
@@ -113,7 +112,6 @@ void	ServerManager::_updateClientPollFDs()
 			if (_sockets[j]->getPollFD().fd == _pollFDs[i].fd)
 			{
 				_sockets[j]->setPollFD(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
-				break;
 			}
 			if (_sockets[j]->getType() == CLIENT)
 			{
@@ -122,7 +120,6 @@ void	ServerManager::_updateClientPollFDs()
 					temp->setCGIToPipeFd(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
 				if (temp->getPipeToParentFd().fd == _pollFDs[i].fd)
 					temp->setPipeToParentFd(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
-				break;
 			}
 		}
 	}
@@ -159,7 +156,6 @@ void	ServerManager::_receiveRequest(ClientSocket *client)
 	else if (status == COM_IN_PROGRESS || status == CGI_PENDING)
 		client->setPollFD(client->getFD(), POLLIN, 0);
 	_updatePollFDArray();
-	std::cout << "left receiveRequerst()" << std::endl;
 }
 
 void	ServerManager::_sendResponse(ClientSocket *client)
@@ -270,22 +266,6 @@ ClientSocket*	ServerManager::_getClientForPipeFD(int idx) const
 	The client sockets handle request receiving and response sending.
  */
 
-void shufflePollFDs(struct pollfd *_pollFDs, size_t size) {
-	// Seed the random number generator
-	std::srand(std::time(nullptr));
-
-	// Perform Fisher-Yates shuffle
-	for (size_t i = size - 1; i > 0; --i) {
-		// Generate a random index between 0 and i (inclusive)
-		size_t j = std::rand() % (i + 1);
-
-		// Swap _pollFDs[i] and _pollFDs[j]
-		struct pollfd temp = _pollFDs[i];
-		_pollFDs[i] = _pollFDs[j];
-		_pollFDs[j] = temp;
-	}
-}
-
 void	ServerManager::run()
 {
 	int	pollResult;
@@ -302,22 +282,11 @@ void	ServerManager::run()
 			std::exit(EXIT_FAILURE);
 		}
 		_updateClientPollFDs();
-		std::cout << "----------" << std::endl;
-		std::cout << "POLL RESULT: " << pollResult << std::endl;
-		for (int i = 0; i < _numberPollFDs; i++)
-		{
-			std::cout << "Poll fd: " << _pollFDs[i].fd;
-			std::cout << " at " << i << " with REVENT: " << _pollFDs[i].revents << std::endl;
-		}
-		std::cout << "----------" << std::endl << std::endl;
 		//Check every server if a new connection has been requested
 			//POLLIN - ready to read/recv from the fd non-blocking
 			//POLLOUT - ready to write/send to the fd non-blocking
-		std::cout << "****************" << std::endl;
 		for (int i = 0; i < _numberPollFDs; i++)
 		{
-			std::cout << "Poll fd: " << _pollFDs[i].fd;
-			std::cout << " at " << i << " with REVENT: " << _pollFDs[i].revents << std::endl;
 			//check for poll errors
 			if (_checkPollErrors(_getSocketTypeForPollFdIdx(i, &socketIdx), socketIdx, _pollFDs[i].revents))
 				continue;
@@ -327,10 +296,8 @@ void	ServerManager::run()
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request
 			else if ( (_pollFDs[i].revents & POLLIN) && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
-			{
-				std::cout << "INDEEEEEEX: " << i << std::endl;
 				_receiveRequest(dynamic_cast<ClientSocket *>(_sockets[socketIdx]));
-			}
+
 			//Must be a file descriptor of a pipe
 			else if (_getSocketTypeForPollFdIdx(i, &socketIdx) == NO_SOCKET)
 			{
@@ -363,7 +330,6 @@ void	ServerManager::run()
 				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_408); // If cleients timed out, do we have to send a response to it?
 			}
 		}
-		std::cout << "****************" << std::endl << std::endl;
 	}
 	// Close the server socket
 	for (int i = 0; i < _numberServers; i++)

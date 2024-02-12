@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/05 14:32:48 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/12 23:50:42 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ class Socket
 		Socket &		operator=( Socket const & rhs );
 
 		virtual void	setUpSocket() = 0;
-		SocketType	getType() const;
+		SocketType		getType() const;
 		int				getFD() const;
 		void			setPollFD(int fd, short events, short revents);
 		struct pollfd	getPollFD() const;
