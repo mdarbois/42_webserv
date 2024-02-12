@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/11 13:12:19 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/12 21:48:18 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ class ServerManager
 		void					_updatePollFDArray();
 		SocketType				_getSocketTypeForPollFdIdx(int idx, int *socketIndex) const;
 		ClientSocket*			_getClientForPipeFD(int idx) const;
+		void					_updateClientPollFDs();
 
 		ServerManager();
 		ServerManager( ServerManager const & src );

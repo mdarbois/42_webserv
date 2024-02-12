@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:13 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/31 09:04:10 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/12 20:50:18 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ bool	Socket::operator==(const Socket& other)
 */
 void	Socket::setPollFD(int fd, short events, short revents)
 {
+	if (revents < 0)
+		return ;
 	_pollFD.events = events;
 	_pollFD.revents = revents;
 	_pollFD.fd = fd;
