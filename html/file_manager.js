@@ -126,7 +126,7 @@ fetch('/list.php')
 
 
 
-/* 
+
 function listFiles() {
     const fileList = document.getElementById("fileList");
     if (fileList.style.display === "none") {
@@ -169,4 +169,4 @@ function listFiles() {
                 fileList.style.display = "none";
 
     } 
-} */
+}

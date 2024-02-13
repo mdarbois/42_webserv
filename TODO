@@ -1,5 +1,9 @@
 - When there is a chunked request we need a function to reassemble the body -- ALEX
 - Do we need to send chunked responses? How does sending big files as response work?
+- Error: Uploading a big file which takes time and try to submit a game, the game is posted, when the upload attempt times out.
+- SEGFAULT when GET File
+- _pollFDs now at 1000, how to apply MAX_CONNECTIONS to it?
+- When opening upload.html file pipes are created but never written, which is incorrect.
 
 - Post files with the content in the body without multipart --> Yann?
 

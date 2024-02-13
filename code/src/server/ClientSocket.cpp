@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 18:41:56 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 00:17:11 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	_config = config;
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
-	_pollFD.events = POLLIN; //set tot POLLIN, to listen to the request
+	_pollFD.events = 0;
+	_pollFD.events = _pollFD.events | POLLIN; //set tot POLLIN, to listen to the request
 	setUpSocket();
 	_resetRequest();
 }
@@ -153,12 +154,26 @@ bool	ClientSocket::_doneReceiving()
 	return (false);
 }
 
+#include <iomanip>
+#include <ctime>
+
+void printTimeStamp() {
+    // Get current time
+    std::time_t now = std::time(nullptr);
+    // Convert to local time
+    std::tm* localTime = std::localtime(&now);
+    
+    // Print time in hh:mm:ss format
+    std::cout << std::setfill('0') << std::setw(2) << localTime->tm_hour << ":" // Hours
+              << std::setfill('0') << std::setw(2) << localTime->tm_min << ":"  // Minutes
+              << std::setfill('0') << std::setw(2) << localTime->tm_sec << std::endl; // Seconds
+}
+
 CommunicationStatus	ClientSocket::receiveRequest()
 {
 	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE];
 	size_t	bytesRead;
-	
-	if ((bytesRead = recv(_pollFD.fd, &buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
+	if ((bytesRead = recv(_pollFD.fd, buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
 	{
 		std::cerr << "COM ERROR" << std::endl;
 		return (COM_ERROR);
@@ -195,8 +210,8 @@ CommunicationStatus	ClientSocket::receiveRequest()
 		{
 			_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
 			_isCGI = true;
-			setCGIToPipeFd(_cgi.output_pipe[1]);
-			setPipeToParentFd(_cgi.output_pipe[0]);
+			setCGIToPipeFd(_cgi.output_pipe[1], POLLOUT, 0);
+			setPipeToParentFd(_cgi.output_pipe[0], POLLIN, 0);
 			return (CGI_PENDING);
 		}
 		return (COM_DONE);
@@ -282,14 +297,18 @@ CGI&	ClientSocket::getCGI()
 	return (_cgi);
 }
 
-void	ClientSocket::setCGIToPipeFd(int fd)
+void	ClientSocket::setCGIToPipeFd(int fd, short events, short revents)
 {
 	_CGIToPipeFd.fd = fd;
+	_CGIToPipeFd.events = events;
+	_CGIToPipeFd.revents = revents;
 }
 
-void	ClientSocket::setPipeToParentFd(int fd)
+void	ClientSocket::setPipeToParentFd(int fd, short events, short revents)
 {
 	_pipeToParentFd.fd = fd;
+	_pipeToParentFd.events = events;
+	_pipeToParentFd.revents = revents;
 }
 
 /* ************************************************************************** */

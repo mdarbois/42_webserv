@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 17:34:29 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 00:16:59 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ std::ostream &			operator<<( std::ostream & o, ServerManager const & i )
 */
 void printFileDescriptors(const struct pollfd fds[], int num_fds) {
 	for (int i = 0; i < num_fds; ++i) {
-		std::cout << "File Descriptor " << i + 1 << ": " << fds[i].fd << std::endl;
+		std::cout << "File Descriptor " << i << ": " << fds[i].fd;
 	}
 }
 
@@ -103,6 +103,28 @@ void	ServerManager::_updatePollFDArray()
 	}
 }
 
+void	ServerManager::_updateClientPollFDs()
+{
+	for (int i = 0; i < _numberPollFDs; i++)
+	{
+		for (size_t j = 0; j < _sockets.size(); j++)
+		{
+			if (_sockets[j]->getPollFD().fd == _pollFDs[i].fd)
+			{
+				_sockets[j]->setPollFD(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
+			}
+			if (_sockets[j]->getType() == CLIENT)
+			{
+				ClientSocket *temp = dynamic_cast<ClientSocket *>(_sockets[j]);
+				if (temp->getCGIToPipeFd().fd == _pollFDs[i].fd)
+					temp->setCGIToPipeFd(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
+				if (temp->getPipeToParentFd().fd == _pollFDs[i].fd)
+					temp->setPipeToParentFd(_pollFDs[i].fd, _pollFDs[i].events, _pollFDs[i].revents);
+			}
+		}
+	}
+}
+
 void	ServerManager::_acceptNewClient(ServerSocket *socket)
 {
 	ClientSocket	*newClient;
@@ -112,7 +134,7 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 		return ;
 	}
 	newClient = new ClientSocket(socket->getFD(), socket->getServerConfig());
-	if ( newClient->getFD() < 0)
+	if ( !newClient || newClient->getFD() < 0)
 	{
 		std::cerr << "Err creating client socket" << std::endl;
 		delete newClient;
@@ -223,6 +245,21 @@ SocketType	ServerManager::_getSocketTypeForPollFdIdx(int idx, int *socketIndex) 
 	return (NO_SOCKET);
 }
 
+ClientSocket*	ServerManager::_getClientForPipeFD(int idx) const
+{
+	int	pollFD = _pollFDs[idx].fd;
+	for (size_t i = 0; i < _sockets.size(); i++)
+	{
+		if (_sockets[i]->getType() == CLIENT)
+		{
+			ClientSocket* temp = dynamic_cast<ClientSocket *>(_sockets[i]);
+			if (temp->getCGIToPipeFd().fd == pollFD || temp->getPipeToParentFd().fd == pollFD)
+				return (temp);
+		}
+	}
+	return (NULL);
+}
+
 /* 
 	Server loop loops over all pollFDs (pipes and sockets) and listen for write read events.
 	The server sockets accept and create new client sockets.
@@ -238,11 +275,13 @@ void	ServerManager::run()
 	while (42)
 	{
 		//Check all monitored fd with poll if an event occured
-		if ( (pollResult = poll(&_pollFDs[0], _sockets.size(), TIMEOUT_POLL)) < 0)
+		//shufflePollFDs(&_pollFDs[0], _numberPollFDs);
+		if ( (pollResult = poll(&_pollFDs[0], _numberPollFDs, TIMEOUT_POLL)) < 0)
 		{
 			std::cerr << "error: poll() failed";
 			std::exit(EXIT_FAILURE);
 		}
+		_updateClientPollFDs();
 		//Check every server if a new connection has been requested
 			//POLLIN - ready to read/recv from the fd non-blocking
 			//POLLOUT - ready to write/send to the fd non-blocking
@@ -251,39 +290,37 @@ void	ServerManager::run()
 			//check for poll errors
 			if (_checkPollErrors(_getSocketTypeForPollFdIdx(i, &socketIdx), socketIdx, _pollFDs[i].revents))
 				continue;
-			//Check if there was an in comming POLL IN on the server socket, ask for a new connection
-			if ( _pollFDs[i].revents & POLLIN && _getSocketTypeForPollFdIdx(i, &socketIdx) == SERVER )
+			//Check if there was an in comming POLLIN on the server socket, ask for a new connection
+			if ( (_pollFDs[i].revents & POLLIN) && _getSocketTypeForPollFdIdx(i, &socketIdx) == SERVER )
 				_acceptNewClient(dynamic_cast<ServerSocket *>(_sockets[socketIdx]));
-
 			//Check if the client socket is readable non-blocking: POLLIN.
 			//Client is sending HTTP request
-			else if ( _pollFDs[i].revents & POLLIN && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
-				_receiveRequest(dynamic_cast<ClientSocket *>(_sockets[socketIdx]));//receive the request --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
-			
+			else if ( (_pollFDs[i].revents & POLLIN) && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
+				_receiveRequest(dynamic_cast<ClientSocket *>(_sockets[socketIdx]));
+
 			//Must be a file descriptor of a pipe
 			else if (_getSocketTypeForPollFdIdx(i, &socketIdx) == NO_SOCKET)
 			{
-				//socket Idx still the one of the last client which belongs to the current pipe fds
-				ClientSocket *client = dynamic_cast<ClientSocket *>(_sockets[socketIdx]);
+				//since the fds are suffled, get the right client FD for the current pipeFD
+				ClientSocket *client = _getClientForPipeFD(i);
 				//execute the CGI child process and write to the pipe
-				if (_pollFDs[i].revents & POLLOUT && _pollFDs[i].fd == client->getCGIToPipeFd().fd)
+				if (_pollFDs[i].revents == POLLOUT && _pollFDs[i].fd == client->getCGIToPipeFd().fd)
 				{
 					client->getCGI().writeCGIToPipe();
-					client->setCGIToPipeFd(-1); //was closed, should be removed from pollFD in the next _updatePollFDArray()
-					_updatePollFDArray();
+					client->setCGIToPipeFd(-1, 0, 0); //was closed, should be removed from pollFD in the next _updatePollFDArray()
 				}
 				//execution was done. Read the results from the pipe and write it to the client
-				else if (_pollFDs[i].revents & POLLIN && _pollFDs[i].fd == client->getPipeToParentFd().fd)
+				else if ((_pollFDs[i].revents & POLLIN) && _pollFDs[i].fd == client->getPipeToParentFd().fd)
 				{
 					client->getCGI().readBodyFromPipe();
-					client->setPipeToParentFd(-1); //was closed, should be removed from pollFD in the next _updatePollFDArray()
+					client->setPipeToParentFd(-1, 0, 0); //was closed, should be removed from pollFD in the next _updatePollFDArray()
 					client->setPollFD(client->getFD(), POLLOUT, 0); //CGI was executed, can be written now to the client socket
-					_updatePollFDArray();
 				}
+				_updatePollFDArray();
 			}
 			//Check if the client socket is writeable non-blocking: POLLOUT.
 			//Server is sending HTTP response
-			else if ( _pollFDs[i].revents & POLLOUT && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
+			else if ( (_pollFDs[i].revents & POLLOUT) && _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT)
 				_sendResponse(dynamic_cast<ClientSocket *>(_sockets[socketIdx])); //send the response --> CAUTION: CAN BE SEND IN MULTIPLE CHUNKS
 
 			//Check if the client has a timeout
