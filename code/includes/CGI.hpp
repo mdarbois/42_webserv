@@ -10,6 +10,8 @@
 #include "utils.hpp"
 #include <signal.h>
 
+# define TIMEOUT_CGI 3
+
 class CGI {
 	public:
 		CGI();

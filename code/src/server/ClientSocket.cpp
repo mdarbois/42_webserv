@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/13 00:17:11 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 13:50:14 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,21 +154,6 @@ bool	ClientSocket::_doneReceiving()
 	return (false);
 }
 
-#include <iomanip>
-#include <ctime>
-
-void printTimeStamp() {
-    // Get current time
-    std::time_t now = std::time(nullptr);
-    // Convert to local time
-    std::tm* localTime = std::localtime(&now);
-    
-    // Print time in hh:mm:ss format
-    std::cout << std::setfill('0') << std::setw(2) << localTime->tm_hour << ":" // Hours
-              << std::setfill('0') << std::setw(2) << localTime->tm_min << ":"  // Minutes
-              << std::setfill('0') << std::setw(2) << localTime->tm_sec << std::endl; // Seconds
-}
-
 CommunicationStatus	ClientSocket::receiveRequest()
 {
 	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE];
@@ -248,7 +233,10 @@ CommunicationStatus	ClientSocket::sendResponse()
 		_responseData.response.getResponseLength() - _responseData.bytesSent,
 		0); //! Seg fault when send timeout / out of memory
 	if (sendReturn <= 0)
+	{
+		std::cerr << "COM ERRROR" << std::endl;
 		return (COM_ERROR);
+	}
 	_responseData.bytesSent += sendReturn;
 	if (_responseData.bytesSent >= static_cast<int>(fullResponse.size()))
 		return (COM_DONE);

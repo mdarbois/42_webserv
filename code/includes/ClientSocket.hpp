@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/12 21:56:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 11:23:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

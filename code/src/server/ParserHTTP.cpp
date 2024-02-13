@@ -123,6 +123,35 @@ void	trimChars(std::string& input, const std::string& charsToTrim) {
 	input = input.substr(start, end - start + 1);
 }
 
+std::string decodeChunkedBody(std::string& chunkedBody) {
+	std::stringstream result;
+	std::istringstream stream(chunkedBody);
+
+	std::string line;
+	while (std::getline(stream, line)) {
+		// Convert the chunk size to an integer
+		std::stringstream sizeStream(line);
+		size_t chunkSize;
+		sizeStream >> std::hex >> chunkSize;
+		
+		// If the chunk size is 0, it's the end of the message
+		if (chunkSize == 0) {
+			break;
+		}
+		
+		// Read the chunk data
+		std::vector<char> data(chunkSize);
+		stream.read(data.data(), chunkSize);
+		
+		// Read and discard the newline after the chunk data
+		stream.ignore(2, '\r');
+		stream.ignore(2, '\n');
+		
+		// Append the chunk data to the result
+		result.write(data.data(), chunkSize);
+	}
+	return result.str();
+}
 
 void	ParserHTTP::parseRequest()
 {
@@ -166,8 +195,9 @@ void	ParserHTTP::parseRequest()
 		_body += ch;
 	}
 	trimChars(_body, "\n\r ");
-	//check the path
-		//std::cout << "path" << _path << std::endl;
+	//Unchunk the request
+	if (_header.find("Transfer-Encoding") != _header.end() && _header["Transfer-Encoding"] == "chunked")
+		_body = decodeChunkedBody(_body);
 	if (endsWith(_path, ".php"))
 		_isCGI = true;
 	std::istringstream queryStream;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/12 21:48:18 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 15:00:46 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 //For Testing - later set up by config
 # define MAX_GET_SIZE 8192
 # define MAX_CONNECTIONS 10
-#define TIMEOUT_POLL 1000
+# define TIMEOUT_POLL 500
 
 // Enum to represent different colors
 enum LogColor {

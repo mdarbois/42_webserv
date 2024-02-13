@@ -11,7 +11,7 @@
     "args":[],
     "cwd":"${workspaceFolder}",
     "request":"launch",
-    "MIMode":"lldb"
+    "MIMode":"gdb"
     }
     ]
 }
