@@ -21,7 +21,9 @@ Config::Config(std::string path) {
 
   _parse(configurationFile);
   configurationFile.close();
-	//_print();
+	if(!_arePortsDifferent(_servers))
+		throw std::runtime_error("Config: servers can't listen to the same ports");
+_print();
 }
 
 
@@ -146,6 +148,32 @@ std::vector<ServerConfig> Config::servers(void) const
         }
     }
     return (extendedServers);
+}
+
+bool Config::_arePortsDifferent(const std::vector<ServerConfig>& servers) {
+    std::vector<unsigned int> allPorts;
+
+    // Collect all ports from all servers into a single vector
+    for (size_t i = 0; i < servers.size(); ++i) {
+        const std::vector<unsigned int>& ports = servers[i].getPorts();
+        for (size_t j = 0; j < ports.size(); ++j) {
+            allPorts.push_back(ports[j]);
+        }
+    }
+
+    // Check for duplicate ports
+    for (size_t i = 0; i < allPorts.size(); ++i) {
+        unsigned int port = allPorts[i];
+        for (size_t j = i + 1; j < allPorts.size(); ++j) {
+            if (port == allPorts[j]) {
+				//std::cout << port << std::endl;
+                return false; // Found a duplicate port
+            }
+        }
+    }
+
+    // If no duplicate ports were found, return true
+    return true;
 }
 
 /* void Config::extractServers(std::string &content)
