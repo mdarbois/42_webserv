@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:22 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/01/31 09:22:49 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 15:00:46 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,12 @@
 #include "utils.hpp"
 #include "ParserHTTP.hpp"
 #include <csignal>
+#include <ctime>
 
 //For Testing - later set up by config
 # define MAX_GET_SIZE 8192
 # define MAX_CONNECTIONS 10
-#define TIMEOUT_POLL 500
+# define TIMEOUT_POLL 500
 
 // Enum to represent different colors
 enum LogColor {
@@ -67,6 +68,8 @@ class ServerManager
 		void					_sendResponse(ClientSocket *client);
 		void					_updatePollFDArray();
 		SocketType				_getSocketTypeForPollFdIdx(int idx, int *socketIndex) const;
+		ClientSocket*			_getClientForPipeFD(int idx) const;
+		void					_updateClientPollFDs();
 
 		ServerManager();
 		ServerManager( ServerManager const & src );

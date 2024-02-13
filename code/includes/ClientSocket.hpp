@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/08 09:44:27 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 11:23:52 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ class ClientSocket: public Socket
 		bool				requestedCGI() const;
 		struct pollfd		getPipeToParentFd() const;
 		struct pollfd		getCGIToPipeFd() const;
-		void				setCGIToPipeFd(int fd);
-		void				setPipeToParentFd(int fd);
+		void				setCGIToPipeFd(int fd, short events, short revents);
+		void				setPipeToParentFd(int fd, short events, short revents);
 		CGI&				getCGI();
 		void				closeClient(HttpStatus status);
 

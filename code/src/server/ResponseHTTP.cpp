@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseHTTP.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/08 23:17:54 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 14:01:35 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		return ;
 	}
 	_path = _config.getLocationPath(_request.getPath());
-	//std::cout << _path << std::endl;
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 
 	if (_request.getHeaderMap().find("Host") == _request.getHeaderMap().end()
@@ -151,26 +150,26 @@ void	ResponseHTTP::_createErrorResponse(HttpStatus status)
 
 bool	ResponseHTTP::_readFile()
 {
-	std::ifstream	htmlFile(getFullRequestedPath().c_str());
-	if (!htmlFile.is_open())
+	std::ifstream	file(getFullRequestedPath().c_str());
+	if (!file.is_open())
 		return (false);
 
 	// Determine the size of the file
-	htmlFile.seekg(0, std::ios::end);  // Move to the end of the file
-	int fileSize = static_cast<int>(htmlFile.tellg());  // Get the current position (which is the file size)
-	htmlFile.seekg(0, std::ios::beg);  // Move back to the beginning of the file
+	file.seekg(0, std::ios::end);  // Move to the end of the file
+	int fileSize = static_cast<int>(file.tellg());  // Get the current position (which is the file size)
+	file.seekg(0, std::ios::beg);  // Move back to the beginning of the file
 
 	char* buffer = new char[fileSize];
-	if (!htmlFile.read(buffer, fileSize))
+	if (!buffer || !file.read(buffer, fileSize))
 	{
-		htmlFile.close();
+		file.close();
 		return (false);
 	}
 	_header["Content-Length"] = intToString(fileSize);
 	_bodyLength = fileSize;
 	_body = std::string(buffer, fileSize);
 	delete []buffer;
-	htmlFile.close();
+	file.close();
 	return (true);
 }
 

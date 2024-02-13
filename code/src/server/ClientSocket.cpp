@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/07 18:41:56 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 13:50:14 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	_config = config;
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
-	_pollFD.events = POLLIN; //set tot POLLIN, to listen to the request
+	_pollFD.events = 0;
+	_pollFD.events = _pollFD.events | POLLIN; //set tot POLLIN, to listen to the request
 	setUpSocket();
 	_resetRequest();
 }
@@ -157,8 +158,7 @@ CommunicationStatus	ClientSocket::receiveRequest()
 {
 	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE];
 	size_t	bytesRead;
-	
-	if ((bytesRead = recv(_pollFD.fd, &buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
+	if ((bytesRead = recv(_pollFD.fd, buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
 	{
 		std::cerr << "COM ERROR" << std::endl;
 		return (COM_ERROR);
@@ -195,8 +195,8 @@ CommunicationStatus	ClientSocket::receiveRequest()
 		{
 			_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
 			_isCGI = true;
-			setCGIToPipeFd(_cgi.output_pipe[1]);
-			setPipeToParentFd(_cgi.output_pipe[0]);
+			setCGIToPipeFd(_cgi.output_pipe[1], POLLOUT, 0);
+			setPipeToParentFd(_cgi.output_pipe[0], POLLIN, 0);
 			return (CGI_PENDING);
 		}
 		return (COM_DONE);
@@ -233,7 +233,10 @@ CommunicationStatus	ClientSocket::sendResponse()
 		_responseData.response.getResponseLength() - _responseData.bytesSent,
 		0); //! Seg fault when send timeout / out of memory
 	if (sendReturn <= 0)
+	{
+		std::cerr << "COM ERRROR" << std::endl;
 		return (COM_ERROR);
+	}
 	_responseData.bytesSent += sendReturn;
 	if (_responseData.bytesSent >= static_cast<int>(fullResponse.size()))
 		return (COM_DONE);
@@ -282,14 +285,18 @@ CGI&	ClientSocket::getCGI()
 	return (_cgi);
 }
 
-void	ClientSocket::setCGIToPipeFd(int fd)
+void	ClientSocket::setCGIToPipeFd(int fd, short events, short revents)
 {
 	_CGIToPipeFd.fd = fd;
+	_CGIToPipeFd.events = events;
+	_CGIToPipeFd.revents = revents;
 }
 
-void	ClientSocket::setPipeToParentFd(int fd)
+void	ClientSocket::setPipeToParentFd(int fd, short events, short revents)
 {
 	_pipeToParentFd.fd = fd;
+	_pipeToParentFd.events = events;
+	_pipeToParentFd.revents = revents;
 }
 
 /* ************************************************************************** */
