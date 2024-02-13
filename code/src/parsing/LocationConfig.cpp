@@ -104,6 +104,8 @@ std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size
 			throw (std::runtime_error("Location: Error, unknown keyword in location/methods"));
 	i++;
 	}
+	if (!line.empty())
+		throw (std::runtime_error("Location: Error, unknown keyword in location/methods"));
 	return methods;
 }
 
