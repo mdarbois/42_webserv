@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:18:02 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/09 15:17:25 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 09:18:16 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,20 +93,20 @@ void	ServerSocket::setUpSocket()
 
 	// Reusable Port and Socket
 	//Linux
-	/* int on = 1;
+	int on = 1;
 	if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
 	{
 		perror("setsockop()");
 		std::exit(EXIT_FAILURE);
-	} */
+	}
 
 	//MacOS
-	int on = 1;
+	/* int on = 1;
 	if ( setsockopt(_pollFD.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0 ) //fails when adding | SO_REUSEPORT on macos
 	{
 		perror("setsockop()");
 		std::exit(EXIT_FAILURE);
-	}
+	} */
 	
 	/*
 		fctnl = file control system call to set options on file descriptor.

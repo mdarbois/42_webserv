@@ -85,10 +85,10 @@ bool	CGI::timeOut() const
 void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 {
 	//MacOS
-	_php = "/usr/local/bin/php";
+	//_php = "/usr/local/bin/php";
 
 	//Linux
-	//_php = "/usr/bin/php";
+	_php = "/usr/bin/php";
 	
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
@@ -137,8 +137,6 @@ void CGI::_childProcess(int *output_pipe)
 		throw std::runtime_error("CGI error: dup2 output pipe in child process failed");
 	}
 	close(output_pipe[1]);
-	//std::cout << "args " << _argsArray << std::endl;
-	//std::cout << "env " << _envArray << std::endl;
 	if (execve(_php, _argsArray, _envArray) == -1)
 	{
 		deleteArray(_argsArray);
@@ -150,9 +148,8 @@ void CGI::_childProcess(int *output_pipe)
 }
 void CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime)
 {
-	//std::cout << "PARENT" << std::endl;
 	close(output_pipe[1]);
-	while (pidWait == 0 && time(0) - startTime <= 6)
+	while (pidWait == 0 && time(0) - startTime <= TIMEOUT_CGI)
 		pidWait = waitpid(pid, NULL, WNOHANG);
 	if (pidWait == 0) {
 		kill(1, SIGKILL);

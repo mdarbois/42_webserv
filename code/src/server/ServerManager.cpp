@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/13 00:16:59 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/13 16:18:20 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,9 @@ std::ostream &			operator<<( std::ostream & o, ServerManager const & i )
 */
 void printFileDescriptors(const struct pollfd fds[], int num_fds) {
 	for (int i = 0; i < num_fds; ++i) {
-		std::cout << "File Descriptor " << i << ": " << fds[i].fd;
+		std::cout << "File Descriptor " << i << ": " << fds[i].fd << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 /*
@@ -165,7 +166,7 @@ void	ServerManager::_sendResponse(ClientSocket *client)
 	if (responseStatus == COM_DONE)
 		_deleteClient(client, NO_ERROR);
 	else if (responseStatus == COM_ERROR)
-		_deleteClient(client, HTTP_500);
+		_deleteClient(client, NO_ERROR); //we dont want to send another response if there was already a COM_ERROR
 	else if (responseStatus == COM_IN_PROGRESS)
 		client->setPollFD(client->getFD(), POLLOUT, 0);
 	_updatePollFDArray();
@@ -282,6 +283,7 @@ void	ServerManager::run()
 			std::exit(EXIT_FAILURE);
 		}
 		_updateClientPollFDs();
+		printFileDescriptors(_pollFDs, _numberPollFDs);
 		//Check every server if a new connection has been requested
 			//POLLIN - ready to read/recv from the fd non-blocking
 			//POLLOUT - ready to write/send to the fd non-blocking
@@ -301,6 +303,7 @@ void	ServerManager::run()
 			//Must be a file descriptor of a pipe
 			else if (_getSocketTypeForPollFdIdx(i, &socketIdx) == NO_SOCKET)
 			{
+				std::cout << "MARKER" << std::endl;
 				//since the fds are suffled, get the right client FD for the current pipeFD
 				ClientSocket *client = _getClientForPipeFD(i);
 				//execute the CGI child process and write to the pipe
