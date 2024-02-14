@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/14 18:26:09 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/14 18:36:57 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,7 @@ void	ResponseHTTP::_GET()
 {
 	//Check if GET is allowed for the requested location
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "GET"))
-		return (_createErrorResponse(HTTP_403));
+		return (_createErrorResponse(HTTP_405));
 
 	//chck read rights
 	if (access(getFullRequestedPath().c_str(), R_OK) != 0)
@@ -293,7 +293,7 @@ void	ResponseHTTP::_POST()
 		
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
-		return _createErrorResponse(HTTP_403);
+		return _createErrorResponse(HTTP_405);
 
 	//we only handle cgi and upload as post
 	if (!_request.isCGI() && !_request.isUpload())
@@ -318,9 +318,9 @@ void	ResponseHTTP::_DELETE()
 	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
 		return (_createErrorResponse(HTTP_403));
 
-	//check if the location supports POST
+	//check if the location supports DELETE
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
-		return _createErrorResponse(HTTP_403);
+		return _createErrorResponse(HTTP_405);
 
 	//Check if file is requested to delete
 	if (_request.getPath()[_request.getPath().length() - 1] != '/')
