@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/13 13:50:14 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/14 18:27:38 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,10 +235,6 @@ CommunicationStatus	ClientSocket::sendResponse()
 		//Make a HTTP-Response
 		try
 		{
-			/* std::map< unsigned int, std::string>::iterator it;
-        	for (it = _config.getErrorPages().begin(); it != _config.getErrorPages().end(); ++it) {
-           	 	std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-        	} */
 			if (_isCGI)
 				_responseData.response = ResponseHTTP(_cgi, _config);
 			else
