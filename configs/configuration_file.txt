@@ -2,7 +2,7 @@ server {
 	listen 18000;
 	listen 18001;
 	#listen 18000;
-	host 127.0.0.1;
+	host 127.2.0.1;
 	root ./html;
 	error_page 404 /408.html;
 	#client_max_body_size 5;
@@ -61,14 +61,9 @@ server {
 	root ./html;
 	#client_max_body_size 10000;
 	server_name testhugo;
-	
-	location / {
-		methods GET;
-		index index.html;
-	}
 
-	location /uploads/ {
-		methods POST ;
+		location /uploads/ {
+		methods GET POST DELETE;
 		autoindex on;
 	}
 }

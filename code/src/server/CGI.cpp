@@ -8,8 +8,6 @@ CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0
 	_parsedRequest = parsedRequest;
 	_addEnv(parsedRequest);
 	_addArgs(parsedRequest, config);
-
-	
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
 	//std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
@@ -95,6 +93,7 @@ void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
 	_args.push_back(phpScript + parsing.getPath());
+	std::cout << parsing.getPath() << std::endl;
 }
 
 void CGI::_addEnv(ParserHTTP &parsing)

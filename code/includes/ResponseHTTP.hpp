@@ -66,6 +66,7 @@ class ResponseHTTP
 		void								_createErrorPageLookUp();
 		std::string							_getErrorPage(HttpStatus status);
 		void								_generateAutoIndexHTML();
+		void								_checkNames();
 };
 
 std::ostream &			operator<<( std::ostream & o, ResponseHTTP const & i );
