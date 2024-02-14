@@ -102,10 +102,13 @@ char** vectorToCharArray(const std::vector<std::string>& strVector) {
 
 void deleteArray(char** charArray)
 {
+    if (charArray)
+    {
 	for (size_t i = 0; charArray[i] != NULL; ++i) {
 			delete[] charArray[i];
 		}
 		delete[] charArray;
+    }
 
 } 
 

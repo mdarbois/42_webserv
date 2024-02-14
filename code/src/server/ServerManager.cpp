@@ -283,7 +283,7 @@ void	ServerManager::run()
 			std::exit(EXIT_FAILURE);
 		}
 		_updateClientPollFDs();
-		printFileDescriptors(_pollFDs, _numberPollFDs);
+		//printFileDescriptors(_pollFDs, _numberPollFDs);
 		//Check every server if a new connection has been requested
 			//POLLIN - ready to read/recv from the fd non-blocking
 			//POLLOUT - ready to write/send to the fd non-blocking

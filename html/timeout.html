@@ -31,6 +31,7 @@
             } else {
                 // Display the HTML response from the server in the current window
                 console.log(xhr.responseText);
+                location.reload();
                 document.open(); // Open a new document
                 document.write(xhr.responseText); // Write the HTML response to the document
                 document.close(); // Close the document

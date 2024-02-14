@@ -1,6 +1,7 @@
 <?php
 
 // Delay the server's response for 5 seconds
-sleep(31);
+while(true);
 echo "Hello from the server!";
+
 ?>

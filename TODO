@@ -1,19 +1,11 @@
-- When there is a chunked request we need a function to reassemble the body -- DONE
-- Uploading a big file just exits the progrm / SEGFAULT when GET File --DONE
+
+
 - _pollFDs now at 1000, how to apply MAX_CONNECTIONS to it?
 - When opening upload.html file pipes are created but never written, which is incorrect.
 
-- Post files with the content in the body without multipart --> Yann?
-
-- %20 to delete screenshot --> Marie
-
-- default error page?
+- default error page? -- clean configuration file MARIE
 - End the server with ctrl c? Are every socekts freed correctly --> valgrind
 
-- It is possible to create the same server twice: MARIE
-- Getting files with spaces in name does not work: MARIE
-
-- Doesnt detect wrong METHOD 'GRT' if there are more valid listed lik: methods sdfsadf GET;
 
 
 TESTING:

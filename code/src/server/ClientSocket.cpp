@@ -231,7 +231,7 @@ CommunicationStatus	ClientSocket::sendResponse()
 	int sendReturn = send(
 		_pollFD.fd, fullResponse.c_str() + _responseData.bytesSent,
 		_responseData.response.getResponseLength() - _responseData.bytesSent,
-		0); //! Seg fault when send timeout / out of memory
+		0);
 	if (sendReturn <= 0)
 	{
 		std::cerr << "COM ERRROR" << std::endl;

@@ -32,6 +32,8 @@ void	CGI::writeCGIToPipe()
 		deleteArray(_envArray);
 		throw std::runtime_error("CGI error: fork failed");
 	}
+	//deleteArray(_argsArray);
+	//deleteArray(_envArray);
 }
 
 void	CGI::readBodyFromPipe()

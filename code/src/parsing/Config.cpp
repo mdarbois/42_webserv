@@ -23,7 +23,7 @@ Config::Config(std::string path) {
   configurationFile.close();
 	if(!_arePortsDifferent(_servers))
 		throw std::runtime_error("Config: servers can't listen to the same ports");
-_print();
+//_print();
 }
 
 

@@ -71,6 +71,7 @@ ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 		_pathRoot = _config.getLocationRoot(_path, _request.getPath());
 	if (!config.getHost().empty())
 		_body = cgi.getBody();
+	setResponseLine(HTTP_200);
 }
 
 ResponseHTTP::ResponseHTTP(HttpStatus status, ServerConfig config)
