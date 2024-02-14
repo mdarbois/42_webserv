@@ -17,7 +17,9 @@
 */
 
 Socket::Socket() {}
-//Socket::Socket( const Socket & src ) {}
+Socket::Socket( const Socket & src ) {
+	this->_config = src._config;
+}
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -30,7 +32,10 @@ Socket::~Socket() {}
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-//Socket &				Socket::operator=( Socket const & rhs ) {}
+Socket &				Socket::operator=( Socket const & rhs ) {
+	this->_config = rhs._config;
+	return *this;
+}
 
 std::ostream &			operator<<( std::ostream & o, Socket const & i )
 {

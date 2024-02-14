@@ -5,7 +5,7 @@ ServerConfig::ServerConfig(){
   //std::cout << "ServerConfig default constructor called" << std::endl;
 }
 
-ServerConfig::ServerConfig(std::stringstream &serverStream, int index, std::map<std::string, LocationConfig> locations) : _port(0), _ports(), _host (""), _root(""), _serverName(""), _clientMaxBodySize(0), _ip(0), _errorPages(), _locations(locations)
+ServerConfig::ServerConfig(std::stringstream &serverStream, int index, std::map<std::string, LocationConfig> locations) : _port(0), _ports(), _host (""), _root(""), _serverName(""), _clientMaxBodySize(0), _ip(0), _locations(locations)
 {
   	//std::cout << "ServerConfig fancy constructor called" << std::endl;
   _parseServer(serverStream);
@@ -69,6 +69,10 @@ void ServerConfig::_parseServer(std::stringstream &serverStream)
         {
           line = extractString(line, line.find("error_page"), strlen("error_page"));
           _parseErrorPages(line);
+          /*   std::map< unsigned int, std::string>::iterator it;
+				for (it = getErrorPages().begin(); it != getErrorPages().end(); ++it) {
+					std::cout << "PARSE SERVER Key: " << it->first << ", Value: " << it->second << std::endl;
+				} */
         }
         else if (line.find("client_max_body_size") != std::string::npos)
              _clientMaxBodySize = extractInt(line, line.find("client_max_body_size"), strlen("client_max_body_size"));
@@ -163,11 +167,18 @@ void ServerConfig::_setDefaultLocations()
 }
 void ServerConfig::_setDefaultErrorPages()
 {
-  _errorPages[200] = "/error_pages/200.html";
-  _errorPages[404] = "/error_pages/404.html";
-  _errorPages[405] = "/error_pages/405.html";
-  _errorPages[413] = "/error_pages/413.html";
-  _errorPages[501] = "/error_pages/501.html";
+  if (_errorPages[400] == "")
+    _errorPages[400] = "/400.html";
+  if (_errorPages[403] == "")
+    _errorPages[403] = "/403.html";
+  if (_errorPages[404] == "")
+    _errorPages[404] = "/404.html";
+  if (_errorPages[408] == "")
+    _errorPages[408] = "/408.html";
+  if (_errorPages[413] == "")
+    _errorPages[413] = "/413.html";
+  if (_errorPages[500] == "")
+    _errorPages[500] = "/500.html";
 }
 
 void ServerConfig::_validation(void) const
@@ -228,14 +239,15 @@ unsigned int ServerConfig::getIp(void) const
 
 std::map<unsigned int, std::string>  ServerConfig::getErrorPages(void) const
 {
-  std::map<unsigned int, std::string>   copyErrorPages(_errorPages);
+  /* std::map<unsigned int, std::string>   copyErrorPages(_errorPages);
 
     for (std::map<unsigned int, std::string>::iterator it = copyErrorPages.begin();
             it != copyErrorPages.end(); ++it)
     {
-        it->second = _root + it->second;
+        it->second = (it->second).c_str();
     }
-    return (copyErrorPages);
+    return (copyErrorPages); */
+    return(_errorPages);
 }
 
 std::map<std::string,LocationConfig> ServerConfig::getLocations(void) const

@@ -19,10 +19,10 @@ ResponseHTTP::ResponseHTTP() {}
 
 ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 {
-	_createErrorPageLookUp();
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
+	_createErrorPageLookUp();
 	// check if there is a slash after a dot // throwing 404 but might not be the right one
   	if (isSlashAfterDot(_request.getPath()))
 	{
@@ -64,6 +64,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
+	_config = config;
 	_createErrorPageLookUp();
 	if (_path.empty())
 		_path = _config.getLocationPath(_request.getPath());
@@ -129,12 +130,13 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 */
 void	ResponseHTTP::_createErrorPageLookUp()
 {
-	_errorPageLookUp[HTTP_400] = "/400.html";
-	_errorPageLookUp[HTTP_403] = "/403.html";
-	_errorPageLookUp[HTTP_404] = "/404.html";
-	_errorPageLookUp[HTTP_408] = "/408.html";
-	_errorPageLookUp[HTTP_413] = "/413.html";
-	_errorPageLookUp[HTTP_500] = "/500.html";
+
+	_errorPageLookUp[HTTP_400] = _config.getErrorPages()[(400)];
+	_errorPageLookUp[HTTP_403] = _config.getErrorPages()[(403)];
+	_errorPageLookUp[HTTP_404] = _config.getErrorPages()[(404)];
+	_errorPageLookUp[HTTP_408] = _config.getErrorPages()[(408)];
+	_errorPageLookUp[HTTP_413] = _config.getErrorPages()[(413)];
+	_errorPageLookUp[HTTP_500] = _config.getErrorPages()[(500)];
 	
 }
 
@@ -214,7 +216,6 @@ void	ResponseHTTP::_generateAutoIndexHTML()
 	std::stringstream output;
 	DIR* dir = opendir(getFullRequestedPath().c_str());
 	if (dir == NULL) {
-		std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
 		return;
 	}
 	output << "<html><head><title>Autoindex</title></head><body><h1>Autoindex</h1><ul>";

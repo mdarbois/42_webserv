@@ -34,6 +34,10 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	
 	_type = CLIENT;
 	_config = config;
+	/* std::map< unsigned int, std::string>::iterator it;
+    for (it = _config.getErrorPages().begin(); it != _config.getErrorPages().end(); ++it) {
+        std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
+    } */
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
 	_pollFD.events = 0;
@@ -44,7 +48,15 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 
 ClientSocket::ClientSocket( const ClientSocket & src )
 {
-	(void)src;
+	this->_cgi = src._cgi;
+	this->_isCGI = src._isCGI;
+	this->_connectingServerFD = src._connectingServerFD;
+	this->_request = src._request;
+	this->_startTimeCommunication = src._startTimeCommunication;
+	this->_pipeToParentFd = src._pipeToParentFd;
+	this->_CGIToPipeFd = src._CGIToPipeFd;
+	this->_parser = src._parser;
+	this->_responseData	= src._responseData;
 }
 
 ClientSocket::ClientSocket()
@@ -71,7 +83,15 @@ ClientSocket &				ClientSocket::operator=( ClientSocket const & rhs )
 	//{
 		//this->_value = rhs.getValue();
 	//}
-	(void)rhs;
+	this->_cgi = rhs._cgi;
+	this->_isCGI = rhs._isCGI;
+	this->_connectingServerFD = rhs._connectingServerFD;
+	this->_request = rhs._request;
+	this->_startTimeCommunication = rhs._startTimeCommunication;
+	this->_pipeToParentFd = rhs._pipeToParentFd;
+	this->_CGIToPipeFd = rhs._CGIToPipeFd;
+	this->_parser = rhs._parser;
+	this->_responseData	= rhs._responseData;
 	return *this;
 }
 
@@ -104,7 +124,7 @@ void	ClientSocket::setUpSocket()
 		std::cerr << "Error accepting connection\n";
 		exit(EXIT_FAILURE);
 	}
-	std::cout << "Client socket created with FD: " << _pollFD.fd << std::endl;
+	//std::cout << "Client socket created with FD: " << _pollFD.fd << std::endl;
 }
 
 void	ClientSocket::_resetRequest()
@@ -215,6 +235,10 @@ CommunicationStatus	ClientSocket::sendResponse()
 		//Make a HTTP-Response
 		try
 		{
+			/* std::map< unsigned int, std::string>::iterator it;
+        	for (it = _config.getErrorPages().begin(); it != _config.getErrorPages().end(); ++it) {
+           	 	std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
+        	} */
 			if (_isCGI)
 				_responseData.response = ResponseHTTP(_cgi, _config);
 			else

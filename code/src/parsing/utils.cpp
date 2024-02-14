@@ -100,7 +100,7 @@ char** vectorToCharArray(const std::vector<std::string>& strVector) {
     return charArray;
 }
 
-void deleteArray(char** charArray)
+char** deleteArray(char** charArray)
 {
     if (charArray)
     {
@@ -109,7 +109,7 @@ void deleteArray(char** charArray)
 		}
 		delete[] charArray;
     }
-
+    return (NULL);
 } 
 
 std::string pairToString(const std::string& key, const std::string& value) {

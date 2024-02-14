@@ -1,1 +1,0 @@
-http://localhost:18000/cgi-bin/myscript.py?name=John&age=25

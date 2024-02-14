@@ -18,20 +18,25 @@ Config::Config(std::string path) {
   std::ifstream configurationFile(path.c_str());
   if(!configurationFile || !configurationFile.is_open())
     throw std::runtime_error("Config: Error opening configuration file");
-
   _parse(configurationFile);
+	/* std::map< unsigned int, std::string>::iterator it;
+    for (it = _servers[0].getErrorPages().begin(); it != _servers[0].getErrorPages().end(); ++it) {
+        std::cout << "CONFIG CONSTRUCTOR Key: " << it->first << ", Value: " << it->second << std::endl;
+    } */
   configurationFile.close();
 	if(!_arePortsDifferent(_servers))
 		throw std::runtime_error("Config: servers can't listen to the same ports");
 //_print();
+
 }
 
 
 Config::Config(Config const &src) {
   if(this != &src)
   {
-    *this = src;
+	_servers = src._servers;
   }
+    *this = src;
    // std::cout << "Config copy constructor called" << std::endl;
 }
 
@@ -82,6 +87,10 @@ void Config::_parse(std::ifstream &configurationFile)
 			else if (_foundServer && line.find("}") != std::string::npos)
 			{
 				ServerConfig server(serverStream, _servers.size(), locations);
+				/* std::map< unsigned int, std::string>::iterator it;
+				for (it = server.getErrorPages().begin(); it != server.getErrorPages().end(); ++it) {
+					std::cout << "SERVER Key: " << it->first << ", Value: " << it->second << std::endl;
+				} */
 				_servers.push_back(server);
 				locations.clear();
 			}

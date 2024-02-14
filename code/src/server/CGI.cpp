@@ -12,8 +12,8 @@ CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0
 	
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
-	std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
-	std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
+	//std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
+	//std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
 }
 
 void	CGI::writeCGIToPipe()
@@ -28,20 +28,20 @@ void	CGI::writeCGIToPipe()
 		_parentProcess(pid, output_pipe, 0, startTime);
 	else
 	{
-		deleteArray(_argsArray);
-		deleteArray(_envArray);
+		_argsArray = deleteArray(_argsArray);
+		_envArray = deleteArray(_envArray);
 		throw std::runtime_error("CGI error: fork failed");
 	}
-	//deleteArray(_argsArray);
-	//deleteArray(_envArray);
+	_argsArray = deleteArray(_argsArray);
+	_envArray = deleteArray(_envArray);
 }
 
 void	CGI::readBodyFromPipe()
 {
 	if (!_timeOut)
 		_body = _readOutput(output_pipe);
-	deleteArray(_argsArray);
-	deleteArray(_envArray);
+	_argsArray = deleteArray(_argsArray);
+	_envArray = deleteArray(_envArray);
 }
 
 CGI::~CGI() {}
@@ -134,15 +134,15 @@ void CGI::_childProcess(int *output_pipe)
 	close(output_pipe[0]);
 	if (dup2(output_pipe[1], 1) == -1)
 	{
-		deleteArray(_argsArray);
-		deleteArray(_envArray);
+		_argsArray = deleteArray(_argsArray);
+		_envArray = deleteArray(_envArray);
 		throw std::runtime_error("CGI error: dup2 output pipe in child process failed");
 	}
 	close(output_pipe[1]);
 	if (execve(_php, _argsArray, _envArray) == -1)
 	{
-		deleteArray(_argsArray);
-		deleteArray(_envArray);
+		_argsArray = deleteArray(_argsArray);
+		_envArray = deleteArray(_envArray);
 		throw std::runtime_error("Error: execve failed");
 	}
 	else

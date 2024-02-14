@@ -1,15 +1,15 @@
 server {
 	listen 18000;
-	#listen 18001;
+	listen 18001;
 	#listen 18000;
 	host 127.0.0.1;
 	root ./html;
-	#client_max_body_size 10000;
-	error_page: 404 /error_pages/405.html;
+	error_page 404 /408.html;
+	#client_max_body_size 5;
 	server_name coucou;
 	
 	location / {
-		methods GET;
+		methods GET POST;
 		autoindex on;
 		uploads usr/bin/php;
 	}
@@ -54,13 +54,12 @@ server {
 }
 
 server {
-	listen 18001;
 	#listen 18001;
-	#listen 18007;
-	host 127.0.0.1;
+	#listen 18001;
+	listen 18007;
+	host 127.1.0.1;
 	root ./html;
 	#client_max_body_size 10000;
-	error_page: 404 /error_pages/405.html;
 	server_name testhugo;
 	
 	location / {

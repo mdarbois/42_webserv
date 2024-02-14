@@ -27,7 +27,8 @@ ServerSocket::ServerSocket(int port, int ip, ServerConfig config)
 
 ServerSocket::ServerSocket( const ServerSocket & src )
 {
-	(void)src;
+	this->_config = src._config;
+	
 }
 
 ServerSocket::ServerSocket()
@@ -56,6 +57,7 @@ ServerSocket &				ServerSocket::operator=( ServerSocket const & rhs )
 		this->_ip = rhs._ip;
 		this->_port = rhs._port;
 		this->_type = rhs._type;
+		this->_config = rhs._config;
 	}
 	return *this;
 }

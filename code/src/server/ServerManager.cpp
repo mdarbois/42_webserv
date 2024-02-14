@@ -19,6 +19,10 @@
 ServerManager::ServerManager(Config const &config)
 {
 	_config = config;
+	/* std::map< unsigned int, std::string>::iterator itr;
+    for (itr = _config.getServers()[0].getErrorPages().begin(); itr != _config.getServers()[0].getErrorPages().end(); ++itr) {
+        std::cout << "CONSTRUCTOR MAANGER Key: " << itr->first << ", Value: " << itr->second << std::endl;
+    } */
 	_numberPollFDs = 0;
 	_numberServers = config.getServers().size();
 	std::vector<ServerConfig> serversList = config.getServers();
@@ -134,6 +138,10 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 		std::cerr << "Maximum amout of possible connections reached." << std::endl;
 		return ;
 	}
+	/* std::map< unsigned int, std::string>::iterator it;
+    for (it = _config.getServers()[0].getErrorPages().begin(); it != _config.getServers()[0].getErrorPages().end(); ++it) {
+        std::cout << "NEW CLIENT Key: " << it->first << ", Value: " << it->second << std::endl;
+    } */
 	newClient = new ClientSocket(socket->getFD(), socket->getServerConfig());
 	if ( !newClient || newClient->getFD() < 0)
 	{
@@ -184,7 +192,7 @@ void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 			close(client->getFD());
 			delete client;
 			_updatePollFDArray();
-			std::cout << "Deleted client" << std::endl;
+			//std::cout << "Deleted client" << std::endl;
 			return ;
 		}
 	}
@@ -271,7 +279,10 @@ void	ServerManager::run()
 {
 	int	pollResult;
 	int	socketIdx;
-	
+	/* std::map< unsigned int, std::string>::iterator it;
+    for (it = _config.getServers()[0].getErrorPages().begin(); it != _config.getServers()[0].getErrorPages().end(); ++it) {
+        std::cout << "MAIN LOOP Key: " << it->first << ", Value: " << it->second << std::endl;
+    } */
 	//Main server loop
 	while (42)
 	{
@@ -303,7 +314,7 @@ void	ServerManager::run()
 			//Must be a file descriptor of a pipe
 			else if (_getSocketTypeForPollFdIdx(i, &socketIdx) == NO_SOCKET)
 			{
-				std::cout << "MARKER" << std::endl;
+				//std::cout << "MARKER" << std::endl;
 				//since the fds are suffled, get the right client FD for the current pipeFD
 				ClientSocket *client = _getClientForPipeFD(i);
 				//execute the CGI child process and write to the pipe
@@ -329,7 +340,7 @@ void	ServerManager::run()
 			//Check if the client has a timeout
 			if ( _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT && dynamic_cast<ClientSocket *>(_sockets[socketIdx])->hasCommunicationTimeOut())
 			{
-				std::cerr << "Client has timed out" << std::endl;
+				//std::cerr << "Client has timed out" << std::endl;
 				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_408); // If cleients timed out, do we have to send a response to it?
 			}
 		}
