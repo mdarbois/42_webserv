@@ -69,58 +69,8 @@
   <!--   <button id="listButton">List Files</button> -->
     <ul id="fileList"></ul>
     
-	<script src="file_manager.js">
-		/*var isListDisplayed = false;
-		function listFiles() {
-			if (isListDisplayed) {
-				// If list is displayed, hide it and update the button text
-				document.getElementById("fileList").innerHTML = "";
-				document.getElementById("listButton").innerText = "List Files";
-				isListDisplayed = false;
-			} else {
-					fetch('list_files.php')
-					.then(response => response.json())
-					.then(data => {
-						const fileList = document.getElementById('fileList');
-
-						data.forEach(item => {
-							const listItem = document.createElement('li');
-							listItem.textContent = item;
-
-							const getButton = document.createElement('button');
-							getButton.textContent = 'GET';
-							getButton.addEventListener('click', () => sendGetRequest(item));
-
-							const deleteButton = document.createElement('button');
-							deleteButton.textContent = 'DELETE';
-							deleteButton.addEventListener('click', () => {
-								sendDeleteRequest(item)
-								.then(() => location.reload())
-								.catch(error => console.error('Error deleting file:', error));
-							});
-							listItem.appendChild(getButton);
-							listItem.appendChild(deleteButton);
-
-							fileList.appendChild(listItem);
-						});
-					})}}
-
-				// Make an AJAX request to fetch the file history from the server
-				var xhr = new XMLHttpRequest();
-				xhr.onreadystatechange = function () {
-					if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-						// Display the file history in the result div
-						document.getElementById("fileList").innerHTML = xhr.responseText;
-						document.getElementById("listButton").innerText = "Hide List";
-						isListDisplayed = true;
-					}
-				};
-				xhr.open("GET", "list_files.php", true);
-				xhr.send();
-			}
-		}*/
-		
-	</script>
+	<script src="file_manager.js"></script>
+   
 	<a href="./index.html">Back to Home</a>
 </body>
 </html>
