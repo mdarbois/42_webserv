@@ -73,32 +73,35 @@ std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size
 	
 	size_t	i = 0;
 	std::vector<std::string> methods;
-	while (line[i] && !line.empty())
+	while (i < line.length() && !line.empty())
 	{
 		trimSpaces(line);
 		//printf("line=%s\n", line.c_str());
-		if (line.find("GET") != std::string::npos)
+		if (line.find("GET") == 0)
 		{
 			methods.push_back("GET");
-			i = line.find("GET") + strlen("GET");
-			line = extractString(line, 0, strlen("GET"));
+			line.erase(0,3);
+			//i = line.find("GET") + strlen("GET");
+			//line = extractString(line, 0, strlen("GET"));
 			//printf("line after get=%s i=%lu\n", line.c_str(),i);
-			continue;
+			//continue;
 		}
-		else if (line.find("POST") != std::string::npos)
+		else if (line.find("POST") == 0)
 		{
 			methods.push_back("POST");
-			i = line.find("POST") + strlen("POST");
-			line = extractString(line, 0, strlen("POST"));
+			line.erase(0,4);
+			//i = line.find("POST") + strlen("POST");
+			//line = extractString(line, 0, strlen("POST"));
 			//printf("line after post=%s i=%lu\n", line.c_str(),i);
-			continue;
+			//continue;
 		}
-		else if (line.find("DELETE") != std::string::npos)
+		else if (line.find("DELETE") == 0)
 		{
 			methods.push_back("DELETE");
-			i = line.find("DELETE") + strlen("DELETE");
-			line = extractString(line, 0, strlen("DELETE"));
-			continue;
+			line.erase(0,6);
+			//i = line.find("DELETE") + strlen("DELETE");
+			//line = extractString(line, 0, strlen("DELETE"));
+			//continue;
 		}
 		else
 			throw (std::runtime_error("Location: Error, unknown keyword in location/methods"));

@@ -62,6 +62,10 @@ server {
 	#client_max_body_size 10000;
 	server_name testhugo;
 
+		location / {
+		methods POST GET;
+		autoindex off;
+	}
 		location /uploads/ {
 		methods GET POST DELETE;
 		autoindex on;
