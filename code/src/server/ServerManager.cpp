@@ -336,7 +336,7 @@ void	ServerManager::run()
 			//Check if the client has a timeout
 			if ( _getSocketTypeForPollFdIdx(i, &socketIdx) == CLIENT && dynamic_cast<ClientSocket *>(_sockets[socketIdx])->hasCommunicationTimeOut())
 			{
-				std::cerr << "Client has timed out" << std::endl;
+				//std::cerr << "Client has timed out" << std::endl;
 				_deleteClient(dynamic_cast<ClientSocket *>(_sockets[socketIdx]), HTTP_408); // If cleients timed out, do we have to send a response to it?
 			}
 		}

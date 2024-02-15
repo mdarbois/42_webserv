@@ -48,7 +48,7 @@ function uploadFile() {
 		formData.append('file', fileInput.files[0], fileInput.files[0].name.replace(/ /g, "%20"));
 		// Send the FormData object containing the file
 		xhr.send(formData);
-		console.log(fileInput.files[0]);
+		//console.log(fileInput.files[0]);
 		
 	} else {
 		 // Hide the "Uploading file..." message if no file is selected

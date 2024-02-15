@@ -99,7 +99,7 @@ void CGI::_addArgs(ParserHTTP &parsing, ServerConfig &config)
 	_args.push_back(_php);
 	std::string phpScript = config.getRoot();
 	_args.push_back(phpScript + parsing.getPath());
-	std::cout << parsing.getPath() << std::endl;
+	//std::cout << parsing.getPath() << std::endl;
 }
 
 void CGI::_addEnv(ParserHTTP &parsing)
