@@ -168,7 +168,7 @@ LocationConfig &				LocationConfig::operator=( LocationConfig const & rhs )
 		_autoindex = rhs._autoindex;
 		_uploads = rhs._uploads;
 	}
-	std::cout << "LocationConfig copy assignment operator called" << std::endl;
+	//std::cout << "LocationConfig copy assignment operator called" << std::endl;
 	return *this;
 }
 

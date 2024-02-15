@@ -26,7 +26,7 @@ class CGI {
 		std::vector<std::string>	getEnv() const;
 		std::vector<std::string>	getArgs() const;
 		bool						timeOut() const;
-		void						writeCGIToPipe();
+		int							writeCGIToPipe();
 		void						readBodyFromPipe();
 
 	private:
@@ -44,7 +44,7 @@ class CGI {
 		void						_addArgs(ParserHTTP &parsing, ServerConfig &config);
 		void						_addEnv(ParserHTTP &parsing);
 		void						_childProcess(int *output_pipe);
-		void						_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime);
+		int							_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime);
 		std::string					_readOutput(int output_pipe[2]);
 };
 

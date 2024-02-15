@@ -173,6 +173,8 @@ void ServerConfig::_setDefaultErrorPages()
     _errorPages[403] = "/403.html";
   if (_errorPages[404] == "")
     _errorPages[404] = "/404.html";
+  if (_errorPages[405] == "")
+    _errorPages[405] = "/405.html";
   if (_errorPages[408] == "")
     _errorPages[408] = "/408.html";
   if (_errorPages[413] == "")
