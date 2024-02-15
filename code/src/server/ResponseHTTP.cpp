@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/14 18:36:57 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 10:44:31 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ ResponseHTTP::ResponseHTTP() {}
 
 ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 {
-	std::cout << request << std::endl;
 	//Config needed, to check if the Method is allowed for the location
 	_config = config;
 	_request = request;
@@ -59,7 +58,6 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		_createErrorResponse(HTTP_413);
 		return;
 	}
-
 	if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
@@ -381,7 +379,7 @@ std::string ResponseHTTP::_getResponsePhrase(HttpStatus status) const
 	case 409:
 		return "Conflict";
 		break;
-	case 413:
+	case 413: 
 		return "Payload too large";
 		break;
 	case 500:

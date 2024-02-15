@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/14 18:27:38 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 15:01:32 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,25 +19,23 @@
 ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 {
 	_isCGI = false;
+	_cgiFound = true;
+	_hasInternalCGIError = false;
 	
 	_startTimeCommunication = time(0);
 	_responseData.bytesSent = 0;
 	_responseData.sendInProgress = false;
 
-	_pipeToParentFd.fd = 0;
+	_pipeToParentFd.fd = -1;
 	_pipeToParentFd.revents = 0;
 	_pipeToParentFd.events = POLLIN;
 
-	_CGIToPipeFd.fd = 0;
+	_CGIToPipeFd.fd = -1;
 	_CGIToPipeFd.revents = 0;
 	_CGIToPipeFd.events = POLLOUT;
 	
 	_type = CLIENT;
 	_config = config;
-	/* std::map< unsigned int, std::string>::iterator it;
-    for (it = _config.getErrorPages().begin(); it != _config.getErrorPages().end(); ++it) {
-        std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-    } */
 	_connectingServerFD = connectingServerFD;
 	_pollFD.revents = 0;
 	_pollFD.events = 0;
@@ -57,6 +55,8 @@ ClientSocket::ClientSocket( const ClientSocket & src )
 	this->_CGIToPipeFd = src._CGIToPipeFd;
 	this->_parser = src._parser;
 	this->_responseData	= src._responseData;
+	this->_cgiFound = src._cgiFound;
+	this->_hasInternalCGIError = src._hasInternalCGIError;
 }
 
 ClientSocket::ClientSocket()
@@ -92,6 +92,8 @@ ClientSocket &				ClientSocket::operator=( ClientSocket const & rhs )
 	this->_CGIToPipeFd = rhs._CGIToPipeFd;
 	this->_parser = rhs._parser;
 	this->_responseData	= rhs._responseData;
+	this->_cgiFound = rhs._cgiFound;
+	this->_hasInternalCGIError = rhs._hasInternalCGIError;
 	return *this;
 }
 
@@ -210,14 +212,20 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	{
 		//Parse the request string
 		_parser = ParserHTTP (_request.buffer);
-		//std::cout << "parser = " << _parser << std::endl;
 		if (_parser.isCGI())
 		{
-			_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
+			
 			_isCGI = true;
-			setCGIToPipeFd(_cgi.output_pipe[1], POLLOUT, 0);
-			setPipeToParentFd(_cgi.output_pipe[0], POLLIN, 0);
-			return (CGI_PENDING);
+			if (access((_config.getRoot() + _parser.getPath()).c_str(), F_OK) == 0)
+			{
+				_cgiFound = true;
+				_cgi = CGI(_parser, _config); //Set up the CGI with the pipes and environment
+				setCGIToPipeFd(_cgi.output_pipe[1], POLLOUT, 0);
+				setPipeToParentFd(_cgi.output_pipe[0], POLLIN, 0);
+				return (CGI_PENDING);
+			}
+			else
+				_cgiFound = false;
 		}
 		return (COM_DONE);
 	}
@@ -235,7 +243,11 @@ CommunicationStatus	ClientSocket::sendResponse()
 		//Make a HTTP-Response
 		try
 		{
-			if (_isCGI)
+			if (_isCGI && !_cgiFound)
+				_responseData.response = ResponseHTTP(HTTP_404, _config);
+			else if (_hasInternalCGIError)
+				_responseData.response = ResponseHTTP(HTTP_500, _config);
+			else if (_isCGI)
 				_responseData.response = ResponseHTTP(_cgi, _config);
 			else
 				_responseData.response = ResponseHTTP(_parser, _config);
@@ -317,6 +329,11 @@ void	ClientSocket::setPipeToParentFd(int fd, short events, short revents)
 	_pipeToParentFd.fd = fd;
 	_pipeToParentFd.events = events;
 	_pipeToParentFd.revents = revents;
+}
+
+void	ClientSocket::setCGIErrorState(bool state)
+{
+	_hasInternalCGIError = state;
 }
 
 /* ************************************************************************** */

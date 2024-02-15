@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/13 11:23:52 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 12:08:30 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ class ClientSocket: public Socket
 		struct pollfd		getPipeToParentFd() const;
 		struct pollfd		getCGIToPipeFd() const;
 		void				setCGIToPipeFd(int fd, short events, short revents);
+		void				setCGIErrorState(bool state);
 		void				setPipeToParentFd(int fd, short events, short revents);
 		CGI&				getCGI();
 		void				closeClient(HttpStatus status);
@@ -76,6 +77,8 @@ class ClientSocket: public Socket
 	private:
 		CGI					_cgi;
 		bool				_isCGI;
+		bool				_cgiFound;
+		bool				_hasInternalCGIError;
 		int					_connectingServerFD;
 		Request				_request;
 		time_t				_startTimeCommunication;
