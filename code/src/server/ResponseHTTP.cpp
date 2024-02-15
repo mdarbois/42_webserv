@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 10:44:31 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 16:11:39 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,12 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	{
 		_createErrorResponse(HTTP_405);
 		return;
+	}
+	std::cout << _request.getProtocol() << " // " << ALLOWED_HTTP_PROTOCOL << std::endl;
+	if (_request.getProtocol() != ALLOWED_HTTP_PROTOCOL)
+	{
+		_createErrorResponse(HTTP_505);
+		return ;
 	}
 
 	if (isSlashAfterDot(_request.getPath()))
@@ -173,6 +179,7 @@ void	ResponseHTTP::_createErrorPageLookUp()
 	_errorPageLookUp[HTTP_408] = _config.getErrorPages()[408];
 	_errorPageLookUp[HTTP_413] = _config.getErrorPages()[413];
 	_errorPageLookUp[HTTP_500] = _config.getErrorPages()[500];
+	_errorPageLookUp[HTTP_505] = _config.getErrorPages()[505];
 }
 
 void	ResponseHTTP::_createErrorResponse(HttpStatus status)

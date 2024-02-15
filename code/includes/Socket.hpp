@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:17:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/12 23:50:42 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 16:07:04 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,5 @@ class Socket
 		struct pollfd	_pollFD;
 		ServerConfig	_config;
 };
-
-//std::ostream &			operator<<( std::ostream & o, Socket const & i );
 
 #endif /* ********************************************************** SOCKET_H */

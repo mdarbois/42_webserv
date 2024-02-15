@@ -181,6 +181,8 @@ void ServerConfig::_setDefaultErrorPages()
     _errorPages[413] = "/413.html";
   if (_errorPages[500] == "")
     _errorPages[500] = "/500.html";
+  if (_errorPages[505] == "")
+    _errorPages[505] = "/505.html";
 }
 
 void ServerConfig::_validation(void) const
