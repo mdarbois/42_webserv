@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/13 14:01:35 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 10:44:31 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,14 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	_request = request;
 	_createErrorPageLookUp();
 	// check if there is a slash after a dot // throwing 404 but might not be the right one
-  	if (isSlashAfterDot(_request.getPath()))
+
+	if (!(_request.getMethod() == GET) && !(_request.getMethod() == POST) && !(_request.getMethod() == DELETE))
+	{
+		_createErrorResponse(HTTP_405);
+		return;
+	}
+
+	if (isSlashAfterDot(_request.getPath()))
 	{
 		_createErrorResponse(HTTP_404);
 		return ;
@@ -52,15 +59,12 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		_createErrorResponse(HTTP_413);
 		return;
 	}
-
 	if (request.getMethod() == GET)
 		_GET();
 	else if (request.getMethod() == POST)
 		_POST();
 	else if (request.getMethod() == DELETE)
 		_DELETE();
-	else
-		_createErrorResponse(HTTP_403);
 }
 
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
@@ -162,13 +166,13 @@ void ResponseHTTP::_checkNames()
 void	ResponseHTTP::_createErrorPageLookUp()
 {
 
-	_errorPageLookUp[HTTP_400] = _config.getErrorPages()[(400)];
-	_errorPageLookUp[HTTP_403] = _config.getErrorPages()[(403)];
-	_errorPageLookUp[HTTP_404] = _config.getErrorPages()[(404)];
-	_errorPageLookUp[HTTP_408] = _config.getErrorPages()[(408)];
-	_errorPageLookUp[HTTP_413] = _config.getErrorPages()[(413)];
-	_errorPageLookUp[HTTP_500] = _config.getErrorPages()[(500)];
-	
+	_errorPageLookUp[HTTP_400] = _config.getErrorPages()[400];
+	_errorPageLookUp[HTTP_403] = _config.getErrorPages()[403];
+	_errorPageLookUp[HTTP_404] = _config.getErrorPages()[404];
+	_errorPageLookUp[HTTP_405] = _config.getErrorPages()[405];
+	_errorPageLookUp[HTTP_408] = _config.getErrorPages()[408];
+	_errorPageLookUp[HTTP_413] = _config.getErrorPages()[413];
+	_errorPageLookUp[HTTP_500] = _config.getErrorPages()[500];
 }
 
 void	ResponseHTTP::_createErrorResponse(HttpStatus status)
@@ -211,23 +215,13 @@ bool ResponseHTTP::_checkRedirection()
 {
 	std::map<std::string, LocationConfig> locations(_config.getLocations());
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it)
-	if(it->first == _path && !(it->second.getRedirection().empty()))
 	{
-		std::string statusCode = (it->second).getRedirection().substr(0,3);
-		setResponseLine(static_cast<HttpStatus>(std::atoi(statusCode.c_str())));
-		std::string link = (it->second).getRedirection().erase(0,3);
-		trimSpaces(link);
-		std::string htmlContent =
-			"<html>"
-			"<head>"
-			"<title>Redirecting...</title>"
-			"</head>"
-			"<body>"
-			"<p>This page has moved. Please follow <a href=\"" + link + "\">this link</a>.</p>"
-			"</body>"
-			"</html>";
-		setBody(htmlContent);
-		return true;
+		if(it->first == _path && !(it->second.getRedirection().empty()))
+		{
+			setResponseLine(HTTP_301);
+			setHeader("Location", it->second.getRedirection().substr(4));
+			return true;
+		}
 	}
 	return false;
 }
@@ -276,7 +270,7 @@ void	ResponseHTTP::_GET()
 {
 	//Check if GET is allowed for the requested location
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "GET"))
-		return (_createErrorResponse(HTTP_403));
+		return (_createErrorResponse(HTTP_405));
 
 	//chck read rights
 	if (access(getFullRequestedPath().c_str(), R_OK) != 0)
@@ -328,7 +322,7 @@ void	ResponseHTTP::_POST()
 		
 	//check if the location supports POST
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "POST"))
-		return _createErrorResponse(HTTP_403);
+		return _createErrorResponse(HTTP_405);
 
 	//we only handle cgi and upload as post
 	if (!_request.isCGI() && !_request.isUpload())
@@ -353,9 +347,9 @@ void	ResponseHTTP::_DELETE()
 	if (access(getFullRequestedPath().c_str(), R_OK | W_OK) != 0)
 		return (_createErrorResponse(HTTP_403));
 
-	//check if the location supports POST
+	//check if the location supports DELETE
 	if (!containsValue<std::string>(_config.getLocations()[_path].getMethods(), "DELETE"))
-		return _createErrorResponse(HTTP_403);
+		return _createErrorResponse(HTTP_405);
 
 	//Check if file is requested to delete
 	if (_request.getPath()[_request.getPath().length() - 1] != '/')
@@ -416,7 +410,7 @@ std::string ResponseHTTP::_getResponsePhrase(HttpStatus status) const
 	case 409:
 		return "Conflict";
 		break;
-	case 413:
+	case 413: 
 		return "Payload too large";
 		break;
 	case 500:

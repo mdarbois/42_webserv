@@ -10,12 +10,12 @@ CGI::CGI(ParserHTTP &parsedRequest, ServerConfig &config) : _php(""), _length (0
 	_addArgs(parsedRequest, config);
 	if (pipe(output_pipe) == -1)
 		throw std::runtime_error("CGI error: output pipe failed");
-	//std::cerr << "Pipe set up write end: " << output_pipe[1] << std::endl;
-	//std::cerr << "Pipe set up read end: " << output_pipe[0] << std::endl;
 }
 
-void	CGI::writeCGIToPipe()
+int	CGI::writeCGIToPipe()
 {
+	int	parentReturn = 0;
+
 	time_t	startTime = time(0);
 	int		pid = fork();
 	_argsArray = vectorToCharArray(_args);
@@ -23,7 +23,7 @@ void	CGI::writeCGIToPipe()
 	if (pid == 0)
 		_childProcess(output_pipe);
 	else if (pid > 0)
-		_parentProcess(pid, output_pipe, 0, startTime);
+		parentReturn = _parentProcess(pid, output_pipe, 0, startTime);
 	else
 	{
 		_argsArray = deleteArray(_argsArray);
@@ -32,6 +32,12 @@ void	CGI::writeCGIToPipe()
 	}
 	_argsArray = deleteArray(_argsArray);
 	_envArray = deleteArray(_envArray);
+	if (parentReturn != 0)
+	{
+		close(output_pipe[0]);
+		close(output_pipe[1]);
+	}
+	return (parentReturn);
 }
 
 void	CGI::readBodyFromPipe()
@@ -144,21 +150,22 @@ void CGI::_childProcess(int *output_pipe)
 		_envArray = deleteArray(_envArray);
 		throw std::runtime_error("Error: execve failed");
 	}
-	else
-		close(output_pipe[1]);
 }
-void CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime)
+int	CGI::_parentProcess(int pid, int *output_pipe, pid_t pidWait, time_t startTime)
 {
+	int	status;
+
 	close(output_pipe[1]);
 	while (pidWait == 0 && time(0) - startTime <= TIMEOUT_CGI)
-		pidWait = waitpid(pid, NULL, WNOHANG);
+		pidWait = waitpid(pid, &status, WNOHANG);
 	if (pidWait == 0) {
-		kill(1, SIGKILL);
+		kill(pid, SIGKILL);
 		_timeOut = true;
 	}
 	if (pidWait == -1)	{
 		throw std::runtime_error("CGI error: waitpid failed");
 	}
+	return (WIFEXITED(status) && WEXITSTATUS(status));
 }
 
 
