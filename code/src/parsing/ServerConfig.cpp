@@ -126,7 +126,7 @@ unsigned int ServerConfig::_ipConvert(const std::string host)
 void ServerConfig::_setDefault(int index)
 {
   _setDefaultErrorPages();
-  _setDefaultLocations();
+  //_setDefaultLocations();
   if (_serverName.empty())
   {
     std::stringstream ss;
@@ -201,6 +201,8 @@ void ServerConfig::_validation(void) const
       if (duplicate != _ports.end())
         throw std::runtime_error("duplicate ports");
     }
+  if (_locations.empty())
+    throw std::runtime_error("please provide at least one location");
 }
 
 

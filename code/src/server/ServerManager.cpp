@@ -19,10 +19,6 @@
 ServerManager::ServerManager(Config const &config)
 {
 	_config = config;
-	/* std::map< unsigned int, std::string>::iterator itr;
-    for (itr = _config.getServers()[0].getErrorPages().begin(); itr != _config.getServers()[0].getErrorPages().end(); ++itr) {
-        std::cout << "CONSTRUCTOR MAANGER Key: " << itr->first << ", Value: " << itr->second << std::endl;
-    } */
 	_numberPollFDs = 0;
 	_numberServers = config.getServers().size();
 	std::vector<ServerConfig> serversList = config.getServers();
@@ -278,10 +274,6 @@ void	ServerManager::run()
 {
 	int	pollResult;
 	int	socketIdx;
-	/* std::map< unsigned int, std::string>::iterator it;
-    for (it = _config.getServers()[0].getErrorPages().begin(); it != _config.getServers()[0].getErrorPages().end(); ++it) {
-        std::cout << "MAIN LOOP Key: " << it->first << ", Value: " << it->second << std::endl;
-    } */
 	//Main server loop
 	while (42)
 	{

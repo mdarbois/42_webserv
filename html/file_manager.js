@@ -1,12 +1,15 @@
+
+
 function uploadFile() {
 	// Display the "Uploading file..." message
 	document.getElementById("message").style.display = "block";
 	// Get the file input element
 	var fileInput = document.getElementById('file');
-	
+	//console.log(fileInput.files[0].name);
 	// Check if a file is selected
 	if (fileInput.files.length > 0) {
 		// Create a new XMLHttpRequest object
+
 		var xhr = new XMLHttpRequest();
 		//xhr.setRequestHeader('Content-Type', 'undefined');
 		
@@ -14,8 +17,9 @@ function uploadFile() {
 		var host = window.location.hostname; // Get the current hostname dynamically
 		var port = window.location.port; // Get the current port dynamically
 		xhr.open('POST', 'http://' + host + ':' + port + '/uploads/', true);
-		console.log(host, port);
+		//console.log(host, port);
 		// Define a callback function to handle the response
+	
 		xhr.onload = function() {
 			// Hide the "Uploading file..." message
 			document.getElementById("message").style.display = "none";
@@ -23,13 +27,19 @@ function uploadFile() {
 				alert('File uploaded successfully!');
 				window.location.reload();
 			} else {
-				// Display the HTML response from the server in the current window
-				console.log(xhr.responseText);
+				// Display the HTML response from the server in the current window				console.log(xhr.responseText);
 				document.open(); // Open a new document
 				document.write(xhr.responseText); // Write the HTML response to the document
 				document.close(); // Close the document
 			}
 		};
+
+		// Define an error event handler to handle ERR_ACCESS_DENIED error
+		xhr.onerror = function() {
+            // Hide the "Uploading file..." message
+            document.getElementById("message").style.display = "none";
+            alert('Error: Access denied. You do not have permission to upload this file.');
+        };
 
 		// Create a FormData object
 		var formData = new FormData();
@@ -38,6 +48,8 @@ function uploadFile() {
 		formData.append('file', fileInput.files[0], fileInput.files[0].name.replace(/ /g, "%20"));
 		// Send the FormData object containing the file
 		xhr.send(formData);
+		console.log(fileInput.files[0]);
+		
 	} else {
 		 // Hide the "Uploading file..." message if no file is selected
 		 document.getElementById("message").style.display = "none";

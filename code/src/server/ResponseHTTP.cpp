@@ -38,7 +38,8 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 	}
 	_path = _config.getLocationPath(_request.getPath());
 	_pathRoot = _config.getLocationRoot(_path, _request.getPath());
-
+	_checkNames();
+	
 	if (_request.getHeaderMap().find("Host") == _request.getHeaderMap().end()
 		|| _request.getHeaderMap()["Host"].empty())
 	{
@@ -69,6 +70,7 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 ResponseHTTP::ResponseHTTP(const CGI& cgi, ServerConfig config)
 {
 	_config = config;
+	_checkNames();
 	_createErrorPageLookUp();
 	if (_path.empty())
 		_path = _config.getLocationPath(_request.getPath());
@@ -85,6 +87,7 @@ ResponseHTTP::ResponseHTTP(HttpStatus status, ServerConfig config)
 	_createErrorPageLookUp();
 	_createErrorResponse(status);
 }
+
 /* ResponseHTTP::ResponseHTTP()
 {
 } */
@@ -132,6 +135,34 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+void ResponseHTTP::_checkNames()
+{
+	int _match = 0;
+	std::vector<unsigned int> ports = _config.getPorts();
+	
+	for (std::vector<unsigned int>::iterator it = ports.begin(); it != ports.end(); ++it)
+	{
+		std::ostringstream ossHost;
+		ossHost << _config.getHost() << ":" << *it;
+		std::ostringstream ossName;
+		ossName << _config.getServerName() << ":" << *it;
+		//std::cout << ossHost.str() << std::endl;
+		//std::cout << ossName.str() << std::endl;
+		if ((_request.getHeaderMap()["Host"] == ossHost.str()) || (_request.getHeaderMap()["Host"] == ossName.str()))
+		{
+			//std::cout << "match found" << std::endl;
+			_match += 1;
+		}
+	}
+	if (!_match)
+	{
+		_createErrorResponse(HTTP_400);
+		return ;
+	}
+}
+
+
 void	ResponseHTTP::_createErrorPageLookUp()
 {
 
