@@ -135,25 +135,19 @@ ResponseHTTP &				ResponseHTTP::operator=( ResponseHTTP const & rhs )
 void ResponseHTTP::_checkNames()
 {
 	int _match = 0;
-	std::cout << _request << std::endl;
 	std::vector<unsigned int> ports = _config.getPorts();
 	
 	for (std::vector<unsigned int>::iterator it = ports.begin(); it != ports.end(); ++it)
 	{
 		std::ostringstream ossHost;
 		ossHost << _config.getHost() << ":" << *it;
-		std::ostringstream ossLocal;
-		if (_config.getHost() == "127.0.0.1")
-		{
-				ossLocal << "localhost" << ":" << *it;
-		}
 		std::ostringstream ossName;
 		ossName << _config.getServerName() << ":" << *it;
-		std::cout << ossHost.str() << std::endl;
-		std::cout << ossName.str() << std::endl;
-		if ((_request.getHeaderMap()["Host"] == ossHost.str()) || (_request.getHeaderMap()["Host"] == ossName.str()) || (_request.getHeaderMap()["Host"] == ossLocal.str()))
+		//std::cout << ossHost.str() << std::endl;
+		//std::cout << ossName.str() << std::endl;
+		if ((_request.getHeaderMap()["Host"] == ossHost.str()) || (_request.getHeaderMap()["Host"] == ossName.str()))
 		{
-			std::cout << "match found" << std::endl;
+			//std::cout << "match found" << std::endl;
 			_match += 1;
 		}
 	}
