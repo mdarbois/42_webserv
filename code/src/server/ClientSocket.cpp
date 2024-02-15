@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 15:01:32 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 16:53:17 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ CommunicationStatus	ClientSocket::receiveRequest()
 	}
 	if (bytesRead == 0)
 	{
-		std::cerr << "CONN CLOSED" << std::endl;
+		//std::cerr << "CONN CLOSED" << std::endl;
 		return (COM_CONN_CLOSED);
 	}
 	_request.readBytes += bytesRead;

@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 12:41:03 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 16:11:39 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/15 16:50:31 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ ResponseHTTP::ResponseHTTP(ParserHTTP request, ServerConfig config)
 		_createErrorResponse(HTTP_405);
 		return;
 	}
-	std::cout << _request.getProtocol() << " // " << ALLOWED_HTTP_PROTOCOL << std::endl;
 	if (_request.getProtocol() != ALLOWED_HTTP_PROTOCOL)
 	{
 		_createErrorResponse(HTTP_505);
