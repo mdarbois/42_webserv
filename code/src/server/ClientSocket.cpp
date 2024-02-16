@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 16:53:17 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/16 08:30:23 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 	_resetRequest();
 }
 
-ClientSocket::ClientSocket( const ClientSocket & src )
+ClientSocket::ClientSocket( const ClientSocket & src ): Socket()
 {
 	this->_cgi = src._cgi;
 	this->_isCGI = src._isCGI;
@@ -179,7 +179,7 @@ bool	ClientSocket::_doneReceiving()
 CommunicationStatus	ClientSocket::receiveRequest()
 {
 	char	buffer[CLIENT_RECEIVE_BUFFER_SIZE];
-	size_t	bytesRead;
+	ssize_t	bytesRead;
 	if ((bytesRead = recv(_pollFD.fd, buffer, CLIENT_RECEIVE_BUFFER_SIZE, O_NONBLOCK)) < 0)
 	{
 		std::cerr << "COM ERROR" << std::endl;
