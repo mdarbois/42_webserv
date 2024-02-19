@@ -10,7 +10,7 @@ server {
 	
 	location / {
 		methods GET POST;
-		autoindex on;
+		index index.html;
 		uploads usr/bin/php;
 	}
 
@@ -61,6 +61,12 @@ server {
 	root ./html;
 	#client_max_body_size 10000;
 	server_name testhugo;
+
+	location / {
+		methods GET POST;
+		autoindex on;
+		uploads usr/bin/php;
+	}
 
 	location /uploads/ {
 		methods GET POST DELETE;
