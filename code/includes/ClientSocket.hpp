@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:15 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 12:08:30 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/19 09:40:01 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ class ClientSocket: public Socket
 		bool				hasCommunicationTimeOut();
 		Request				getRequest() const;
 		bool				requestedCGI() const;
+		bool				cgiFound() const;
 		struct pollfd		getPipeToParentFd() const;
 		struct pollfd		getCGIToPipeFd() const;
 		void				setCGIToPipeFd(int fd, short events, short revents);

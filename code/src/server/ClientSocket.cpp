@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aehrlich <aehrlich@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:16:34 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/16 08:30:23 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/19 09:42:57 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 ClientSocket::ClientSocket(int connectingServerFD, ServerConfig config)
 {
 	_isCGI = false;
-	_cgiFound = true;
+	_cgiFound = false;
 	_hasInternalCGIError = false;
 	
 	_startTimeCommunication = time(0);
@@ -310,6 +310,11 @@ struct pollfd	ClientSocket::getPipeToParentFd() const
 struct pollfd	ClientSocket::getCGIToPipeFd() const
 {
 	return (_CGIToPipeFd);
+}
+
+bool	ClientSocket::cgiFound() const
+{
+	return (_cgiFound);
 }
 
 CGI&	ClientSocket::getCGI()

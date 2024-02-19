@@ -6,7 +6,7 @@
 /*   By: aehrlich <aehrlich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 11:37:35 by aehrlich          #+#    #+#             */
-/*   Updated: 2024/02/15 15:42:41 by aehrlich         ###   ########.fr       */
+/*   Updated: 2024/02/19 09:44:26 by aehrlich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void	ServerManager::_updateClientPollFDs()
 
 void	ServerManager::_acceptNewClient(ServerSocket *socket)
 {
-	ClientSocket	*newClient;
+	ClientSocket	*newClient = NULL;
 	if (_sockets.size() == MAX_CONNECTIONS)
 	{
 		std::cerr << "Maximum amout of possible connections reached." << std::endl;
@@ -138,7 +138,8 @@ void	ServerManager::_acceptNewClient(ServerSocket *socket)
 	if ( !newClient || newClient->getFD() < 0)
 	{
 		std::cerr << "Err creating client socket" << std::endl;
-		delete newClient;
+		if (newClient)
+			delete newClient;
 		std::exit(EXIT_FAILURE);
 	}
 	_sockets.push_back(newClient);
@@ -175,6 +176,8 @@ void	ServerManager::_sendResponse(ClientSocket *client)
 
 void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 {
+	if (!client)
+		return ;
 	if (code != NO_ERROR)
 		client->closeClient(code);
 	for (std::vector<Socket *>::iterator it = _sockets.begin() ; it != _sockets.end(); it++)
@@ -182,7 +185,7 @@ void	ServerManager::_deleteClient(ClientSocket *client, HttpStatus code)
 		if ((*it)->getFD() == client->getFD())
 		{
 			//std::cout << "Deleted client with fd " << client->getFD() << std::endl;
-			if (client->getCGI().timeOut())
+			if (client->requestedCGI() && client->cgiFound() && client->getCGI().timeOut())
 				close(client->getPipeToParentFd().fd);
 			_sockets.erase(it);
 			close(client->getFD());
