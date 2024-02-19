@@ -11,13 +11,25 @@
 /* ************************************************************************** */
 
 #include "../../includes/ServerManager.hpp"
-
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
+bool signalReceived = false;
+
+void	signalHandler(int signum)
+{
+	(void)signum;
+	std::cout << "CTRL+C was pressed. Exiting..." << std::endl;
+	signalReceived = true;
+}
 
 ServerManager::ServerManager(Config const &config)
 {
+	if (signal(SIGINT, signalHandler) == SIG_ERR)
+  	{
+    	std::cerr << "Error signal" << std::endl;
+		return;
+  	}
 	_config = config;
 	_numberPollFDs = 0;
 	_numberServers = config.getServers().size();
@@ -42,7 +54,14 @@ ServerManager::ServerManager(Config const &config)
 
 ServerManager::~ServerManager()
 {
+	for (std::vector<Socket *>::iterator it = _sockets.begin(); it != _sockets.end(); ++it) {
+		if ((*it)->getType() == SERVER)
+			close((*it)->getFD());
+		delete (*it);
+	}
+	_sockets.clear();	
 }
+
 
 
 /*
@@ -278,15 +297,12 @@ void	ServerManager::run()
 	int	pollResult;
 	int	socketIdx;
 	//Main server loop
-	while (42)
+	while (!signalReceived)
 	{
 		//Check all monitored fd with poll if an event occured
 		//shufflePollFDs(&_pollFDs[0], _numberPollFDs);
 		if ( (pollResult = poll(&_pollFDs[0], _numberPollFDs, TIMEOUT_POLL)) < 0)
-		{
-			std::cerr << "error: poll() failed";
-			std::exit(EXIT_FAILURE);
-		}
+			throw std::runtime_error("error: poll() failed");
 		_updateClientPollFDs();
 		//printFileDescriptors(_pollFDs, _numberPollFDs);
 		//Check every server if a new connection has been requested
@@ -344,9 +360,6 @@ void	ServerManager::run()
 			}
 		}
 	}
-	// Close the server socket
-	for (int i = 0; i < _numberServers; i++)
-		close(_sockets[i]->getFD());
 }
 
 /*
