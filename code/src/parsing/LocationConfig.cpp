@@ -112,29 +112,6 @@ std::vector<std::string> LocationConfig::_extractMethods(std::string &line, size
 	return methods;
 }
 
-/* std::pair<int, std::string> LocationConfig::_extractRedirection(std::string &line, size_t pos, size_t length) 
-{
-	if (pos != std::string::npos)
-		line.erase(pos, length);
-	if (line.find(";") != std::string::npos)
-  		line.erase(line.find(";"), 1);
-	std::string sCode = line.erase(0,3);
-	std::istringstream iss(line);
-	std::istringstream codess(sCode);
-    std::string str;
-    std::pair<int, std::string>  newPair;
-	int code;
-	codess >> code;
-    if (iss >> code >> str)
-    {
-        return (std::make_pair(code, str));
-    }
-    else
-    {
-    	throw (std::runtime_error("Error, incomplete key value pair"));
-    }
-} */
-
 void LocationConfig::_validate()
 {
 	if (_methods.empty())

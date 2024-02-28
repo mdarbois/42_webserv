@@ -245,14 +245,6 @@ unsigned int ServerConfig::getIp(void) const
 
 std::map<unsigned int, std::string>  ServerConfig::getErrorPages(void) const
 {
-  /* std::map<unsigned int, std::string>   copyErrorPages(_errorPages);
-
-    for (std::map<unsigned int, std::string>::iterator it = copyErrorPages.begin();
-            it != copyErrorPages.end(); ++it)
-    {
-        it->second = (it->second).c_str();
-    }
-    return (copyErrorPages); */
     return(_errorPages);
 }
 
@@ -318,14 +310,6 @@ std::string ServerConfig::getLocationRoot(std::string path, std::string requestP
         else
             return (root + pathRoot + "/");
     }
-   //check if Uri already specified a file, if not add based on "index"
-    /* if (pathRoot.empty() || pathRoot == "/")
-    {
-        fileName = _locations[path].getIndex();
-        if (fileName.empty())
-            fileName =  "/" + _index;
-    } */
-
     if (pathRoot[0] != '/')
         pathRoot = "/" + pathRoot;
     return (_root + pathRoot); // + fileName
